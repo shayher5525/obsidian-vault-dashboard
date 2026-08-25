@@ -1,0 +1,6 @@
+# 本机运行时设置（插件面板里的开关、折叠状态等），因机器而异，不入库。
+data.json
+
+# macOS / iCloud 生成的系统文件
+.DS_Store
+.icloud

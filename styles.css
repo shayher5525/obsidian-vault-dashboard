@@ -1,0 +1,1563 @@
+/*
+ * 知识库仪表盘样式
+ *
+ * 默认视觉基线：`DESIGN-generalized-apple-style.md`（Minimal Product Gallery）。
+ * 令牌在 .vdash-content 作用域内声明；Y2K 外观在文末另行覆盖。
+ *
+ * 已知偏离：热力图格与深层目录行保持数据密度，未强制扩为 44px；
+ * 键盘焦点仍以统一 2px focus ring 补足可达性。
+ */
+
+.workspace-leaf-content .view-content.vdash-content {
+  /* ------------------------------- 颜色令牌 ------------------------------- */
+  --vd-primary: #0066cc;
+  --vd-primary-hover: #005bb5;
+  --vd-primary-focus: #0071e3;
+  --vd-on-primary: #ffffff;
+
+  --vd-canvas: #ffffff;
+  --vd-canvas-muted: #f5f5f7;
+  --vd-surface-raised: #fafafc;
+
+  --vd-ink: #1d1d1f;
+  --vd-body-muted: #66666b;
+  --vd-ink-subtle: #7a7a7a;
+
+  --vd-divider-soft: #f0f0f0;
+  --vd-hairline: #e0e0e0;
+
+  /* 目录分布图的识别色：只用于数据可视化，不承担「可点击」含义 */
+  --vd-viz-purple: #7d5bd6;
+  --vd-viz-cyan: #2a90a8;
+  --vd-viz-green: #18864b;
+  --vd-viz-amber: #a15c00;
+  --vd-viz-pink: #c33d84;
+
+  /* 热力图色阶：主色到浅表面的 4 级实色梯，不靠透明度叠加 */
+  --vd-heat-0: #ececf0;
+  --vd-heat-1: #cfe2f7;
+  --vd-heat-2: #9dc4ef;
+  --vd-heat-3: #4f92db;
+  --vd-heat-4: #0066cc;
+
+  /* ------------------------------- 排版令牌 ------------------------------- */
+  --vd-font-num: "Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --vd-text-display: clamp(1.75rem, 3vw, 2.125rem); /* display-md */
+  --vd-text-tagline: 1.0625rem; /* body-strong 档，用作板块标题 */
+  --vd-text-body: 0.875rem; /* caption 档，见文件头偏离说明 */
+  --vd-text-fine: 0.75rem; /* fine-print */
+
+  /* ------------------------------- 间距令牌 ------------------------------- */
+  --vd-space-xxs: 4px;
+  --vd-space-xs: 8px;
+  --vd-space-sm: 12px;
+  --vd-space-md: 16px;
+  --vd-space-lg: 24px;
+  --vd-space-xl: 32px;
+
+  /* ------------------------------- 形状令牌 ------------------------------- */
+  --vd-radius-xs: 5px;
+  --vd-radius-sm: 8px;
+  --vd-radius-md: 12px;
+  --vd-radius-lg: 18px;
+  --vd-radius-pill: 9999px;
+
+  /* ------------------------------- 动效令牌 ------------------------------- */
+  --vd-motion-fast: 120ms;
+  --vd-motion-standard: 220ms;
+  --vd-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ------------------------------- 层次令牌 ------------------------------- */
+  --vd-elevation-subtle: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  overflow-y: auto;
+  color: var(--vd-ink);
+  font-size: var(--vd-text-body);
+  line-height: 1.45;
+}
+
+/* 铺满视图的底色层，承接规范里的 canvas-muted 章节底 */
+.workspace-leaf-content .view-content.vdash-content .vdash-stage {
+  min-height: 100%;
+  padding: clamp(16px, 3vw, 32px);
+  background-color: var(--vd-canvas-muted);
+}
+
+/* 深色主题：只换表面与文字令牌，色阶单独配深底版本 */
+.theme-dark .workspace-leaf-content .view-content.vdash-content {
+  --vd-primary: #2997ff;
+  --vd-primary-hover: #4aa8ff;
+  --vd-primary-focus: #2997ff;
+
+  --vd-canvas: #272729;
+  --vd-canvas-muted: #1c1c1e;
+  --vd-surface-raised: #2a2a2c;
+
+  --vd-ink: #ffffff;
+  --vd-body-muted: #cccccc;
+  --vd-ink-subtle: #8e8e93;
+
+  --vd-divider-soft: #333335;
+  --vd-hairline: #3a3a3c;
+
+  /* 深底上提亮识别色，保证与 surface-dark 的对比度 */
+  --vd-viz-purple: #a58cf0;
+  --vd-viz-cyan: #4fc3dc;
+  --vd-viz-green: #46c07f;
+  --vd-viz-amber: #e0a34a;
+  --vd-viz-pink: #f07ab5;
+
+  --vd-heat-0: #313134;
+  --vd-heat-1: #1b3a5c;
+  --vd-heat-2: #1f5b93;
+  --vd-heat-3: #2179cc;
+  --vd-heat-4: #2997ff;
+}
+
+.view-content.vdash-content .vdash-panel {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--vd-space-lg);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas);
+}
+
+/* 统一焦点环：规范要求 2px 以上、不被容器裁切 */
+.view-content.vdash-content :focus-visible {
+  outline: 2px solid var(--vd-primary-focus);
+  outline-offset: 2px;
+  border-radius: var(--vd-radius-xs);
+}
+
+/* -------------------------------- 顶部标签与区间 ------------------------------- */
+
+.view-content.vdash-content .vdash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vd-space-sm);
+  margin-bottom: var(--vd-space-lg);
+}
+
+.view-content.vdash-content .vdash-tabs,
+.view-content.vdash-content .vdash-range {
+  display: flex;
+  align-items: center;
+  gap: var(--vd-space-xxs);
+}
+
+.view-content.vdash-content .vdash-tab,
+.view-content.vdash-content .vdash-range-btn {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--vd-space-md);
+  border-radius: var(--vd-radius-sm);
+  color: var(--vd-body-muted);
+  font-size: var(--vd-text-body);
+  font-weight: 450;
+  cursor: pointer;
+  user-select: none;
+  .view-content.vdash-content transition: background-color var(--vd-motion-fast) var(--vd-ease),
+  .view-content.vdash-content color var(--vd-motion-fast) var(--vd-ease); }  .vdash-tab:hover,
+  .view-content.vdash-content .vdash-range-btn:hover {
+  background-color: var(--vd-divider-soft);
+  color: var(--vd-ink);
+}
+
+/* 主标签选中态用主色实底：全页唯一的高优先级行动信号 */
+.view-content.vdash-content .vdash-tab.is-active,
+.view-content.vdash-content .vdash-tab.is-active:hover {
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  font-weight: 600;
+}
+
+.view-content.vdash-content .vdash-tab.is-disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.view-content.vdash-content .vdash-tab.is-disabled:hover {
+  background-color: transparent;
+  color: var(--vd-body-muted);
+}
+
+.view-content.vdash-content .vdash-range {
+  padding: 3px;
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-pill);
+}
+
+.view-content.vdash-content .vdash-range-btn {
+  min-height: 28px;
+  padding: 0 var(--vd-space-sm);
+  border-radius: var(--vd-radius-pill);
+  font-size: var(--vd-text-fine);
+}
+
+/* 区间是次级切换，选中态用描边而非实底，避免与主标签争夺注意力 */
+.view-content.vdash-content .vdash-range-btn.is-active,
+.view-content.vdash-content .vdash-range-btn.is-active:hover {
+  background-color: var(--vd-canvas);
+  color: var(--vd-primary);
+  box-shadow: inset 0 0 0 1px var(--vd-primary);
+}
+
+/* --------------------------------- 统计卡片 --------------------------------- */
+
+.view-content.vdash-content .vdash-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--vd-space-sm);
+  margin-bottom: var(--vd-space-lg);
+}
+
+.view-content.vdash-content .vdash-card {
+  padding: var(--vd-space-md);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content .vdash-card-label {
+  margin-bottom: var(--vd-space-xxs);
+  color: var(--vd-body-muted);
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content .vdash-card-value {
+  color: var(--vd-ink);
+  font-family: var(--vd-font-num);
+  font-size: var(--vd-text-display);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------- 热力图 ---------------------------------- */
+
+.view-content.vdash-content .vdash-heatmap {
+  --vdash-cell: 26px;
+  --vdash-gap: 5px;
+  margin-bottom: var(--vd-space-md);
+  overflow-x: auto;
+}
+
+.view-content.vdash-content .vdash-heatmap.is-strip {
+  --vdash-cell: 24px;
+}
+
+/* 带状模式左对齐：格子数少时 space-between 会把日历拉散 */
+.view-content.vdash-content .vdash-heatmap.is-strip .vdash-grid {
+  justify-content: start;
+}
+
+/*
+ * 列宽固定、列间距由 space-between 撑开铺满面板：
+ * 数据变多时列数增加、间距自动收窄，超出宽度则横向滚动。
+ */
+.view-content.vdash-content .vdash-months,
+.view-content.vdash-content .vdash-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--vdash-cols), var(--vdash-cell));
+  justify-content: space-between;
+  column-gap: var(--vdash-gap);
+  row-gap: var(--vdash-gap);
+  min-width: min-content;
+}
+
+.view-content.vdash-content .vdash-months {
+  margin-bottom: var(--vd-space-xs);
+}
+
+.view-content.vdash-content .vdash-month {
+  color: var(--vd-ink-subtle);
+  font-family: var(--vd-font-num);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.view-content.vdash-content .vdash-grid {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--vdash-rows), var(--vdash-cell));
+}
+
+.view-content.vdash-content .vdash-cell {
+  width: var(--vdash-cell);
+  height: var(--vdash-cell);
+  border-radius: var(--vd-radius-xs);
+  background-color: var(--vd-heat-4);
+  cursor: pointer;
+  outline: 1px solid transparent;
+  outline-offset: 1px;
+  transition: outline-color var(--vd-motion-fast) var(--vd-ease);
+}
+
+.view-content.vdash-content .vdash-cell:hover {
+  outline-color: var(--vd-ink-subtle);
+}
+
+.view-content.vdash-content .vdash-cell.is-void {
+  background-color: transparent;
+  cursor: default;
+  outline: none;
+}
+
+/* 数据开始之前的补白格：与「无记录」同色，但不可点 */
+.view-content.vdash-content .vdash-cell.is-pad {
+  cursor: default;
+}
+
+.view-content.vdash-content .vdash-cell.is-pad:hover {
+  outline-color: transparent;
+}
+
+.view-content.vdash-content .vdash-cell.level-0 { background-color: var(--vd-heat-0); }
+.view-content.vdash-content .vdash-cell.level-1 { background-color: var(--vd-heat-1); }
+.view-content.vdash-content .vdash-cell.level-2 { background-color: var(--vd-heat-2); }
+.view-content.vdash-content .vdash-cell.level-3 { background-color: var(--vd-heat-3); }
+.view-content.vdash-content .vdash-cell.level-4 { background-color: var(--vd-heat-4); }
+
+/* --------------------------------- 目录分布页 -------------------------------- */
+
+.view-content.vdash-content .vdash-stack {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  margin-bottom: var(--vd-space-lg);
+  border-radius: var(--vd-radius-pill);
+  overflow: hidden;
+}
+
+.view-content.vdash-content .vdash-stack-seg {
+  flex-basis: 0;
+  min-width: 3px;
+  cursor: default;
+}
+
+.view-content.vdash-content .vdash-rows {
+  margin-bottom: var(--vd-space-md);
+}
+
+.view-content.vdash-content .vdash-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.5fr) minmax(80px, 1fr) 62px 60px;
+  align-items: center;
+  gap: var(--vd-space-sm);
+  min-height: 32px;
+  padding: var(--vd-space-xxs) var(--vd-space-xs);
+  border-radius: var(--vd-radius-sm);
+  font-size: var(--vd-text-body);
+}
+
+.view-content.vdash-content .vdash-row.is-openable {
+  cursor: pointer;
+}
+
+.view-content.vdash-content .vdash-row.is-openable:hover {
+  background-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content .vdash-row-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--vd-space-xxs);
+  min-width: 0;
+  color: var(--vd-ink);
+}
+
+.view-content.vdash-content .vdash-row-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-content.vdash-content .vdash-caret {
+  flex-shrink: 0;
+  width: 10px;
+  color: var(--vd-ink-subtle);
+  font-size: 9px;
+  line-height: 1;
+  transition: transform var(--vd-motion-fast) var(--vd-ease);
+}
+
+.view-content.vdash-content .vdash-caret.is-open {
+  transform: rotate(90deg);
+}
+
+.view-content.vdash-content .vdash-caret.is-leaf {
+  opacity: 0.5;
+}
+
+.view-content.vdash-content .vdash-row-added {
+  flex-shrink: 0;
+  color: var(--vd-primary);
+  font-family: var(--vd-font-num);
+  font-size: var(--vd-text-fine);
+  font-variant-numeric: tabular-nums;
+}
+
+.view-content.vdash-content .vdash-row-bar {
+  height: 8px;
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-divider-soft);
+  overflow: hidden;
+}
+
+.view-content.vdash-content .vdash-row-fill {
+  height: 100%;
+  min-width: 2px;
+  border-radius: var(--vd-radius-pill);
+}
+
+.view-content.vdash-content .vdash-row-count,
+.view-content.vdash-content .vdash-row-pct {
+  font-family: var(--vd-font-num);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.view-content.vdash-content .vdash-row-count {
+  color: var(--vd-ink);
+}
+
+.view-content.vdash-content .vdash-row-pct {
+  color: var(--vd-body-muted);
+}
+
+/* --------------------------------- 图例与脚注 -------------------------------- */
+
+.view-content.vdash-content .vdash-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--vd-space-xxs);
+  margin-top: var(--vd-space-sm);
+  color: var(--vd-ink-subtle);
+  font-size: var(--vd-text-fine);
+}
+
+/* 图例色块固定小尺寸，不跟随热力图格宽 */
+.view-content.vdash-content .vdash-legend .vdash-cell {
+  width: 12px;
+  height: 12px;
+  cursor: default;
+}
+
+.view-content.vdash-content .vdash-legend span {
+  margin: 0 3px;
+}
+
+.view-content.vdash-content .vdash-footer {
+  padding-top: var(--vd-space-sm);
+  border-top: 1px solid var(--vd-hairline);
+  color: var(--vd-body-muted);
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content .vdash-empty {
+  padding: var(--vd-space-xl) 0;
+  color: var(--vd-body-muted);
+  text-align: center;
+}
+
+/* -------------------------------- 内容工厂快捷入口 ------------------------------- */
+
+.view-content.vdash-content .vdash-factory {
+  margin-top: var(--vd-space-lg);
+  padding-top: var(--vd-space-lg);
+  border-top: 1px solid var(--vd-hairline);
+}
+
+.view-content.vdash-content .vdash-factory-title {
+  margin-bottom: var(--vd-space-sm);
+  color: var(--vd-ink);
+  font-size: var(--vd-text-tagline);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.view-content.vdash-content .vdash-factory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vd-space-xs);
+  margin-bottom: var(--vd-space-sm);
+}
+
+/* 一级标签用胶囊描边 chip，选中态填主色 */
+.view-content.vdash-content .vdash-factory-tab {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--vd-space-md);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-canvas);
+  color: var(--vd-body-muted);
+  font-size: var(--vd-text-body);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  .view-content.vdash-content transition: background-color var(--vd-motion-fast) var(--vd-ease),
+  .view-content.vdash-content border-color var(--vd-motion-fast) var(--vd-ease),
+  .view-content.vdash-content color var(--vd-motion-fast) var(--vd-ease); }  .vdash-factory-tab:hover {
+  border-color: var(--vd-ink-subtle);
+  color: var(--vd-ink);
+}
+
+.view-content.vdash-content .vdash-factory-tab.is-active,
+.view-content.vdash-content .vdash-factory-tab.is-active:hover {
+  border-color: var(--vd-primary);
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+}
+
+/* 二级标签整体降一档：无描边、小一号，靠左侧竖线归属到一级 */
+.view-content.vdash-content .vdash-factory-tabs.is-sub {
+  padding-left: var(--vd-space-sm);
+  border-left: 2px solid var(--vd-hairline);
+}
+
+.view-content.vdash-content .vdash-factory-tabs.is-sub .vdash-factory-tab {
+  min-height: 28px;
+  padding: 0 var(--vd-space-sm);
+  border-color: transparent;
+  background-color: var(--vd-canvas-muted);
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-color: var(--vd-primary);
+  background-color: var(--vd-canvas);
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content .vdash-factory-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.view-content.vdash-content .vdash-factory-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--vd-space-sm);
+  min-height: 32px;
+  padding: var(--vd-space-xs) var(--vd-space-xxs);
+  border-bottom: 1px solid var(--vd-divider-soft);
+  border-radius: var(--vd-radius-xs);
+  transition: background-color var(--vd-motion-fast) var(--vd-ease);
+}
+
+.view-content.vdash-content .vdash-factory-item:last-child {
+  border-bottom: none;
+}
+
+.view-content.vdash-content .vdash-factory-item:hover {
+  background-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content .vdash-factory-link {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--vd-primary);
+  font-size: var(--vd-text-body);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 悬停时补下划线：颜色之外再给一层可点击信号 */
+.view-content.vdash-content .vdash-factory-link:hover {
+  color: var(--vd-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.view-content.vdash-content .vdash-factory-where,
+.view-content.vdash-content .vdash-factory-date {
+  flex: none;
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content .vdash-factory-where {
+  color: var(--vd-ink-subtle);
+}
+
+.view-content.vdash-content .vdash-factory-date {
+  color: var(--vd-body-muted);
+  font-family: var(--vd-font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.view-content.vdash-content .vdash-factory-hint {
+  padding-top: var(--vd-space-sm);
+  color: var(--vd-ink-subtle);
+  font-size: var(--vd-text-fine);
+}
+
+/* ------------------------- 现代高端（Minimal Product Gallery） ------------------------- */
+
+/*
+ * 界面退后、内容先行。黑白中性色与单一蓝色交互信号构成全部视觉语法；
+ * 大区块以表面明暗而非描边分隔，工具卡仅保留 hairline，不使用装饰阴影。
+ */
+.workspace-leaf-content .view-content.vdash-content.vdash-style-modern {
+  --vd-on-dark: #ffffff;
+  --vd-muted-on-dark: #cccccc;
+  --vd-font-display: "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --vd-font-body: "SF Pro Text", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --vd-text-display: clamp(2.125rem, 4vw, 2.5rem);
+  --vd-text-tagline: 1.3125rem;
+  --vd-text-body: 1rem;
+  --vd-text-fine: 0.875rem;
+  --vd-space-md: 17px;
+  --vd-space-xxl: 48px;
+  --vd-elevation-subtle: none;
+  font-family: var(--vd-font-body);
+  line-height: 1.47;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-stage {
+  padding: clamp(16px, 3vw, 40px);
+  background-color: var(--vd-canvas);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-panel {
+  max-width: 1200px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-primary {
+  background-color: var(--vd-canvas);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  min-height: 52px;
+  margin-bottom: var(--vd-space-xl);
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(245, 245, 247, 0.82);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.theme-dark .view-content.vdash-content.vdash-style-modern .vdash-header {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(28, 28, 30, 0.82);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-tab,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn {
+  min-height: 44px;
+  border-radius: var(--vd-radius-pill);
+  font-weight: 400;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-tab:active,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn:active,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab:active {
+  transform: scale(0.95);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-range {
+  padding: 2px;
+  border-color: transparent;
+  background-color: rgba(210, 210, 215, 0.45);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn {
+  padding: 0 16px;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-active:hover {
+  background-color: var(--vd-canvas);
+  color: var(--vd-primary);
+  box-shadow: inset 0 0 0 2px var(--vd-primary-focus);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-cards {
+  gap: var(--vd-space-md);
+  margin-bottom: var(--vd-space-xl);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-card {
+  min-height: 148px;
+  padding: var(--vd-space-lg);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-surface-raised);
+  box-shadow: none;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-card-label {
+  margin-bottom: var(--vd-space-sm);
+  font-size: var(--vd-text-body);
+  line-height: 1.24;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-card-value {
+  font-family: var(--vd-font-display);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-heatmap {
+  margin: 0;
+  padding: clamp(24px, 4vw, 48px);
+  background-color: var(--vd-canvas-muted);
+  color: var(--vd-ink);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-month,
+.view-content.vdash-content.vdash-style-modern .vdash-legend {
+  color: var(--vd-ink-subtle);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-cell {
+  border-radius: var(--vd-radius-xs);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-footer {
+  margin: 0 0 var(--vd-space-xl);
+  padding: var(--vd-space-lg) clamp(24px, 4vw, 48px);
+  border: none;
+  background-color: var(--vd-canvas-muted);
+  color: var(--vd-ink-subtle);
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-stack {
+  margin-bottom: var(--vd-space-xl);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-rows {
+  margin-bottom: var(--vd-space-xl);
+  padding: var(--vd-space-sm);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-row {
+  min-height: 44px;
+  padding: var(--vd-space-xs) var(--vd-space-sm);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory {
+  margin-top: clamp(48px, 7vw, 80px);
+  padding: clamp(40px, 7vw, 80px);
+  border: none;
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-title {
+  margin-bottom: var(--vd-space-lg);
+  font-family: var(--vd-font-display);
+  font-size: var(--vd-text-tagline);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs {
+  gap: var(--vd-space-sm);
+  margin-bottom: var(--vd-space-md);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab {
+  min-height: 44px;
+  padding: 0 16px;
+  border-color: transparent;
+  background-color: var(--vd-canvas);
+  font-size: var(--vd-text-fine);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub {
+  padding: var(--vd-space-xs);
+  border: none;
+  border-radius: var(--vd-radius-md);
+  background-color: rgba(210, 210, 215, 0.32);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab {
+  min-height: 40px;
+  background-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-color: var(--vd-primary-focus);
+  background-color: rgba(0, 113, 227, 0.1);
+  color: var(--vd-primary);
+  box-shadow: inset 0 0 0 1px var(--vd-primary-focus);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-list {
+  max-height: 420px;
+  padding: var(--vd-space-sm);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-item {
+  min-height: 44px;
+  padding: var(--vd-space-sm);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-link {
+  font-size: var(--vd-text-body);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-hint {
+  padding-top: var(--vd-space-md);
+  font-size: var(--vd-text-fine);
+}
+
+/* --------------------------- Y2K 控制台（第二套） --------------------------- */
+
+/*
+ * 参考 `DESIGN.md — Y2K Console Interface Style.md`：页面是机器面板，
+ * 冷色塑料与深色控制区负责结构，橙色信号仅标识交互；硬倒角、内嵌屏、
+ * 小圆角、紧凑排布与机械按压态贯穿全部模块。
+ */
+.workspace-leaf-content .view-content.vdash-content.vdash-style-y2k {
+  --vd-primary: #ff9d00;
+  --vd-primary-hover: #ffbd3f;
+  --vd-primary-focus: #ffd44d;
+  --vd-primary-soft: #563817;
+  --vd-on-primary: #171323;
+
+  --vd-canvas: #7785c7;
+  --vd-canvas-muted: #4d5794;
+  --vd-surface-raised: #c3cdf2;
+
+  --vd-ink: #11152a;
+  --vd-body-muted: #343a65;
+  --vd-ink-subtle: #555d8c;
+
+  --vd-divider-soft: #8995c9;
+  --vd-hairline: #30366f;
+
+  --vd-y2k-shell-light: #dce5ff;
+  --vd-y2k-shell: #8795d5;
+  --vd-y2k-shell-dark: #373475;
+  --vd-y2k-control: #151a31;
+  --vd-y2k-control-raised: #22294a;
+  --vd-y2k-control-deep: #090d1d;
+  --vd-y2k-highlight: #edf2ff;
+  --vd-y2k-shadow: #272b61;
+  --vd-y2k-signal-secondary: #ffd44d;
+
+  --vd-viz-purple: #5e49a8;
+  --vd-viz-cyan: #267fa0;
+  --vd-viz-green: #2b765d;
+  --vd-viz-amber: #ff9d00;
+  --vd-viz-pink: #a54378;
+
+  --vd-heat-0: #28304e;
+  --vd-heat-1: #485c9c;
+  --vd-heat-2: #6960ad;
+  --vd-heat-3: #d07622;
+  --vd-heat-4: #ffb126;
+
+  --vd-font-pixel: "Ark Pixel 10px monospaced zh_cn", "Ark Pixel", monospace;
+  --vd-font-num: var(--vd-font-pixel);
+  --vd-radius-xs: 1px;
+  --vd-radius-sm: 2px;
+  --vd-radius-md: 3px;
+  --vd-radius-lg: 4px;
+  --vd-radius-pill: 3px;
+  --vd-motion-fast: 100ms;
+  --vd-motion-standard: 150ms;
+  --vd-ease: linear;
+  --vd-elevation-subtle: 3px 3px 0 rgba(9, 13, 29, 0.85);
+
+  font-family: var(--vd-font-pixel);
+}
+
+.theme-dark .workspace-leaf-content .view-content.vdash-content.vdash-style-y2k {
+  --vd-canvas: #6573b3;
+  --vd-canvas-muted: #353d76;
+  --vd-surface-raised: #abb7e3;
+  --vd-divider-soft: #717dad;
+  --vd-y2k-shell: #727fc0;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-stage {
+  padding: clamp(10px, 2vw, 22px);
+  background-color: var(--vd-canvas-muted);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(237, 242, 255, 0.035) 0,
+    rgba(237, 242, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-panel {
+  position: relative;
+  max-width: 1160px;
+  padding: 14px;
+  border-top: 3px solid var(--vd-y2k-highlight);
+  border-left: 3px solid #bdcaff;
+  border-right: 3px solid var(--vd-y2k-shadow);
+  border-bottom: 3px solid var(--vd-y2k-control-deep);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-y2k-shell);
+  box-shadow: var(--vd-elevation-subtle);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-panel::before,
+.view-content.vdash-content.vdash-style-y2k .vdash-panel::after {
+  position: absolute;
+  z-index: 2;
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--vd-y2k-control-deep);
+  border-radius: 50%;
+  background-color: #7d86b0;
+  box-shadow: inset 1px 1px 0 var(--vd-y2k-highlight);
+  content: "";
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-panel::before { top: 7px; left: 7px; }
+.view-content.vdash-content.vdash-style-y2k .vdash-panel::after { right: 7px; bottom: 7px; }
+
+.view-content.vdash-content.vdash-style-y2k .vdash-header {
+  min-height: 38px;
+  margin-bottom: 12px;
+  padding: 5px;
+  border-top: 2px solid var(--vd-y2k-control-deep);
+  border-left: 2px solid var(--vd-y2k-control-deep);
+  border-right: 2px solid #566294;
+  border-bottom: 2px solid #566294;
+  background-color: var(--vd-y2k-control);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-tabs,
+.view-content.vdash-content.vdash-style-y2k .vdash-range {
+  gap: 3px;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-tab,
+.view-content.vdash-content.vdash-style-y2k .vdash-range-btn {
+  min-height: 28px;
+  border-top: 2px solid #6975a9;
+  border-left: 2px solid #6975a9;
+  border-right: 2px solid var(--vd-y2k-control-deep);
+  border-bottom: 2px solid var(--vd-y2k-control-deep);
+  border-radius: var(--vd-radius-sm);
+  background-color: var(--vd-y2k-control-raised);
+  color: #e8ecff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-tab:hover,
+.view-content.vdash-content.vdash-style-y2k .vdash-range-btn:hover {
+  background-color: #303960;
+  color: var(--vd-y2k-signal-secondary);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-y2k .vdash-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-y2k .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-y2k .vdash-range-btn.is-active:hover {
+  border-top-color: #9d5c00;
+  border-left-color: #9d5c00;
+  border-right-color: #ffe083;
+  border-bottom-color: #ffe083;
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  box-shadow: inset 0 -3px 0 #da7900;
+  transform: translate(1px, 1px);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-range {
+  padding: 3px;
+  border: 1px solid #6671a3;
+  border-radius: var(--vd-radius-sm);
+  background-color: var(--vd-y2k-control-deep);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-cards {
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-card {
+  padding: 11px;
+  border-top: 2px solid var(--vd-y2k-control-deep);
+  border-left: 2px solid var(--vd-y2k-control-deep);
+  border-right: 2px solid #6a76a8;
+  border-bottom: 2px solid #6a76a8;
+  border-radius: var(--vd-radius-sm);
+  background-color: var(--vd-y2k-control);
+  box-shadow: inset 0 0 0 1px #303a62;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-card-label {
+  color: #aeb8e4;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-card-value {
+  color: var(--vd-y2k-signal-secondary);
+  font-family: var(--vd-font-pixel);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-shadow: 2px 2px 0 #58401c;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-heatmap {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-top: 2px solid var(--vd-y2k-control-deep);
+  border-left: 2px solid var(--vd-y2k-control-deep);
+  border-right: 2px solid #a7b4e4;
+  border-bottom: 2px solid #a7b4e4;
+  background-color: #343d70;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-month,
+.view-content.vdash-content.vdash-style-y2k .vdash-legend {
+  color: #d7defa;
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-cell {
+  border: 1px solid rgba(9, 13, 29, 0.65);
+  border-radius: 1px;
+  box-shadow: inset 1px 1px 0 rgba(237, 242, 255, 0.2);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-cell:hover {
+  outline: 2px solid var(--vd-y2k-signal-secondary);
+  outline-offset: 1px;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-stack {
+  height: 14px;
+  padding: 2px;
+  border: 2px inset var(--vd-y2k-shadow);
+  border-radius: 1px;
+  background-color: var(--vd-y2k-control-deep);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-rows {
+  border: 2px inset var(--vd-y2k-shadow);
+  background-color: #aeb9e1;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-row {
+  min-height: 30px;
+  border-bottom: 1px solid #6975a9;
+  border-radius: 0;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-row.is-openable:hover {
+  background-color: #c6cff0;
+  box-shadow: inset 4px 0 0 var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-row-added {
+  color: #8c4b00;
+  font-weight: 800;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-row-bar {
+  border: 1px solid #555f94;
+  border-radius: 1px;
+  background-color: #727ead;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-row-fill {
+  border-radius: 0;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-footer {
+  margin-top: 8px;
+  padding: 7px 9px;
+  border: 1px solid #515b8c;
+  background-color: var(--vd-y2k-control);
+  color: #b9c3ea;
+  font-family: var(--vd-font-pixel);
+  letter-spacing: 0.03em;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory {
+  margin-top: 24px;
+  padding: 9px;
+  border-top: 2px solid var(--vd-y2k-highlight);
+  border-left: 2px solid #bdcaff;
+  border-right: 2px solid var(--vd-y2k-shadow);
+  border-bottom: 2px solid var(--vd-y2k-control-deep);
+  background-color: #99a6d9;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-title {
+  margin: -9px -9px 8px;
+  padding: 7px 10px;
+  border-bottom: 3px solid var(--vd-primary);
+  background-color: var(--vd-y2k-control);
+  color: #f2f4ff;
+  font-family: var(--vd-font-pixel);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tabs {
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tab {
+  min-height: 28px;
+  border-top: 2px solid var(--vd-y2k-highlight);
+  border-left: 2px solid #bdcaff;
+  border-right: 2px solid #505a8f;
+  border-bottom: 2px solid #505a8f;
+  border-radius: var(--vd-radius-sm);
+  background-color: #aab6e2;
+  color: var(--vd-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tab:hover {
+  border-color: var(--vd-primary);
+  color: #6b3900;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-top-color: #9d5c00;
+  border-left-color: #9d5c00;
+  border-right-color: #ffe083;
+  border-bottom-color: #ffe083;
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  box-shadow: inset 0 -2px 0 #da7900;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tabs.is-sub {
+  padding: 5px;
+  border: 2px inset #596492;
+  background-color: #727ead;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-tabs.is-sub .vdash-factory-tab {
+  background-color: #30395f;
+  color: #dbe1fa;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-list {
+  border: 2px inset #555f94;
+  background-color: #d0d7ef;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-item {
+  min-height: 30px;
+  padding: 6px 8px;
+  border-bottom-color: #8b96bf;
+  border-radius: 0;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-item:hover {
+  background-color: #e5e9f8;
+  box-shadow: inset 4px 0 0 var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-link {
+  color: #713c00;
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-factory-link:hover {
+  color: #a45700;
+}
+
+.view-content.vdash-content.vdash-style-y2k .vdash-empty {
+  border: 2px inset #555f94;
+  background-color: #c3ccea;
+  color: #343a65;
+}
+
+/* --------------------------- Starbucks 咖啡馆 --------------------------- */
+
+/*
+ * 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/Starbucks_Inspired_Design_System.md`：
+ * 深绿主色 + 暖调米色背景 + 咖啡棕辅色，圆润有机形态、柔和阴影与舒缓过渡，
+ * 传达「温暖、天然、高级但可亲」的咖啡馆氛围；避免冷调科技感与强烈商业化视觉。
+ */
+.workspace-leaf-content .view-content.vdash-content.vdash-style-starbucks {
+  --vd-primary: #00704a;
+  --vd-primary-hover: #006241;
+  --vd-primary-focus: #00704a;
+  --vd-primary-soft: #d4e9d7;
+  --vd-on-primary: #f7f3ed;
+
+  --vd-canvas: #f7f3ed;
+  --vd-canvas-muted: #f5f1e8;
+  --vd-surface-raised: #ffffff;
+
+  --vd-ink: #1e1e1e;
+  --vd-body-muted: #6b4f3a;
+  --vd-ink-subtle: #8a7a6a;
+
+  --vd-divider-soft: #ece4d8;
+  --vd-hairline: #e2d8c8;
+
+  --vd-viz-purple: #8b5fbf;
+  --vd-viz-cyan: #3a8f8f;
+  --vd-viz-green: #a8763e;
+  --vd-viz-amber: #b8860b;
+  --vd-viz-pink: #c17a5a;
+
+  --vd-heat-0: #e6dac2;
+  --vd-heat-1: #d4e9d7;
+  --vd-heat-2: #a8d5ba;
+  --vd-heat-3: #00704a;
+  --vd-heat-4: #004d40;
+
+  --vd-font-display: Georgia, "Iowan Old Style", "Songti SC", serif;
+  --vd-font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", system-ui, sans-serif;
+  --vd-font-num: var(--vd-font-body);
+  --vd-text-display: clamp(1.875rem, 3.4vw, 2.25rem);
+  --vd-text-tagline: 1.125rem;
+  --vd-text-body: 0.9375rem;
+  --vd-text-fine: 0.8125rem;
+
+  --vd-space-md: 18px;
+  --vd-space-lg: 26px;
+  --vd-space-xl: 34px;
+
+  --vd-radius-xs: 6px;
+  --vd-radius-sm: 8px;
+  --vd-radius-md: 16px;
+  --vd-radius-lg: 24px;
+  --vd-radius-pill: 9999px;
+
+  --vd-motion-fast: 150ms;
+  --vd-motion-standard: 280ms;
+  --vd-ease: ease-in-out;
+  --vd-elevation-subtle: 0 8px 24px rgba(74, 52, 40, 0.12);
+
+  font-family: var(--vd-font-body);
+  line-height: 1.6;
+}
+
+.theme-dark .workspace-leaf-content .view-content.vdash-content.vdash-style-starbucks {
+  --vd-primary: #3fa87a;
+  --vd-primary-hover: #58c093;
+  --vd-primary-focus: #3fa87a;
+  --vd-on-primary: #0a1512;
+
+  --vd-canvas: #1d1a15;
+  --vd-canvas-muted: #171410;
+  --vd-surface-raised: #26221b;
+
+  --vd-ink: #f5f1e8;
+  --vd-body-muted: #cdb9a3;
+  --vd-ink-subtle: #9c8a76;
+
+  --vd-divider-soft: #332c22;
+  --vd-hairline: #3a3226;
+
+  --vd-heat-0: #26221b;
+  --vd-heat-1: #1f3a2e;
+  --vd-heat-2: #275a41;
+  --vd-heat-3: #2f8058;
+  --vd-heat-4: #3fa87a;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-stage {
+  padding: clamp(16px, 3vw, 34px);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-panel {
+  max-width: 1080px;
+  padding: var(--vd-space-lg);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas);
+  box-shadow: var(--vd-elevation-subtle);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-header {
+  margin-bottom: var(--vd-space-lg);
+  padding-bottom: var(--vd-space-sm);
+  border-bottom: 1px solid var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab {
+  min-height: 36px;
+  border-radius: var(--vd-radius-pill);
+  font-weight: 500;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active:hover {
+  box-shadow: 0 4px 12px rgba(0, 112, 74, 0.28);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-range {
+  padding: 3px;
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active:hover {
+  background-color: var(--vd-canvas);
+  box-shadow: 0 2px 6px rgba(74, 52, 40, 0.14);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-cards {
+  gap: var(--vd-space-md);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-card {
+  padding: var(--vd-space-lg);
+  border: none;
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-surface-raised);
+  box-shadow: 0 4px 14px rgba(74, 52, 40, 0.08);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-card-value {
+  font-family: var(--vd-font-display);
+  color: var(--vd-primary);
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-heatmap {
+  padding: var(--vd-space-lg);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-cell {
+  border-radius: var(--vd-radius-xs);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-stack {
+  height: 14px;
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-rows {
+  padding: var(--vd-space-xs);
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-row {
+  border-radius: var(--vd-radius-sm);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-row.is-openable:hover {
+  background-color: var(--vd-primary-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-row-added {
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory {
+  margin-top: var(--vd-space-xl);
+  padding-top: var(--vd-space-lg);
+  border-top: 1px solid var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-title {
+  font-family: var(--vd-font-display);
+  color: var(--vd-primary);
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-active:hover {
+  border-color: var(--vd-primary);
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  box-shadow: 0 3px 10px rgba(0, 112, 74, 0.22);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  background-color: var(--vd-primary-soft);
+  color: var(--vd-deep-green, #006241);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-list {
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-item {
+  border-radius: var(--vd-radius-sm);
+  border-bottom-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-item:hover {
+  background-color: var(--vd-primary-soft);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-link {
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-link:hover {
+  color: var(--vd-primary-hover);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-empty {
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+/* ---------------------------------- 窄屏适配 --------------------------------- */
+
+@media (max-width: 735px) {
+  .view-content.vdash-content .vdash-panel {
+    padding: var(--vd-space-md);
+  }
+
+  .view-content.vdash-content .vdash-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .view-content.vdash-content .vdash-header {
+    flex-wrap: wrap;
+  }
+
+  .view-content.vdash-content.vdash-style-modern .vdash-panel {
+    padding: 0;
+  }
+
+  .view-content.vdash-content.vdash-style-modern .vdash-factory {
+    margin-top: 48px;
+    padding: 40px 24px;
+  }
+}
+
+/* 触摸尺寸的窄屏：标签放大到 40px，接近规范建议的触摸目标 */
+@media (max-width: 419px) {
+  .view-content.vdash-content .vdash-tab,
+  .view-content.vdash-content .vdash-factory-tab {
+    min-height: 40px;
+  }
+
+  .view-content.vdash-content .vdash-factory-item {
+    min-height: 40px;
+  }
+
+  .view-content.vdash-content .vdash-row {
+    grid-template-columns: minmax(100px, 1.4fr) 56px 52px;
+  }
+
+  .view-content.vdash-content .vdash-row-bar {
+    display: none;
+  }
+
+  .view-content.vdash-content.vdash-style-modern .vdash-stage {
+    padding: 12px;
+  }
+
+  .view-content.vdash-content.vdash-style-modern .vdash-factory {
+    margin-top: 32px;
+    padding: 32px 16px;
+  }
+}
+
+/* 尊重「减少动态效果」：只留颜色变化，去掉位移与旋转过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .view-content.vdash-content *,
+  .view-content.vdash-content *::before,
+  .view-content.vdash-content *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------ 设置页：可视文件夹 ------------------------------ */
+
+/*
+ * 独立于仪表盘正文样式，走 Obsidian 原生设置页变量，不用 vdash- 令牌体系。
+ * 「板块 N」标签与两个输入框同一行、垂直居中；提示文字换行放在第二个输入框正下方左对齐，
+ * 不再占用行尾空间挤压排版。
+ */
+.vdash-setting-slot {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.vdash-setting-slot-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 3fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.vdash-setting-slot-name {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vdash-setting-input-folder,
+.vdash-setting-input-label {
+  width: 100%;
+  height: var(--input-height, 30px);
+  padding: 0 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--input-radius, 6px);
+  background-color: var(--background-modifier-form-field);
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+}
+
+.vdash-setting-slot-status-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 3fr) minmax(0, 2fr);
+  gap: 10px;
+}
+
+.vdash-setting-slot-status {
+  grid-column: 3;
+  margin-top: 4px;
+  font-size: var(--font-ui-smaller);
+  text-align: left;
+}
+
