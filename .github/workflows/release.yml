@@ -7,15 +7,30 @@ on:
 
 permissions:
   contents: write
+  # 生成 artifact attestation 需要这两项：签名用 OIDC token + 写入证明
+  id-token: write
+  attestations: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # 让用户可以用 `gh attestation verify` 验证资产确实由本仓库构建
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
+
       - name: Create release and attach plugin assets
         uses: softprops/action-gh-release@v2
         with:
+          # 从提交历史自动生成 release notes，避免空描述
+          generate_release_notes: true
           files: |
             main.js
             manifest.json

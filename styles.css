@@ -160,9 +160,13 @@
   font-weight: 450;
   cursor: pointer;
   user-select: none;
-  .view-content.vdash-content transition: background-color var(--vd-motion-fast) var(--vd-ease),
-  .view-content.vdash-content color var(--vd-motion-fast) var(--vd-ease); }  .vdash-tab:hover,
-  .view-content.vdash-content .vdash-range-btn:hover {
+  transition:
+    background-color var(--vd-motion-fast) var(--vd-ease),
+    color var(--vd-motion-fast) var(--vd-ease);
+}
+
+.view-content.vdash-content .vdash-tab:hover,
+.view-content.vdash-content .vdash-range-btn:hover {
   background-color: var(--vd-divider-soft);
   color: var(--vd-ink);
 }
@@ -503,9 +507,13 @@
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  .view-content.vdash-content transition: background-color var(--vd-motion-fast) var(--vd-ease),
-  .view-content.vdash-content border-color var(--vd-motion-fast) var(--vd-ease),
-  .view-content.vdash-content color var(--vd-motion-fast) var(--vd-ease); }  .vdash-factory-tab:hover {
+  transition:
+    background-color var(--vd-motion-fast) var(--vd-ease),
+    border-color var(--vd-motion-fast) var(--vd-ease),
+    color var(--vd-motion-fast) var(--vd-ease);
+}
+
+.view-content.vdash-content .vdash-factory-tab:hover {
   border-color: var(--vd-ink-subtle);
   color: var(--vd-ink);
 }

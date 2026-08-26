@@ -33,6 +33,18 @@
 
 ---
 
+## [0.7.1] — 2026-08-26
+
+### 修复
+
+- **修复 `styles.css` 中两处被批量正则改写损坏的规则**（`styles.css:163` 与 `:506`）。此前给选择器批量添加 `.view-content.vdash-content` 前缀时误伤了跨行的 `transition` 声明，并压塌了规则边界，导致：①社区目录 CSS Lint 报 `Unknown word transition` 错误；②`.vdash-tab` / `.vdash-range-btn` / `.vdash-factory-tab` 的过渡动画与 `:hover` 样式**一直未生效**。
+
+### 变更
+
+- 发布工作流新增 GitHub artifact attestations（`actions/attest-build-provenance`），用户可用 `gh attestation verify` 验证 `main.js` / `manifest.json` / `styles.css` 确由本仓库构建。
+- 发布工作流开启 `generate_release_notes`，避免 Release 描述为空。
+- 新增 `package-lock.json`，使构建可复现（社区目录构建验证需要 lockfile）。
+
 ## [0.7.0] — 2026-08-24
 
 ### 新增
