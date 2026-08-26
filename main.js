@@ -38,6 +38,8 @@ function isExcluded(path) {
 
 /** 周网格最少渲染周数，数据不足时向前补空周 */
 const MIN_WEEKS = 20;
+/** 周网格最多渲染周数：「全部」区间跨度过大（如笔记活跃度含离群日期）时封顶，避免渲染上万格子 */
+const MAX_WEEKS = 53;
 /** 库根笔记在目录分布里的显示名 */
 const ROOT_LABEL = "（库根）";
 
@@ -467,6 +469,8 @@ class DashboardView extends ItemView {
     this.counts = new Map();
     this.empty = false;
     this._notes = null; // 全库笔记列表缓存（create/delete/rename 时失效）
+    this._fileDates = null; // noteActivity 增量映射 path→'YYYY-MM-DD'；null 表示需全量重建
+    this._dirtyNotes = new Set(); // 防抖窗口内改动过的笔记路径，refresh 时做增量
     this.expanded = new Set(); // 目录页展开的节点路径
     this.factorySlotPath = null; // 内容工厂当前选中板块（设置里配置的文件夹路径），null = 未初始化
     this.factoryL2 = null; // 内容工厂二级标签：子目录路径，null = 全部
@@ -512,8 +516,12 @@ class DashboardView extends ItemView {
     // 数据源一改动就刷新（防抖，避免连续写入时重复渲染）
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
-        if (this.isDataPath(file.path)) this.scheduleRefresh();
-        else if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) this.scheduleRefresh();
+        if (this.isDataPath(file.path)) {
+          if (this.plugin.settings.dataSource === "noteActivity") this._dirtyNotes.add(file.path);
+          this.scheduleRefresh();
+        } else if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) {
+          this.scheduleRefresh();
+        }
       }),
     );
 
@@ -522,6 +530,7 @@ class DashboardView extends ItemView {
       this.registerEvent(
         this.app.vault.on(evt, (file) => {
           this._notes = null;
+          if (this.plugin.settings.dataSource === "noteActivity") this._fileDates = null;
           if (this.isDataPath(file.path)) this.scheduleRefresh();
           else if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) this.scheduleRefresh();
         }),
@@ -540,12 +549,68 @@ class DashboardView extends ItemView {
   }
 
   async refresh() {
-    const provider = this.plugin.getProvider();
-    const notes = this.plugin.settings.dataSource === "noteActivity" ? this.vaultNotes() : [];
-    this.counts = await provider.getDailyCounts(this.app, notes);
+    if (this.plugin.settings.dataSource === "noteActivity") {
+      if (this._fileDates === null) {
+        await this.recomputeNoteActivity();
+        this._dirtyNotes.clear();
+      } else {
+        // 增量更新防抖窗口内改动过的笔记，其余沿用缓存，避免整库重扫
+        const dirty = [...this._dirtyNotes];
+        this._dirtyNotes.clear();
+        for (const path of dirty) {
+          const file = this.app.vault.getAbstractFileByPath(path);
+          if (file instanceof TFile && file.extension === "md" && !isExcluded(file.path)) {
+            this.applyNoteDelta(file);
+          }
+        }
+      }
+    } else {
+      const provider = this.plugin.getProvider();
+      this.counts = await provider.getDailyCounts(this.app);
+    }
     // 文件存在但一条日期都没有（如只剩总纲）同样算无数据
     this.empty = this.counts.size === 0;
     this.render();
+  }
+
+  /** noteActivity 全量重建：provider 出 counts，再补建 path→day 映射供后续增量更新。 */
+  async recomputeNoteActivity() {
+    const provider = this.plugin.getProvider();
+    const notes = this.vaultNotes();
+    this.counts = await provider.getDailyCounts(this.app, notes);
+    const fileDates = new Map();
+    for (const file of notes) {
+      const cache = this.app.metadataCache.getFileCache(file);
+      const day = noteActivityDay(file, cache, this.plugin.settings);
+      if (day) fileDates.set(file.path, day);
+    }
+    this._fileDates = fileDates;
+  }
+
+  /** noteActivity 单篇增量：重算该笔记活跃日，增减 counts 与映射。 */
+  applyNoteDelta(file) {
+    const prev = this._fileDates.get(file.path);
+    const cache = this.app.metadataCache.getFileCache(file);
+    const next = noteActivityDay(file, cache, this.plugin.settings);
+    if (prev === next) return;
+    if (prev) {
+      const v = (this.counts.get(prev) || 0) - 1;
+      if (v > 0) this.counts.set(prev, v);
+      else this.counts.delete(prev);
+    }
+    if (next) {
+      this.counts.set(next, (this.counts.get(next) || 0) + 1);
+      this._fileDates.set(file.path, next);
+    } else {
+      this._fileDates.delete(file.path);
+    }
+  }
+
+  /** 让计数缓存失效并重算（数据源或判定规则变更时用）。 */
+  invalidate() {
+    this._fileDates = null;
+    this._dirtyNotes.clear();
+    this.refresh();
   }
 
   emptyMessage() {
@@ -563,10 +628,12 @@ class DashboardView extends ItemView {
 
     if (preset.days) return { start: addDays(today, -(preset.days - 1)), end: today };
 
-    // 全部：从最早有记录的一天起
+    // 全部：从最早有记录的一天起；封顶 MAX_WEEKS 周，避免异常跨度（如笔记活跃度含离群日期）拖垮热力图渲染
     const dates = [...this.counts.keys()].sort();
     const start = dates.length ? parseYmd(dates[0]) : addDays(today, -29);
-    return { start: start > today ? today : start, end: today };
+    const floor = addDays(today, -(MAX_WEEKS * 7 - 1));
+    const clamped = start < floor ? floor : start;
+    return { start: clamped > today ? today : clamped, end: today };
   }
 
   /**
@@ -1131,7 +1198,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
         dropdown.onChange(async (value) => {
           this.plugin.settings.dataSource = value;
           await this.plugin.saveSettings();
-          this.plugin.refreshViews();
+          this.plugin.reloadViews();
           this.display();
         });
       });
@@ -1147,7 +1214,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
             .onChange(async (value) => {
               this.plugin.settings.activityDateField = value.trim() || "updated";
               await this.plugin.saveSettings();
-              this.plugin.refreshViews();
+              this.plugin.reloadViews();
             });
         });
       new Setting(containerEl)
@@ -1157,7 +1224,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
           toggle.setValue(this.plugin.settings.useMtime).onChange(async (value) => {
             this.plugin.settings.useMtime = value;
             await this.plugin.saveSettings();
-            this.plugin.refreshViews();
+            this.plugin.reloadViews();
           });
         });
     }
@@ -1173,7 +1240,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
               .map((p) => p.trim())
               .filter(Boolean);
             await this.plugin.saveSettings();
-            this.plugin.refreshViews();
+            this.plugin.reloadViews();
           });
         });
     }
@@ -1315,6 +1382,13 @@ module.exports = class VaultDashboardPlugin extends Plugin {
   refreshViews() {
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
       if (leaf.view instanceof DashboardView) leaf.view.render();
+    }
+  }
+
+  /** 让所有打开的视图失效计数缓存并重算（数据源、活跃日期字段、mtime 开关、迭代日志路径变更时用）。 */
+  reloadViews() {
+    for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
+      if (leaf.view instanceof DashboardView) leaf.view.invalidate();
     }
   }
 
