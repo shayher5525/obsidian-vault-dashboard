@@ -1,9 +1,9 @@
 /*
- * 知识库仪表盘 · 第一期：热力图总览
+ * 知识库仪表盘 · 活跃度总览
  *
- * 数据源：库根 `迭代日志.md`
- *   `## YYYY-MM-DD` 小节 = 一天；小节下的顶层无序列表项 = 一条迭代记录。
- *   `### 分类` 等下级标题不打断当天归属（二期按分类下钻时会用到）。
+ * 数据源抽象：provider 接口 `getDailyCounts(app, notes) → Map<'YYYY-MM-DD', number>`。
+ *   默认「笔记活跃度」（每篇笔记按 frontmatter 日期 → 文件名日期 → mtime 逐级取活跃日）；
+ *   「迭代日志」解析（`## YYYY-MM-DD` 小节 + 顶层列表项）保留为可选模式，本库继续用。
  *
  * 无构建步骤：本文件即插件产物，改完在 Obsidian 里禁用/启用插件即可生效。
  */
@@ -19,10 +19,23 @@ const {
   setTooltip,
 } = require("obsidian");
 
-const VIEW_TYPE = "vault-dashboard-view";
+const VIEW_TYPE = "vault-dashboard-x-view";
+/**
+ * 迭代日志数据源：可以是单个文件，也可以是装着月度日志的文件夹。
+ * 2026-08-25 起日志按月拆分，库根 `迭代日志.md` 只剩总纲，日期小节全在月度目录里。
+ * 仅作为 changelog 模式的默认路径；笔记活跃度模式不看这两个常量。
+ */
 const LOG_PATH = "迭代日志.md";
+const LOG_FOLDER = "A_CultureOps-Codex-Daily/12_Automation 自动化脚本/12-03_ChangeLog 迭代日志";
+const DEFAULT_CHANGELOG_PATHS = [LOG_PATH, LOG_FOLDER];
+
 /** 体检排除边界：废纸篓不计入任何统计（见 CLAUDE.md L4.2） */
 const EXCLUDED_PREFIXES = ["ZZ_Trash 废纸篓/"];
+
+function isExcluded(path) {
+  return EXCLUDED_PREFIXES.some((prefix) => path.startsWith(prefix));
+}
+
 /** 周网格最少渲染周数，数据不足时向前补空周 */
 const MIN_WEEKS = 20;
 /** 库根笔记在目录分布里的显示名 */
@@ -44,9 +57,20 @@ const FACTORY_RECENT_LIMIT = 20;
 const SETTINGS_LOCALES = ["zh-Hans", "zh-Hant", "en"];
 const DEFAULT_LOCALE = "zh-Hans";
 
+/** 数据源取值：笔记活跃度（通用默认）/ 迭代日志（本库原行为） */
+const DATA_SOURCES = ["noteActivity", "changelog"];
+
 const DEFAULT_SETTINGS = {
   appearance: "modern",
   settingsLocale: DEFAULT_LOCALE,
+  /** 活跃度数据来源：noteActivity（笔记活跃度，通用默认）| changelog（迭代日志） */
+  dataSource: "noteActivity",
+  /** 笔记活跃度：优先取的 frontmatter 字段（取不到再回退 created/date → 文件名 → mtime） */
+  activityDateField: "updated",
+  /** 笔记活跃度：是否允许用 mtime 兜底。同步盘会批量刷新 mtime，默认关闭避免假柱。 */
+  useMtime: false,
+  /** 迭代日志模式：一条为文件、一条为文件夹（取其下所有 .md，不递归） */
+  changelogPaths: DEFAULT_CHANGELOG_PATHS.slice(),
   /**
    * 可视文件夹最多 5 个自定义板块（标签）：每项 { folder, label }。
    * folder 留空 = 该板块不显示；label 留空则用文件夹名自动去编号前缀。
@@ -73,6 +97,20 @@ const I18N = {
     localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "外观风格",
     appearanceDesc: "选择仪表盘的视觉风格。更改后会立即应用到已打开的仪表盘。",
+    dataSourceTitle: "数据源",
+    dataSourceName: "活跃度数据来源",
+    dataSourceDesc:
+      "决定热力图按什么统计。「笔记活跃度」在任意库都能用；「迭代日志」按 changelog 文件解析（本库原有行为）。",
+    dataSourceNoteActivity: "笔记活跃度",
+    dataSourceChangelog: "迭代日志",
+    activityDateFieldName: "活跃日期字段",
+    activityDateFieldDesc:
+      "优先取笔记 frontmatter 的这个字段作为活跃日期；取不到再依次回退 created / date → 文件名日期 → 文件修改时间。",
+    useMtimeName: "用文件修改时间兜底",
+    useMtimeDesc:
+      "关闭时不用 mtime，避免同步盘（iCloud 等）批量刷新 mtime 造成「某天改几千篇」的假柱。默认关闭。",
+    changelogPathsName: "迭代日志路径",
+    changelogPathsDesc: "每行一个文件或文件夹路径；文件夹取其下所有 .md（不递归）。",
     factoryTitle: "可视文件夹",
     factoryDesc:
       "最多可配置 5 个板块。每个板块指定一个文件夹，仪表盘按该文件夹的子目录出二级标签、按修改时间列出笔记。" +
@@ -91,6 +129,20 @@ const I18N = {
     localeName: { "zh-Hans": "簡體中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "外觀風格",
     appearanceDesc: "選擇儀表盤的視覺風格。更改後會立即應用到已打開的儀表盤。",
+    dataSourceTitle: "數據源",
+    dataSourceName: "活躍度資料來源",
+    dataSourceDesc:
+      "決定熱力圖按什麼統計。「筆記活躍度」在任意庫都能用；「迭代日誌」按 changelog 檔案解析（本庫原有行為）。",
+    dataSourceNoteActivity: "筆記活躍度",
+    dataSourceChangelog: "迭代日誌",
+    activityDateFieldName: "活躍日期欄位",
+    activityDateFieldDesc:
+      "優先取筆記 frontmatter 的這個欄位作為活躍日期；取不到再依次回退 created / date → 檔名日期 → 檔案修改時間。",
+    useMtimeName: "用檔案修改時間兜底",
+    useMtimeDesc:
+      "關閉時不用 mtime，避免同步盤（iCloud 等）批量刷新 mtime 造成「某天改幾千篇」的假柱。預設關閉。",
+    changelogPathsName: "迭代日誌路徑",
+    changelogPathsDesc: "每行一個檔案或資料夾路徑；資料夾取其下所有 .md（不遞迴）。",
     factoryTitle: "可視文件夾",
     factoryDesc:
       "最多可配置 5 個板塊。每個板塊指定一個文件夾，儀表盤按該文件夾的子目錄出二級標籤、按修改時間列出筆記。" +
@@ -103,12 +155,26 @@ const I18N = {
     statusNotFound: "⚠ 庫內未找到該路徑，請檢查大小寫與完整層級",
   },
   en: {
-    settingsTitle: "Vault Dashboard Settings",
+    settingsTitle: "Vault Dashboard X Settings",
     settingsLanguage: "Settings Language",
     settingsLanguageDesc: "Only affects the text on this settings page; dashboard content is unaffected.",
     localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "Appearance",
     appearanceDesc: "Choose the dashboard's visual style. Applies immediately to any open dashboard.",
+    dataSourceTitle: "Data source",
+    dataSourceName: "Activity data source",
+    dataSourceDesc:
+      "What the heatmap counts. \"Note activity\" works in any vault; \"Changelog\" parses changelog files (this vault's original behavior).",
+    dataSourceNoteActivity: "Note activity",
+    dataSourceChangelog: "Changelog",
+    activityDateFieldName: "Activity date field",
+    activityDateFieldDesc:
+      "Prefer this frontmatter field as the activity date; then fall back to created/date → filename date → file modified time.",
+    useMtimeName: "Fall back to file modified time",
+    useMtimeDesc:
+      "When off, mtime is not used, avoiding false spikes when a sync drive (iCloud, etc.) bulk-refreshes mtimes. Off by default.",
+    changelogPathsName: "Changelog paths",
+    changelogPathsDesc: "One file or folder per line; a folder takes all .md inside (non-recursive).",
     factoryTitle: "Visual Folders",
     factoryDesc:
       "Configure up to 5 blocks. Each block points to a folder; the dashboard shows its subfolders as " +
@@ -162,6 +228,18 @@ function parseYmd(text) {
   return new Date(y, m - 1, d);
 }
 
+/**
+ * 把 frontmatter 里可能出现的各种日期值规整成 'YYYY-MM-DD'。
+ * 覆盖 'YYYY-MM-DD' 字符串、ISO 时间字符串、Date 对象、数字时间戳。
+ */
+function ymdFromValue(value) {
+  if (value == null) return null;
+  if (value instanceof Date) return isNaN(value.getTime()) ? null : ymd(value);
+  if (typeof value === "number") return ymd(new Date(value));
+  const match = String(value).match(/\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : null;
+}
+
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
@@ -191,6 +269,12 @@ function percent(value, total) {
 
 /* --------------------------------- 迭代日志解析 -------------------------------- */
 
+/** 多个数据源合并到一张表：同一天的条目数相加 */
+function mergeCounts(target, source) {
+  for (const [day, count] of source) target.set(day, (target.get(day) || 0) + count);
+  return target;
+}
+
 /**
  * 解析迭代日志，返回 Map<'YYYY-MM-DD', 条目数>。
  * 只数顶层列表项：一条迭代 = 一句话，与库内写法一致。
@@ -218,6 +302,75 @@ function parseIterationLog(text) {
     }
   }
   return counts;
+}
+
+/* --------------------------------- 数据源 provider -------------------------------- */
+
+/**
+ * 单个笔记文件追溯出的「活跃日期」。
+ * 回退链：frontmatter[activityDateField] → frontmatter.created → frontmatter.date
+ *        → 文件名里的 YYYY-MM-DD → file.stat.mtime（仅当 settings.useMtime 开启）。
+ * 全部取不到返回 null，该笔记不参与统计。
+ */
+function noteActivityDay(file, metadata, settings) {
+  const fm = metadata?.frontmatter;
+  if (fm) {
+    const primary = ymdFromValue(fm[settings.activityDateField]);
+    if (primary) return primary;
+    const created = ymdFromValue(fm.created);
+    if (created) return created;
+    const dated = ymdFromValue(fm.date);
+    if (dated) return dated;
+  }
+  const inName = file.basename.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (inName) return inName[1];
+  if (settings.useMtime) return ymd(new Date(file.stat.mtime));
+  return null;
+}
+
+/** 笔记活跃度数据源：每篇笔记取一个活跃日期，按天计数（通用，任何库都能用）。 */
+class NoteActivityProvider {
+  constructor(settings) {
+    this.settings = settings;
+  }
+  async getDailyCounts(app, notes) {
+    const counts = new Map();
+    for (const file of notes) {
+      const cache = app.metadataCache.getFileCache(file);
+      const day = noteActivityDay(file, cache, this.settings);
+      if (day) counts.set(day, (counts.get(day) || 0) + 1);
+    }
+    return counts;
+  }
+}
+
+/** 迭代日志数据源：解析 `## YYYY-MM-DD` 小节 + 顶层列表项（本库原有行为，保留为可选）。 */
+class ChangelogProvider {
+  constructor(settings) {
+    this.settings = settings;
+  }
+  /** 收集全部日志文件：源是文件直接取，是文件夹就取其下所有 .md（不递归）。 */
+  files(app) {
+    const out = [];
+    for (const source of this.settings.changelogPaths) {
+      const entry = app.vault.getAbstractFileByPath(source);
+      if (entry instanceof TFile) {
+        if (entry.extension === "md") out.push(entry);
+      } else if (entry instanceof TFolder) {
+        for (const child of entry.children) {
+          if (child instanceof TFile && child.extension === "md") out.push(child);
+        }
+      }
+    }
+    return out;
+  }
+  async getDailyCounts(app) {
+    const counts = new Map();
+    for (const file of this.files(app)) {
+      mergeCounts(counts, parseIterationLog(await app.vault.cachedRead(file)));
+    }
+    return counts;
+  }
 }
 
 /* ---------------------------------- 统计计算 --------------------------------- */
@@ -312,7 +465,8 @@ class DashboardView extends ItemView {
     this.tab = "overview";
     this.range = "all";
     this.counts = new Map();
-    this.logMissing = false;
+    this.empty = false;
+    this._notes = null; // 全库笔记列表缓存（create/delete/rename 时失效）
     this.expanded = new Set(); // 目录页展开的节点路径
     this.factorySlotPath = null; // 内容工厂当前选中板块（设置里配置的文件夹路径），null = 未初始化
     this.factoryL2 = null; // 内容工厂二级标签：子目录路径，null = 全部
@@ -330,23 +484,46 @@ class DashboardView extends ItemView {
     return "layout-dashboard";
   }
 
+  /** 当前数据源下，判一个文件改动是否会影响热力图（用于事件监听防抖）。 */
+  isDataPath(path) {
+    if (this.plugin.settings.dataSource === "changelog") {
+      return this.plugin.settings.changelogPaths.some(
+        (p) => path === p || path.startsWith(`${p}/`),
+      );
+    }
+    return path.endsWith(".md");
+  }
+
+  /** 当前统计口径的名称单位：迭代 vs 笔记（用于脚注/提示文案）。 */
+  dataUnit() {
+    return this.plugin.settings.dataSource === "changelog" ? "迭代" : "笔记";
+  }
+
+  /** changelog 模式下的日志文件清单；非 changelog 模式返回空。 */
+  changelogFiles() {
+    if (this.plugin.settings.dataSource !== "changelog") return [];
+    return new ChangelogProvider(this.plugin.settings).files(this.app);
+  }
+
   async onOpen() {
     this.contentEl.addClass("vdash-content");
     await this.refresh();
 
-    // 迭代日志一改动就刷新（防抖，避免连续写入时重复渲染）
+    // 数据源一改动就刷新（防抖，避免连续写入时重复渲染）
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
-        if (file.path === LOG_PATH) this.scheduleRefresh();
+        if (this.isDataPath(file.path)) this.scheduleRefresh();
         else if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) this.scheduleRefresh();
       }),
     );
 
-    // 内容工厂各板块文件夹增删改名后列表要跟着变
+    // 内容工厂各板块文件夹增删改名后列表要跟着变；同时失效笔记缓存
     for (const evt of ["create", "delete", "rename"]) {
       this.registerEvent(
         this.app.vault.on(evt, (file) => {
-          if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) this.scheduleRefresh();
+          this._notes = null;
+          if (this.isDataPath(file.path)) this.scheduleRefresh();
+          else if (this.factoryWatchPrefixes().some((p) => file.path.startsWith(p))) this.scheduleRefresh();
         }),
       );
     }
@@ -362,22 +539,20 @@ class DashboardView extends ItemView {
     this.refreshTimer = window.setTimeout(() => this.refresh(), 800);
   }
 
-  /** 兼容旧版 API：不用 1.5+ 才有的 getFileByPath */
-  logFile() {
-    const file = this.app.vault.getAbstractFileByPath(LOG_PATH);
-    return file instanceof TFile ? file : null;
+  async refresh() {
+    const provider = this.plugin.getProvider();
+    const notes = this.plugin.settings.dataSource === "noteActivity" ? this.vaultNotes() : [];
+    this.counts = await provider.getDailyCounts(this.app, notes);
+    // 文件存在但一条日期都没有（如只剩总纲）同样算无数据
+    this.empty = this.counts.size === 0;
+    this.render();
   }
 
-  async refresh() {
-    const file = this.logFile();
-    if (file) {
-      this.counts = parseIterationLog(await this.app.vault.cachedRead(file));
-      this.logMissing = false;
-    } else {
-      this.counts = new Map();
-      this.logMissing = true;
+  emptyMessage() {
+    if (this.plugin.settings.dataSource === "changelog") {
+      return `未在 ${this.plugin.settings.changelogPaths.join("、")} 找到迭代日志记录，活跃度总览暂无数据。`;
     }
-    this.render();
+    return "未找到带日期信息的笔记（frontmatter 日期、文件名日期或修改时间），活跃度总览暂无数据。可在设置里调整数据源。";
   }
 
   /* ------------------------------- 区间与统计 ------------------------------ */
@@ -388,7 +563,7 @@ class DashboardView extends ItemView {
 
     if (preset.days) return { start: addDays(today, -(preset.days - 1)), end: today };
 
-    // 全部：从迭代日志最早一天起
+    // 全部：从最早有记录的一天起
     const dates = [...this.counts.keys()].sort();
     const start = dates.length ? parseYmd(dates[0]) : addDays(today, -29);
     return { start: start > today ? today : start, end: today };
@@ -409,11 +584,11 @@ class DashboardView extends ItemView {
     };
   }
 
-  /** 全库笔记数（排除废纸篓） */
+  /** 全库笔记数（排除废纸篓），带缓存：create/delete/rename 时失效。 */
   vaultNotes() {
-    return this.app.vault
-      .getMarkdownFiles()
-      .filter((f) => !EXCLUDED_PREFIXES.some((p) => f.path.startsWith(p)));
+    if (this._notes) return this._notes;
+    this._notes = this.app.vault.getMarkdownFiles().filter((f) => !isExcluded(f.path));
+    return this._notes;
   }
 
   collectStats(start, end) {
@@ -469,10 +644,8 @@ class DashboardView extends ItemView {
 
     if (this.tab === "folders") {
       this.renderFolders(primary);
-    } else if (this.logMissing) {
-      primary
-        .createDiv({ cls: "vdash-empty" })
-        .setText(`未找到 ${LOG_PATH}，活跃度总览暂无数据。`);
+    } else if (this.empty) {
+      primary.createDiv({ cls: "vdash-empty" }).setText(this.emptyMessage());
     } else {
       const { start, end } = this.rangeBounds();
       const stats = this.collectStats(start, end);
@@ -564,6 +737,7 @@ class DashboardView extends ItemView {
     grid.style.setProperty("--vdash-rows", stripMode ? "1" : "7");
     grid.style.setProperty("--vdash-cols", String(columns));
 
+    const unit = this.dataUnit();
     for (let d = new Date(gridStart); d <= gridEnd; d = addDays(d, 1)) {
       const key = ymd(d);
 
@@ -579,10 +753,13 @@ class DashboardView extends ItemView {
 
       const value = this.counts.get(key) || 0;
       const cell = grid.createDiv({ cls: `vdash-cell level-${levelOf(value)}` });
-      setTooltip?.(cell, value ? `${key} · ${value} 条迭代` : `${key} · 无记录`, {
+      setTooltip?.(cell, value ? `${key} · ${value} 条${unit}` : `${key} · 无记录`, {
         placement: "top",
       });
-      cell.addEventListener("click", () => this.openLogAt(key));
+      // 只有迭代日志模式才有点格子跳转对应小节的能力（笔记活跃度无单一落点）
+      if (this.plugin.settings.dataSource === "changelog") {
+        cell.addEventListener("click", () => this.openLogAt(key));
+      }
     }
 
     this.renderLegend(wrap);
@@ -615,12 +792,12 @@ class DashboardView extends ItemView {
   renderFooter(parent, stats) {
     const footer = parent.createDiv({ cls: "vdash-footer" });
     if (!stats.total) {
-      footer.setText("该区间还没有迭代记录。");
+      footer.setText(`该区间还没有${this.dataUnit()}记录。`);
       return;
     }
     const average = (stats.total / stats.activeDays).toFixed(1);
     footer.setText(
-      `区间内共 ${stats.total} 条迭代记录，活跃日均 ${average} 条 · 最忙的一天是 ${stats.busiest.date}（${stats.busiest.value} 条）。`,
+      `区间内共 ${stats.total} 条${this.dataUnit()}，活跃日均 ${average} 条 · 最忙的一天是 ${stats.busiest.date}（${stats.busiest.value} 条）。`,
     );
   }
 
@@ -760,8 +937,7 @@ class DashboardView extends ItemView {
   /** 指定目录（含全部子目录）下的笔记，按修改时间倒序 */
   factoryNotes(folderPath) {
     const base = `${folderPath}/`;
-    return this.app.vault
-      .getMarkdownFiles()
+    return this.vaultNotes()
       .filter((f) => f.path.startsWith(base))
       .sort((a, b) => b.stat.mtime - a.stat.mtime);
   }
@@ -869,22 +1045,32 @@ class DashboardView extends ItemView {
     this.app.workspace.revealLeaf(leaf);
   }
 
-  /** 点格子跳到迭代日志对应日期小节 */
+  /**
+   * 点格子跳到迭代日志对应日期小节。
+   * 日志按月拆分后要先在多个文件里找出哪一份含这一天。
+   */
   async openLogAt(dateKey) {
-    const file = this.logFile();
-    if (!file) return;
-
-    const leaf = this.app.workspace.getLeaf("tab");
-    await leaf.openFile(file);
-
-    const text = await this.app.vault.cachedRead(file);
-    const line = text.split("\n").findIndex((l) => l.startsWith(`## ${dateKey}`));
-    if (line < 0) {
+    let target = null;
+    for (const file of this.changelogFiles()) {
+      const text = await this.app.vault.cachedRead(file);
+      const line = text.split("\n").findIndex((l) => l.startsWith(`## ${dateKey}`));
+      if (line >= 0) {
+        target = { file, line };
+        break;
+      }
+    }
+    if (!target) {
       new Notice(`迭代日志中没有 ${dateKey} 的记录`);
       return;
     }
-    leaf.view.editor?.setCursor({ line, ch: 0 });
-    leaf.view.editor?.scrollIntoView({ from: { line, ch: 0 }, to: { line, ch: 0 } }, true);
+
+    const leaf = this.app.workspace.getLeaf("tab");
+    await leaf.openFile(target.file);
+    leaf.view.editor?.setCursor({ line: target.line, ch: 0 });
+    leaf.view.editor?.scrollIntoView(
+      { from: { line: target.line, ch: 0 }, to: { line: target.line, ch: 0 } },
+      true,
+    );
   }
 }
 
@@ -932,6 +1118,65 @@ class VaultDashboardSettingTab extends PluginSettingTab {
           this.plugin.refreshViews();
         });
       });
+
+    containerEl.createEl("h3", { text: t.dataSourceTitle });
+
+    new Setting(containerEl)
+      .setName(t.dataSourceName)
+      .setDesc(t.dataSourceDesc)
+      .addDropdown((dropdown) => {
+        dropdown.addOption("noteActivity", t.dataSourceNoteActivity);
+        dropdown.addOption("changelog", t.dataSourceChangelog);
+        dropdown.setValue(this.plugin.settings.dataSource);
+        dropdown.onChange(async (value) => {
+          this.plugin.settings.dataSource = value;
+          await this.plugin.saveSettings();
+          this.plugin.refreshViews();
+          this.display();
+        });
+      });
+
+    if (this.plugin.settings.dataSource === "noteActivity") {
+      new Setting(containerEl)
+        .setName(t.activityDateFieldName)
+        .setDesc(t.activityDateFieldDesc)
+        .addText((text) => {
+          text
+            .setPlaceholder("updated")
+            .setValue(this.plugin.settings.activityDateField)
+            .onChange(async (value) => {
+              this.plugin.settings.activityDateField = value.trim() || "updated";
+              await this.plugin.saveSettings();
+              this.plugin.refreshViews();
+            });
+        });
+      new Setting(containerEl)
+        .setName(t.useMtimeName)
+        .setDesc(t.useMtimeDesc)
+        .addToggle((toggle) => {
+          toggle.setValue(this.plugin.settings.useMtime).onChange(async (value) => {
+            this.plugin.settings.useMtime = value;
+            await this.plugin.saveSettings();
+            this.plugin.refreshViews();
+          });
+        });
+    }
+
+    if (this.plugin.settings.dataSource === "changelog") {
+      new Setting(containerEl)
+        .setName(t.changelogPathsName)
+        .setDesc(t.changelogPathsDesc)
+        .addTextArea((area) => {
+          area.setValue(this.plugin.settings.changelogPaths.join("\n")).onChange(async (value) => {
+            this.plugin.settings.changelogPaths = value
+              .split("\n")
+              .map((p) => p.trim())
+              .filter(Boolean);
+            await this.plugin.saveSettings();
+            this.plugin.refreshViews();
+          });
+        });
+    }
 
     containerEl.createEl("h3", { text: t.factoryTitle });
     containerEl.createEl("p", {
@@ -1003,10 +1248,17 @@ module.exports = class VaultDashboardPlugin extends Plugin {
 
     this.addRibbonIcon("layout-dashboard", "知识库仪表盘", () => this.activateView());
     this.addCommand({
-      id: "open-vault-dashboard",
+      id: "open-vault-dashboard-x",
       name: "打开知识库仪表盘",
       callback: () => this.activateView(),
     });
+  }
+
+  /** 按当前设置返回数据源 provider（无状态、每次新建，开销可忽略）。 */
+  getProvider() {
+    return this.settings.dataSource === "changelog"
+      ? new ChangelogProvider(this.settings)
+      : new NoteActivityProvider(this.settings);
   }
 
   async loadSettings() {
@@ -1019,6 +1271,25 @@ module.exports = class VaultDashboardPlugin extends Plugin {
     }
     if (!SETTINGS_LOCALES.includes(this.settings.settingsLocale)) {
       this.settings.settingsLocale = DEFAULT_LOCALE;
+    }
+
+    // 老存档（provider 出现前）没有 dataSource 字段：此前一直在用迭代日志，迁移过去保持行为不变
+    if (typeof saved?.dataSource !== "string") {
+      this.settings.dataSource = "changelog";
+    }
+    if (!DATA_SOURCES.includes(this.settings.dataSource)) {
+      this.settings.dataSource = DEFAULT_SETTINGS.dataSource;
+    }
+    // 活跃日期字段：留空回退到 updated
+    if (typeof this.settings.activityDateField !== "string" || !this.settings.activityDateField.trim()) {
+      this.settings.activityDateField = "updated";
+    }
+    this.settings.useMtime = !!this.settings.useMtime;
+    // changelogPaths 深拷贝，避免复用 DEFAULT_SETTINGS 里的数组引用
+    if (!Array.isArray(this.settings.changelogPaths)) {
+      this.settings.changelogPaths = DEFAULT_CHANGELOG_PATHS.slice();
+    } else {
+      this.settings.changelogPaths = this.settings.changelogPaths.filter((p) => typeof p === "string");
     }
 
     // 深拷贝并校验内容工厂板块结构：避免复用 DEFAULT_SETTINGS 的数组引用（原地修改会污染默认值），
@@ -1057,4 +1328,20 @@ module.exports = class VaultDashboardPlugin extends Plugin {
     }
     workspace.revealLeaf(leaf);
   }
+};
+
+/**
+ * 测试/校验用导出：把纯函数与 provider 暴露给 test/harness.js（stub 掉 obsidian 后 require）。
+ * 不影响 Obsidian 运行时——它只关心 module.exports 的默认导出（插件类）。
+ */
+module.exports._internal = {
+  parseIterationLog,
+  mergeCounts,
+  noteActivityDay,
+  ymdFromValue,
+  buildLevelScale,
+  buildFolderTree,
+  NoteActivityProvider,
+  ChangelogProvider,
+  DEFAULT_CHANGELOG_PATHS,
 };
