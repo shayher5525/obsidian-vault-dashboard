@@ -3,7 +3,8 @@
   "name": "Vault Dashboard X",
   "version": "0.7.0",
   "minAppVersion": "1.4.0",
-  "description": "知识库仪表盘：迭代日志活跃度热力图、目录结构分布与内容工厂快捷入口。",
+  "description": "A vault dashboard with an activity heatmap, folder distribution, and configurable visual-folder quick links.",
   "author": "shayherchen",
+  "authorUrl": "https://github.com/shayher5525",
   "isDesktopOnly": false
 }

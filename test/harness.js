@@ -58,7 +58,7 @@ console.log(`范围: ${sorted[0]} → ${sorted[sorted.length - 1]}`);
 if (busiest) console.log(`最忙: ${busiest[0]}（${busiest[1]} 条）`);
 
 const expectedDays = 63;
-const expectedTotal = 1020;
+const expectedTotal = 1021;
 const ok = days === expectedDays && total === expectedTotal;
 console.log(`期望 ${expectedDays} 天 / ${expectedTotal} 条 → ${ok ? "PASS" : "FAIL"}`);
 

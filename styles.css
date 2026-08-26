@@ -10,21 +10,22 @@
 
 .workspace-leaf-content .view-content.vdash-content {
   /* ------------------------------- 颜色令牌 ------------------------------- */
-  --vd-primary: #0066cc;
-  --vd-primary-hover: #005bb5;
-  --vd-primary-focus: #0071e3;
-  --vd-on-primary: #ffffff;
+  /* 语义色一律「原生主题变量优先、设计基线作回退」，随用户主题走 */
+  --vd-primary: var(--interactive-accent, #0066cc);
+  --vd-primary-hover: var(--interactive-accent-hover, #005bb5);
+  --vd-primary-focus: var(--interactive-accent, #0071e3);
+  --vd-on-primary: var(--text-on-accent, #ffffff);
 
-  --vd-canvas: #ffffff;
-  --vd-canvas-muted: #f5f5f7;
-  --vd-surface-raised: #fafafc;
+  --vd-canvas: var(--background-primary, #ffffff);
+  --vd-canvas-muted: var(--background-secondary, #f5f5f7);
+  --vd-surface-raised: var(--background-primary-alt, #fafafc);
 
-  --vd-ink: #1d1d1f;
-  --vd-body-muted: #66666b;
-  --vd-ink-subtle: #7a7a7a;
+  --vd-ink: var(--text-normal, #1d1d1f);
+  --vd-body-muted: var(--text-muted, #66666b);
+  --vd-ink-subtle: var(--text-faint, #7a7a7a);
 
-  --vd-divider-soft: #f0f0f0;
-  --vd-hairline: #e0e0e0;
+  --vd-divider-soft: var(--background-modifier-border, #f0f0f0);
+  --vd-hairline: var(--background-modifier-border, #e0e0e0);
 
   /* 目录分布图的识别色：只用于数据可视化，不承担「可点击」含义 */
   --vd-viz-purple: #7d5bd6;
@@ -34,7 +35,7 @@
   --vd-viz-pink: #c33d84;
 
   /* 热力图色阶：主色到浅表面的 4 级实色梯，不靠透明度叠加 */
-  --vd-heat-0: #ececf0;
+  --vd-heat-0: var(--background-modifier-border, #ececf0);
   --vd-heat-1: #cfe2f7;
   --vd-heat-2: #9dc4ef;
   --vd-heat-3: #4f92db;
@@ -85,20 +86,20 @@
 
 /* 深色主题：只换表面与文字令牌，色阶单独配深底版本 */
 .theme-dark .workspace-leaf-content .view-content.vdash-content {
-  --vd-primary: #2997ff;
-  --vd-primary-hover: #4aa8ff;
-  --vd-primary-focus: #2997ff;
+  --vd-primary: var(--interactive-accent, #2997ff);
+  --vd-primary-hover: var(--interactive-accent-hover, #4aa8ff);
+  --vd-primary-focus: var(--interactive-accent, #2997ff);
 
-  --vd-canvas: #272729;
-  --vd-canvas-muted: #1c1c1e;
-  --vd-surface-raised: #2a2a2c;
+  --vd-canvas: var(--background-primary, #272729);
+  --vd-canvas-muted: var(--background-secondary, #1c1c1e);
+  --vd-surface-raised: var(--background-primary-alt, #2a2a2c);
 
-  --vd-ink: #ffffff;
-  --vd-body-muted: #cccccc;
-  --vd-ink-subtle: #8e8e93;
+  --vd-ink: var(--text-normal, #ffffff);
+  --vd-body-muted: var(--text-muted, #cccccc);
+  --vd-ink-subtle: var(--text-faint, #8e8e93);
 
-  --vd-divider-soft: #333335;
-  --vd-hairline: #3a3a3c;
+  --vd-divider-soft: var(--background-modifier-border, #333335);
+  --vd-hairline: var(--background-modifier-border, #3a3a3c);
 
   /* 深底上提亮识别色，保证与 surface-dark 的对比度 */
   --vd-viz-purple: #a58cf0;
@@ -107,7 +108,7 @@
   --vd-viz-amber: #e0a34a;
   --vd-viz-pink: #f07ab5;
 
-  --vd-heat-0: #313134;
+  --vd-heat-0: var(--background-modifier-border, #313134);
   --vd-heat-1: #1b3a5c;
   --vd-heat-2: #1f5b93;
   --vd-heat-3: #2179cc;

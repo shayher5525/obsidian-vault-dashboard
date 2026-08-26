@@ -25,46 +25,58 @@ const VIEW_TYPE = "vault-dashboard-x-view";
  * 2026-08-25 起日志按月拆分，库根 `迭代日志.md` 只剩总纲，日期小节全在月度目录里。
  * 仅作为 changelog 模式的默认路径；笔记活跃度模式不看这两个常量。
  */
-const LOG_PATH = "迭代日志.md";
-const LOG_FOLDER = "A_CultureOps-Codex-Daily/12_Automation 自动化脚本/12-03_ChangeLog 迭代日志";
-const DEFAULT_CHANGELOG_PATHS = [LOG_PATH, LOG_FOLDER];
+/**
+ * 迭代日志模式的默认路径：留空。
+ * 该模式面向「库里维护着 changelog 文件」的用户，路径因库而异，不预设。
+ */
+const DEFAULT_CHANGELOG_PATHS = [];
 
-/** 体检排除边界：废纸篓不计入任何统计（见 CLAUDE.md L4.2） */
-const EXCLUDED_PREFIXES = ["ZZ_Trash 废纸篓/"];
+/**
+ * 统计排除的路径前缀，默认空 —— 通用库不预设任何排除项。
+ * 用户可在设置里逐行填写（例如某个归档区或废纸篓目录）。
+ */
+const DEFAULT_EXCLUDED_PREFIXES = [];
 
-function isExcluded(path) {
-  return EXCLUDED_PREFIXES.some((prefix) => path.startsWith(prefix));
+function isExcluded(path, prefixes) {
+  if (!prefixes || !prefixes.length) return false;
+  return prefixes.some((prefix) => path.startsWith(prefix));
 }
 
 /** 周网格最少渲染周数，数据不足时向前补空周 */
 const MIN_WEEKS = 20;
 /** 周网格最多渲染周数：「全部」区间跨度过大（如笔记活跃度含离群日期）时封顶，避免渲染上万格子 */
 const MAX_WEEKS = 53;
-/** 库根笔记在目录分布里的显示名 */
-const ROOT_LABEL = "（库根）";
+/** 库根散落笔记在目录树里的内部键（非显示文本，显示走 I18N.rootLabel） */
+const ROOT_KEY = "__vault_root__";
 
-const APPEARANCES = {
-  modern: "Apple",
-  y2k: "Y2K 控制台",
-  starbucks: "Starbucks 咖啡馆",
-};
+const APPEARANCE_IDS = ["modern", "y2k", "starbucks"];
 
-/** 内容工厂快捷入口：板块 1 的出厂默认文件夹（可在设置中改成任意文件夹） */
-const FACTORY_ROOT_DEFAULT = "B_ContentFactory 内容工厂";
+/** 可视文件夹板块 1 的出厂默认：留空，由用户在设置里选择文件夹 */
+const FACTORY_ROOT_DEFAULT = "";
 /** 内容工厂最多可配置的板块（标签）数，对应设置页的 5 组文件夹+名称 */
 const FACTORY_SLOT_COUNT = 5;
 /** 汇总视图（未选定子目录时）「近期修改」列表条数上限 */
 const FACTORY_RECENT_LIMIT = 20;
-/** 设置页支持的界面语言：仅影响「设置」标签页本身，不影响仪表盘正文 */
-const SETTINGS_LOCALES = ["zh-Hans", "zh-Hant", "en"];
-const DEFAULT_LOCALE = "zh-Hans";
+/** 界面语言：同时影响设置页与仪表盘正文 */
+const LOCALES = ["zh-Hans", "zh-Hant", "en"];
+const DEFAULT_LOCALE = "en";
+/** 内部 locale id → Intl 用 locale（数字 / 月份格式化） */
+const INTL_LOCALE = { "zh-Hans": "zh-CN", "zh-Hant": "zh-TW", en: "en" };
+
+function formatNumber(n, localeId) {
+  return n.toLocaleString(INTL_LOCALE[localeId] || "en");
+}
+
+function monthShort(date, localeId) {
+  return new Intl.DateTimeFormat(INTL_LOCALE[localeId] || "en", { month: "short" }).format(date);
+}
 
 /** 数据源取值：笔记活跃度（通用默认）/ 迭代日志（本库原行为） */
 const DATA_SOURCES = ["noteActivity", "changelog"];
 
 const DEFAULT_SETTINGS = {
   appearance: "modern",
-  settingsLocale: DEFAULT_LOCALE,
+  locale: DEFAULT_LOCALE,
   /** 活跃度数据来源：noteActivity（笔记活跃度，通用默认）| changelog（迭代日志） */
   dataSource: "noteActivity",
   /** 笔记活跃度：优先取的 frontmatter 字段（取不到再回退 created/date → 文件名 → mtime） */
@@ -73,13 +85,15 @@ const DEFAULT_SETTINGS = {
   useMtime: false,
   /** 迭代日志模式：一条为文件、一条为文件夹（取其下所有 .md，不递归） */
   changelogPaths: DEFAULT_CHANGELOG_PATHS.slice(),
+  /** 统计时排除的路径前缀，逐行配置；默认空 */
+  excludedPrefixes: DEFAULT_EXCLUDED_PREFIXES.slice(),
   /**
    * 可视文件夹最多 5 个自定义板块（标签）：每项 { folder, label }。
    * folder 留空 = 该板块不显示；label 留空则用文件夹名自动去编号前缀。
    * 板块 1 默认指向原「内容工厂」根目录，升级用户视觉不变；2—5 默认留空。
    */
   factoryTabs: [
-    { folder: FACTORY_ROOT_DEFAULT, label: "内容工厂" },
+    { folder: FACTORY_ROOT_DEFAULT, label: "" },
     { folder: "", label: "" },
     { folder: "", label: "" },
     { folder: "", label: "" },
@@ -88,14 +102,13 @@ const DEFAULT_SETTINGS = {
 };
 
 /**
- * 设置页界面文案：三语字典。仅覆盖「设置」标签页本身的文字，
- * 仪表盘正文（总览/目录/可视文件夹）保持简体中文不受此设置影响。
+ * 三语界面文案：覆盖设置页与仪表盘正文。当前语言由 settings.locale 决定，默认英文。
  */
 const I18N = {
   "zh-Hans": {
     settingsTitle: "知识库仪表盘设置",
-    settingsLanguage: "设置语言",
-    settingsLanguageDesc: "仅影响本设置页的界面文字，不影响仪表盘正文显示。",
+    language: "语言",
+    languageDesc: "设置页与仪表盘正文的界面语言。",
     localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "外观风格",
     appearanceDesc: "选择仪表盘的视觉风格。更改后会立即应用到已打开的仪表盘。",
@@ -111,6 +124,8 @@ const I18N = {
     useMtimeName: "用文件修改时间兜底",
     useMtimeDesc:
       "关闭时不用 mtime，避免同步盘（iCloud 等）批量刷新 mtime 造成「某天改几千篇」的假柱。默认关闭。",
+    excludedPrefixesName: "排除路径",
+    excludedPrefixesDesc: "每行一个路径前缀，匹配到的笔记不计入任何统计；留空表示不排除。",
     changelogPathsName: "迭代日志路径",
     changelogPathsDesc: "每行一个文件或文件夹路径；文件夹取其下所有 .md（不递归）。",
     factoryTitle: "可视文件夹",
@@ -123,11 +138,52 @@ const I18N = {
     labelPlaceholder: "显示名称（留空用文件夹名）",
     statusFound: "✓ 已找到该文件夹",
     statusNotFound: "⚠ 库内未找到该路径，请检查大小写与完整层级",
+
+    appearanceNames: { modern: "Apple", y2k: "Y2K 控制台", starbucks: "Starbucks 咖啡馆" },
+    dashboardTitle: "知识库仪表盘",
+    tabOverview: "总览",
+    tabFolders: "目录",
+    tabAll: "全部",
+    rangeAll: "全部",
+    range30d: "30天",
+    range7d: "7天",
+    rootLabel: "（库根）",
+    selfFiles: "（本层文件）",
+    unitNote: "笔记",
+    unitIteration: "迭代",
+    statNoteCount: "笔记总数",
+    statActiveDays: "活跃天数",
+    statStreakLabel: "当前连续",
+    streakDays: (n) => `${n}天`,
+    statTopBlocks: "顶层区块",
+    statMaxDepth: (n) => `${n}层`,
+    statRootScattered: "库根散落",
+    statMaxDepthLabel: "最深层级",
+    foldersEmpty: "库内暂无笔记。",
+    addedInDays: (n) => `${n}天新增`,
+    addedThisMonth: "本月新增",
+    legendLess: "少",
+    legendMore: "多",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} 条${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · 无记录`,
+    footerEmpty: (unit) => `该区间还没有${unit}记录。`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `区间内共 ${total} 条${unit}，活跃日均 ${average} 条 · 最忙的一天是 ${busiestDate}（${busiestValue} 条）。`,
+    foldersFooter: (addedLabel) =>
+      `占比与条形均相对上级目录，${addedLabel}按文件创建时间统计。点目录名可逐层下钻。`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} 篇（${pct}）`,
+    factoryNotFound: (path) => `库内未找到文件夹：${path}`,
+    factoryHint: (n) => `仅显示最近修改的 ${n} 条笔记`,
+    factoryEmpty: "该目录下暂无笔记。",
+    emptyNoteActivity:
+      "未找到带日期信息的笔记（frontmatter 日期、文件名日期或修改时间），活跃度总览暂无数据。可在设置里调整数据源。",
+    emptyChangelog: (paths) => `未在 ${paths} 找到迭代日志记录，活跃度总览暂无数据。`,
+    logNotFound: (dateKey) => `迭代日志中没有 ${dateKey} 的记录`,
   },
   "zh-Hant": {
     settingsTitle: "知識庫儀表盤設置",
-    settingsLanguage: "設置語言",
-    settingsLanguageDesc: "僅影響本設置頁的界面文字，不影響儀表盤正文顯示。",
+    language: "語言",
+    languageDesc: "設定頁與儀表盤正文的介面語言。",
     localeName: { "zh-Hans": "簡體中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "外觀風格",
     appearanceDesc: "選擇儀表盤的視覺風格。更改後會立即應用到已打開的儀表盤。",
@@ -143,6 +199,8 @@ const I18N = {
     useMtimeName: "用檔案修改時間兜底",
     useMtimeDesc:
       "關閉時不用 mtime，避免同步盤（iCloud 等）批量刷新 mtime 造成「某天改幾千篇」的假柱。預設關閉。",
+    excludedPrefixesName: "排除路徑",
+    excludedPrefixesDesc: "每行一個路徑前綴，符合的筆記不計入任何統計；留空表示不排除。",
     changelogPathsName: "迭代日誌路徑",
     changelogPathsDesc: "每行一個檔案或資料夾路徑；資料夾取其下所有 .md（不遞迴）。",
     factoryTitle: "可視文件夾",
@@ -155,11 +213,52 @@ const I18N = {
     labelPlaceholder: "顯示名稱（留空用文件夾名）",
     statusFound: "✓ 已找到該文件夾",
     statusNotFound: "⚠ 庫內未找到該路徑，請檢查大小寫與完整層級",
+
+    appearanceNames: { modern: "Apple", y2k: "Y2K 控制臺", starbucks: "Starbucks 咖啡館" },
+    dashboardTitle: "知識庫儀表盤",
+    tabOverview: "總覽",
+    tabFolders: "目錄",
+    tabAll: "全部",
+    rangeAll: "全部",
+    range30d: "30天",
+    range7d: "7天",
+    rootLabel: "（庫根）",
+    selfFiles: "（本層文件）",
+    unitNote: "筆記",
+    unitIteration: "迭代",
+    statNoteCount: "筆記總數",
+    statActiveDays: "活躍天數",
+    statStreakLabel: "當前連續",
+    streakDays: (n) => `${n}天`,
+    statTopBlocks: "頂層區塊",
+    statMaxDepth: (n) => `${n}層`,
+    statRootScattered: "庫根散落",
+    statMaxDepthLabel: "最深層級",
+    foldersEmpty: "庫內暫無筆記。",
+    addedInDays: (n) => `${n}天新增`,
+    addedThisMonth: "本月新增",
+    legendLess: "少",
+    legendMore: "多",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} 條${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · 無記錄`,
+    footerEmpty: (unit) => `該區間還沒有${unit}記錄。`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `區間內共 ${total} 條${unit}，活躍日均 ${average} 條 · 最忙的一天是 ${busiestDate}（${busiestValue} 條）。`,
+    foldersFooter: (addedLabel) =>
+      `佔比與條形均相對上級目錄，${addedLabel}按檔案建立時間統計。點目錄名可逐層下鑽。`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} 篇（${pct}）`,
+    factoryNotFound: (path) => `庫內未找到文件夾：${path}`,
+    factoryHint: (n) => `僅顯示最近修改的 ${n} 條筆記`,
+    factoryEmpty: "該目錄下暫無筆記。",
+    emptyNoteActivity:
+      "未找到帶日期資訊的筆記（frontmatter 日期、檔名日期或修改時間），活躍度總覽暫無資料。可在設定裡調整資料來源。",
+    emptyChangelog: (paths) => `未在 ${paths} 找到迭代日誌記錄，活躍度總覽暫無資料。`,
+    logNotFound: (dateKey) => `迭代日誌中沒有 ${dateKey} 的記錄`,
   },
   en: {
     settingsTitle: "Vault Dashboard X Settings",
-    settingsLanguage: "Settings Language",
-    settingsLanguageDesc: "Only affects the text on this settings page; dashboard content is unaffected.",
+    language: "Language",
+    languageDesc: "Interface language for the settings page and the dashboard.",
     localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
     appearance: "Appearance",
     appearanceDesc: "Choose the dashboard's visual style. Applies immediately to any open dashboard.",
@@ -175,6 +274,9 @@ const I18N = {
     useMtimeName: "Fall back to file modified time",
     useMtimeDesc:
       "When off, mtime is not used, avoiding false spikes when a sync drive (iCloud, etc.) bulk-refreshes mtimes. Off by default.",
+    excludedPrefixesName: "Excluded paths",
+    excludedPrefixesDesc:
+      "One path prefix per line. Matching notes are left out of every statistic. Leave empty to exclude nothing.",
     changelogPathsName: "Changelog paths",
     changelogPathsDesc: "One file or folder per line; a folder takes all .md inside (non-recursive).",
     factoryTitle: "Visual Folders",
@@ -188,6 +290,48 @@ const I18N = {
     labelPlaceholder: "Display name (blank = use folder name)",
     statusFound: "✓ Folder found",
     statusNotFound: "⚠ Path not found in vault — check case and full path",
+
+    appearanceNames: { modern: "Apple", y2k: "Y2K Console", starbucks: "Starbucks Café" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "Overview",
+    tabFolders: "Folders",
+    tabAll: "All",
+    rangeAll: "All",
+    range30d: "30 days",
+    range7d: "7 days",
+    rootLabel: "Vault root",
+    selfFiles: "Files here",
+    unitNote: "notes",
+    unitIteration: "iterations",
+    statNoteCount: "Notes",
+    statActiveDays: "Active days",
+    statStreakLabel: "Current streak",
+    streakDays: (n) => `${n} days`,
+    statTopBlocks: "Top-level blocks",
+    statMaxDepth: (n) => `${n} levels`,
+    statRootScattered: "Root files",
+    statMaxDepthLabel: "Max depth",
+    foldersEmpty: "No notes in this vault yet.",
+    addedInDays: (n) => `New in ${n} days`,
+    addedThisMonth: "New this month",
+    legendLess: "Less",
+    legendMore: "More",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} ${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · No activity`,
+    footerEmpty: (unit) => `No ${unit} in this range yet.`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `${total} ${unit} in range, avg ${average}/active day · busiest was ${busiestDate} (${busiestValue}).`,
+    foldersFooter: (addedLabel) =>
+      `Percentages and bars are relative to the parent folder. "${addedLabel}" counts files by creation time. Click a folder to drill down.`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} notes (${pct})`,
+    factoryNotFound: (path) => `Folder not found in vault: ${path}`,
+    factoryHint: (n) => `Showing the ${n} most recently modified notes`,
+    factoryEmpty: "No notes in this folder yet.",
+    emptyNoteActivity:
+      "No notes with a usable date were found (frontmatter date, filename date, or modified time). You can change the data source in settings.",
+    emptyChangelog: (paths) =>
+      `No changelog entries found in ${paths}. The activity overview has no data yet.`,
+    logNotFound: (dateKey) => `No changelog entry for ${dateKey}`,
   },
 };
 
@@ -206,10 +350,11 @@ const PALETTE = [
 const PALETTE_REST = "var(--vd-ink-subtle, #7a7a7a)";
 
 const RANGES = [
-  { id: "all", label: "全部" },
-  { id: "30d", label: "30天", days: 30 },
-  { id: "7d", label: "7天", days: 7 },
+  { id: "all" },
+  { id: "30d", days: 30 },
+  { id: "7d", days: 7 },
 ];
+const RANGE_LABEL_KEYS = { all: "rangeAll", "30d": "range30d", "7d": "range7d" };
 
 
 /** `01_NewMediaCopy 新媒体文案` → `新媒体文案`；取不到中文名时退回原名 */
@@ -431,7 +576,7 @@ function buildFolderTree(files, sinceMs) {
   for (const file of files) {
     const parts = file.path.split("/");
     const dirs = parts.slice(0, -1);
-    const chain = dirs.length ? dirs : [ROOT_LABEL];
+    const chain = dirs.length ? dirs : [ROOT_KEY];
     const isNew = file.stat.ctime >= sinceMs;
 
     maxDepth = Math.max(maxDepth, dirs.length);
@@ -476,12 +621,36 @@ class DashboardView extends ItemView {
     this.factoryL2 = null; // 内容工厂二级标签：子目录路径，null = 全部
   }
 
+  /** 当前 locale 的字典（缺省回退默认）。 */
+  localeDict() {
+    return I18N[this.plugin.settings.locale] || I18N[DEFAULT_LOCALE];
+  }
+
+  /** 取翻译文案；值为函数时按插值调用。 */
+  t(key, ...args) {
+    const v = this.localeDict()[key];
+    return typeof v === "function" ? v(...args) : v;
+  }
+
+  rangeLabel(id) {
+    return this.t(RANGE_LABEL_KEYS[id]);
+  }
+
+  nfmt(n) {
+    return formatNumber(n, this.plugin.settings.locale);
+  }
+
+  /** 目录树节点显示名：内部「库根」键翻译为当前语言。 */
+  folderName(name) {
+    return name === ROOT_KEY ? this.t("rootLabel") : name;
+  }
+
   getViewType() {
     return VIEW_TYPE;
   }
 
   getDisplayText() {
-    return "知识库仪表盘";
+    return this.localeDict().dashboardTitle;
   }
 
   getIcon() {
@@ -500,7 +669,9 @@ class DashboardView extends ItemView {
 
   /** 当前统计口径的名称单位：迭代 vs 笔记（用于脚注/提示文案）。 */
   dataUnit() {
-    return this.plugin.settings.dataSource === "changelog" ? "迭代" : "笔记";
+    return this.plugin.settings.dataSource === "changelog"
+      ? this.t("unitIteration")
+      : this.t("unitNote");
   }
 
   /** changelog 模式下的日志文件清单；非 changelog 模式返回空。 */
@@ -559,7 +730,11 @@ class DashboardView extends ItemView {
         this._dirtyNotes.clear();
         for (const path of dirty) {
           const file = this.app.vault.getAbstractFileByPath(path);
-          if (file instanceof TFile && file.extension === "md" && !isExcluded(file.path)) {
+          if (
+            file instanceof TFile &&
+            file.extension === "md" &&
+            !isExcluded(file.path, this.plugin.settings.excludedPrefixes)
+          ) {
             this.applyNoteDelta(file);
           }
         }
@@ -609,15 +784,17 @@ class DashboardView extends ItemView {
   /** 让计数缓存失效并重算（数据源或判定规则变更时用）。 */
   invalidate() {
     this._fileDates = null;
+    // 排除路径变更会改变全库笔记集合，缓存一并作废
+    this._notes = null;
     this._dirtyNotes.clear();
     this.refresh();
   }
 
   emptyMessage() {
     if (this.plugin.settings.dataSource === "changelog") {
-      return `未在 ${this.plugin.settings.changelogPaths.join("、")} 找到迭代日志记录，活跃度总览暂无数据。`;
+      return this.t("emptyChangelog", this.plugin.settings.changelogPaths.join(", "));
     }
-    return "未找到带日期信息的笔记（frontmatter 日期、文件名日期或修改时间），活跃度总览暂无数据。可在设置里调整数据源。";
+    return this.t("emptyNoteActivity");
   }
 
   /* ------------------------------- 区间与统计 ------------------------------ */
@@ -642,19 +819,20 @@ class DashboardView extends ItemView {
    */
   addedWindow(start) {
     const preset = RANGES.find((r) => r.id === this.range);
-    if (preset.days) return { since: start.getTime(), label: `${preset.days}天新增` };
+    if (preset.days) return { since: start.getTime(), label: this.t("addedInDays", preset.days) };
 
     const today = startOfDay(new Date());
     return {
       since: new Date(today.getFullYear(), today.getMonth(), 1).getTime(),
-      label: "本月新增",
+      label: this.t("addedThisMonth"),
     };
   }
 
-  /** 全库笔记数（排除废纸篓），带缓存：create/delete/rename 时失效。 */
+  /** 全库笔记数（扣除用户配置的排除前缀），带缓存：create/delete/rename 时失效。 */
   vaultNotes() {
     if (this._notes) return this._notes;
-    this._notes = this.app.vault.getMarkdownFiles().filter((f) => !isExcluded(f.path));
+    const prefixes = this.plugin.settings.excludedPrefixes;
+    this._notes = this.app.vault.getMarkdownFiles().filter((f) => !isExcluded(f.path, prefixes));
     return this._notes;
   }
 
@@ -690,7 +868,7 @@ class DashboardView extends ItemView {
 
   applyAppearance() {
     this.contentEl.removeClass("vdash-style-universal");
-    for (const id of Object.keys(APPEARANCES)) {
+    for (const id of APPEARANCE_IDS) {
       this.contentEl.removeClass(`vdash-style-${id}`);
     }
     this.contentEl.addClass(`vdash-style-${this.plugin.settings.appearance}`);
@@ -729,7 +907,7 @@ class DashboardView extends ItemView {
     const header = parent.createDiv({ cls: "vdash-header" });
 
     const tabs = header.createDiv({ cls: "vdash-tabs" });
-    for (const [id, label] of [["overview", "总览"], ["folders", "目录"]]) {
+    for (const [id, label] of [["overview", this.t("tabOverview")], ["folders", this.t("tabFolders")]]) {
       const tab = tabs.createDiv({
         cls: `vdash-tab${this.tab === id ? " is-active" : ""}`,
         text: label,
@@ -744,7 +922,7 @@ class DashboardView extends ItemView {
     for (const preset of RANGES) {
       const btn = switcher.createDiv({
         cls: `vdash-range-btn${this.range === preset.id ? " is-active" : ""}`,
-        text: preset.label,
+        text: this.rangeLabel(preset.id),
       });
       btn.addEventListener("click", () => {
         this.range = preset.id;
@@ -755,10 +933,10 @@ class DashboardView extends ItemView {
 
   renderStatCards(parent, stats) {
     this.renderCards(parent, [
-      { label: "笔记总数", value: stats.noteCount.toLocaleString("zh-CN") },
-      { label: stats.addedLabel, value: stats.added.toLocaleString("zh-CN") },
-      { label: "活跃天数", value: stats.activeDays },
-      { label: "当前连续", value: `${stats.streak}天` },
+      { label: this.t("statNoteCount"), value: this.nfmt(stats.noteCount) },
+      { label: stats.addedLabel, value: this.nfmt(stats.added) },
+      { label: this.t("statActiveDays"), value: stats.activeDays },
+      { label: this.t("statStreakLabel"), value: this.t("streakDays", stats.streak) },
     ]);
   }
 
@@ -820,9 +998,11 @@ class DashboardView extends ItemView {
 
       const value = this.counts.get(key) || 0;
       const cell = grid.createDiv({ cls: `vdash-cell level-${levelOf(value)}` });
-      setTooltip?.(cell, value ? `${key} · ${value} 条${unit}` : `${key} · 无记录`, {
-        placement: "top",
-      });
+      setTooltip?.(
+        cell,
+        value ? this.t("heatmapTooltipCount", key, value, unit) : this.t("heatmapTooltipEmpty", key),
+        { placement: "top" },
+      );
       // 只有迭代日志模式才有点格子跳转对应小节的能力（笔记活跃度无单一落点）
       if (this.plugin.settings.dataSource === "changelog") {
         cell.addEventListener("click", () => this.openLogAt(key));
@@ -842,29 +1022,29 @@ class DashboardView extends ItemView {
       const cell = row.createDiv({ cls: "vdash-month" });
       if (weekStart.getMonth() !== lastMonth) {
         lastMonth = weekStart.getMonth();
-        cell.setText(`${lastMonth + 1}月`);
+        cell.setText(monthShort(weekStart, this.plugin.settings.locale));
       }
     }
   }
 
   renderLegend(parent) {
     const legend = parent.createDiv({ cls: "vdash-legend" });
-    legend.createSpan({ text: "少" });
+    legend.createSpan({ text: this.t("legendLess") });
     for (let level = 0; level <= 4; level++) {
       legend.createDiv({ cls: `vdash-cell level-${level}` });
     }
-    legend.createSpan({ text: "多" });
+    legend.createSpan({ text: this.t("legendMore") });
   }
 
   renderFooter(parent, stats) {
     const footer = parent.createDiv({ cls: "vdash-footer" });
     if (!stats.total) {
-      footer.setText(`该区间还没有${this.dataUnit()}记录。`);
+      footer.setText(this.t("footerEmpty", this.dataUnit()));
       return;
     }
     const average = (stats.total / stats.activeDays).toFixed(1);
     footer.setText(
-      `区间内共 ${stats.total} 条${this.dataUnit()}，活跃日均 ${average} 条 · 最忙的一天是 ${stats.busiest.date}（${stats.busiest.value} 条）。`,
+      this.t("footerSummary", stats.total, this.dataUnit(), average, stats.busiest.date, stats.busiest.value),
     );
   }
 
@@ -877,15 +1057,15 @@ class DashboardView extends ItemView {
     const tops = sortedChildren(root);
 
     if (!root.count) {
-      parent.createDiv({ cls: "vdash-empty" }).setText("库内暂无笔记。");
+      parent.createDiv({ cls: "vdash-empty" }).setText(this.t("foldersEmpty"));
       return;
     }
 
     this.renderCards(parent, [
-      { label: "笔记总数", value: root.count.toLocaleString("zh-CN") },
-      { label: "顶层区块", value: tops.length },
-      { label: "最深层级", value: `${maxDepth}层` },
-      { label: "库根散落", value: root.children.get(ROOT_LABEL)?.count || 0 },
+      { label: this.t("statNoteCount"), value: this.nfmt(root.count) },
+      { label: this.t("statTopBlocks"), value: tops.length },
+      { label: this.t("statMaxDepthLabel"), value: this.t("statMaxDepth", maxDepth) },
+      { label: this.t("statRootScattered"), value: root.children.get(ROOT_KEY)?.count || 0 },
     ]);
 
     const colorOf = new Map(
@@ -899,9 +1079,7 @@ class DashboardView extends ItemView {
 
     parent
       .createDiv({ cls: "vdash-footer" })
-      .setText(
-        `占比与条形均相对上级目录，${addedLabel}按文件创建时间统计。点目录名可逐层下钻。`,
-      );
+      .setText(this.t("foldersFooter", addedLabel));
   }
 
   renderStackBar(parent, nodes, total, colorOf) {
@@ -910,7 +1088,7 @@ class DashboardView extends ItemView {
       const seg = bar.createDiv({ cls: "vdash-stack-seg" });
       seg.style.flexGrow = String(node.count);
       seg.style.backgroundColor = colorOf.get(node.path);
-      setTooltip?.(seg, `${node.name} · ${node.count} 篇（${percent(node.count, total)}）`, {
+      setTooltip?.(seg, this.t("tooltipFolder", this.folderName(node.name), node.count, percent(node.count, total)), {
         placement: "top",
       });
     }
@@ -936,7 +1114,7 @@ class DashboardView extends ItemView {
         cls: `vdash-caret${hasChildren ? "" : " is-leaf"}${isOpen ? " is-open" : ""}`,
         text: hasChildren ? "▸" : "·",
       });
-      name.createSpan({ cls: "vdash-row-text", text: node.name });
+      name.createSpan({ cls: "vdash-row-text", text: this.folderName(node.name) });
       if (node.added > 0) {
         name.createSpan({ cls: "vdash-row-added", text: `+${node.added}` });
       }
@@ -947,7 +1125,7 @@ class DashboardView extends ItemView {
       fill.style.width = `${parentCount ? (node.count / parentCount) * 100 : 0}%`;
       fill.style.backgroundColor = color;
 
-      row.createDiv({ cls: "vdash-row-count", text: node.count.toLocaleString("zh-CN") });
+      row.createDiv({ cls: "vdash-row-count", text: this.nfmt(node.count) });
       row.createDiv({ cls: "vdash-row-pct", text: percent(node.count, parentCount) });
 
       if (!hasChildren) continue;
@@ -964,7 +1142,7 @@ class DashboardView extends ItemView {
       // 直接放在本层的笔记单独列一行，否则子行相加对不上本层总数
       if (node.direct > 0) {
         children.push({
-          name: "（本层文件）",
+          name: this.t("selfFiles"),
           path: `${node.path}//self`,
           count: node.direct,
           direct: 0,
@@ -1015,7 +1193,7 @@ class DashboardView extends ItemView {
     if (!slots.length) return;
 
     const box = parent.createDiv({ cls: "vdash-factory" });
-    box.createDiv({ cls: "vdash-factory-title", text: "可视文件夹" });
+    box.createDiv({ cls: "vdash-factory-title", text: this.t("factoryTitle") });
 
     // 选中板块被删配置或改路径后失效，回落第一个
     if (!slots.some((s) => s.path === this.factorySlotPath)) {
@@ -1035,18 +1213,18 @@ class DashboardView extends ItemView {
 
     const current = this.app.vault.getAbstractFileByPath(this.factorySlotPath);
     if (!current || !current.children) {
-      box.createDiv({ cls: "vdash-empty" }).setText(`未找到文件夹：${this.factorySlotPath}`);
+      box.createDiv({ cls: "vdash-empty" }).setText(this.t("factoryNotFound", this.factorySlotPath));
       return;
     }
 
     const subs = current.children
       .filter((f) => f.children)
-      .sort((a, b) => a.name.localeCompare(b.name, "zh-CN"));
+      .sort((a, b) => a.name.localeCompare(b.name, INTL_LOCALE[this.plugin.settings.locale] || "en"));
 
     if (subs.length) {
       if (this.factoryL2 && !subs.some((f) => f.path === this.factoryL2)) this.factoryL2 = null;
       const l2 = box.createDiv({ cls: "vdash-factory-tabs is-sub" });
-      this.factoryTab(l2, "全部", !this.factoryL2, () => {
+      this.factoryTab(l2, this.t("tabAll"), !this.factoryL2, () => {
         this.factoryL2 = null;
       });
       for (const sub of subs) {
@@ -1063,7 +1241,7 @@ class DashboardView extends ItemView {
     this.renderFactoryList(box, files);
     box
       .createDiv({ cls: "vdash-factory-hint" })
-      .setText(`按修改时间倒序，最多 ${FACTORY_RECENT_LIMIT} 篇。`);
+      .setText(this.t("factoryHint", FACTORY_RECENT_LIMIT));
   }
 
   factoryTab(parent, label, active, onPick) {
@@ -1079,7 +1257,7 @@ class DashboardView extends ItemView {
 
   renderFactoryList(parent, files) {
     if (!files.length) {
-      parent.createDiv({ cls: "vdash-empty" }).setText("该目录暂无笔记。");
+      parent.createDiv({ cls: "vdash-empty" }).setText(this.t("factoryEmpty"));
       return;
     }
 
@@ -1127,7 +1305,7 @@ class DashboardView extends ItemView {
       }
     }
     if (!target) {
-      new Notice(`迭代日志中没有 ${dateKey} 的记录`);
+      new Notice(this.t("logNotFound", dateKey));
       return;
     }
 
@@ -1152,22 +1330,23 @@ class VaultDashboardSettingTab extends PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    const t = I18N[this.plugin.settings.settingsLocale] || I18N[DEFAULT_LOCALE];
+    const t = I18N[this.plugin.settings.locale] || I18N[DEFAULT_LOCALE];
 
     containerEl.createEl("h2", { text: t.settingsTitle });
 
     new Setting(containerEl)
-      .setName(t.settingsLanguage)
-      .setDesc(t.settingsLanguageDesc)
+      .setName(t.language)
+      .setDesc(t.languageDesc)
       .addDropdown((dropdown) => {
-        for (const id of SETTINGS_LOCALES) {
+        for (const id of LOCALES) {
           dropdown.addOption(id, t.localeName[id]);
         }
-        dropdown.setValue(this.plugin.settings.settingsLocale);
+        dropdown.setValue(this.plugin.settings.locale);
         dropdown.onChange(async (value) => {
-          this.plugin.settings.settingsLocale = value;
+          this.plugin.settings.locale = value;
           await this.plugin.saveSettings();
-          this.display(); // 语言切换只重绘设置页本身，不影响仪表盘
+          this.display();
+          this.plugin.refreshViews(); // 语言同时作用于仪表盘正文
         });
       });
 
@@ -1175,8 +1354,8 @@ class VaultDashboardSettingTab extends PluginSettingTab {
       .setName(t.appearance)
       .setDesc(t.appearanceDesc)
       .addDropdown((dropdown) => {
-        for (const [id, label] of Object.entries(APPEARANCES)) {
-          dropdown.addOption(id, label);
+        for (const id of APPEARANCE_IDS) {
+          dropdown.addOption(id, t.appearanceNames[id]);
         }
         dropdown.setValue(this.plugin.settings.appearance);
         dropdown.onChange(async (value) => {
@@ -1244,6 +1423,21 @@ class VaultDashboardSettingTab extends PluginSettingTab {
           });
         });
     }
+
+    // 排除路径对两种数据源都生效，故置于 changelog 专属设置之外
+    new Setting(containerEl)
+      .setName(t.excludedPrefixesName)
+      .setDesc(t.excludedPrefixesDesc)
+      .addTextArea((area) => {
+        area.setValue(this.plugin.settings.excludedPrefixes.join("\n")).onChange(async (value) => {
+          this.plugin.settings.excludedPrefixes = value
+            .split("\n")
+            .map((p) => p.trim())
+            .filter(Boolean);
+          await this.plugin.saveSettings();
+          this.plugin.reloadViews();
+        });
+      });
 
     containerEl.createEl("h3", { text: t.factoryTitle });
     containerEl.createEl("p", {
@@ -1313,10 +1507,10 @@ module.exports = class VaultDashboardPlugin extends Plugin {
     this.registerView(VIEW_TYPE, (leaf) => new DashboardView(leaf, this));
     this.addSettingTab(new VaultDashboardSettingTab(this.app, this));
 
-    this.addRibbonIcon("layout-dashboard", "知识库仪表盘", () => this.activateView());
+    this.addRibbonIcon("layout-dashboard", "Open Vault Dashboard X", () => this.activateView());
     this.addCommand({
       id: "open-vault-dashboard-x",
-      name: "打开知识库仪表盘",
+      name: "Open dashboard",
       callback: () => this.activateView(),
     });
   }
@@ -1333,15 +1527,22 @@ module.exports = class VaultDashboardPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
     const migrated = this.settings.appearance === "universal";
     if (migrated) this.settings.appearance = "y2k";
-    if (!Object.prototype.hasOwnProperty.call(APPEARANCES, this.settings.appearance)) {
+    if (!APPEARANCE_IDS.includes(this.settings.appearance)) {
       this.settings.appearance = DEFAULT_SETTINGS.appearance;
     }
-    if (!SETTINGS_LOCALES.includes(this.settings.settingsLocale)) {
-      this.settings.settingsLocale = DEFAULT_LOCALE;
+    // 旧版仅设置页有 settingsLocale（默认 zh-Hans）；现统一为 locale（默认英文）并做迁移。
+    if (saved && typeof saved.locale !== "string" && typeof saved.settingsLocale === "string") {
+      this.settings.locale = saved.settingsLocale;
     }
+    if (!LOCALES.includes(this.settings.locale)) {
+      this.settings.locale = DEFAULT_LOCALE;
+    }
+    delete this.settings.settingsLocale;
 
-    // 老存档（provider 出现前）没有 dataSource 字段：此前一直在用迭代日志，迁移过去保持行为不变
-    if (typeof saved?.dataSource !== "string") {
+    // 老存档（provider 出现前）没有 dataSource 字段：此前一直在用迭代日志，迁移过去保持行为不变。
+    // 必须限定「确实存在存档」——全新安装 loadData() 返回 null，不能被误判成老存档，
+    // 否则新用户一装就落到 changelog 模式、又没有日志路径可读，看到的是一张空图。
+    if (saved && typeof saved.dataSource !== "string") {
       this.settings.dataSource = "changelog";
     }
     if (!DATA_SOURCES.includes(this.settings.dataSource)) {
