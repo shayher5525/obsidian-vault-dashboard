@@ -57,10 +57,8 @@ console.log(`天数: ${days}  条目: ${total}`);
 console.log(`范围: ${sorted[0]} → ${sorted[sorted.length - 1]}`);
 if (busiest) console.log(`最忙: ${busiest[0]}（${busiest[1]} 条）`);
 
-const expectedDays = 63;
-const expectedTotal = 1021;
-const ok = days === expectedDays && total === expectedTotal;
-console.log(`期望 ${expectedDays} 天 / ${expectedTotal} 条 → ${ok ? "PASS" : "FAIL"}`);
+// 实库数据随本人每天写日志而增长，不能作断言依据，仅打印供参看。
+console.log("（实库为活数据，仅供参看，不参与成败判定）");
 
 // 4) 回退链单元测试
 let pass = 0;
@@ -74,6 +72,17 @@ function assert(label, actual, expected) {
     console.log(`  FAIL ${label}: 期望 ${expected}，实际 ${actual}`);
   }
 }
+
+// 固定夹具：内容不变，可做精确断言
+console.log("\n=== changelog 解析（固定夹具） ===");
+const fixture = path.join(__dirname, "fixtures", "changelog-sample.md");
+const fx = api.parseIterationLog(fs.readFileSync(fixture, "utf8"));
+const fxTotal = [...fx.values()].reduce((a, b) => a + b, 0);
+assert("夹具天数", fx.size, 3);
+assert("夹具条目数", fxTotal, 5);
+assert("多分类同日合并", fx.get("2026-01-03"), 3);
+assert("引用行不计数", fx.get("2026-01-02"), 1);
+assert("非日期二级标题结束当天", fx.get("2026-01-01"), 1);
 
 console.log("\n=== noteActivityDay 回退链 ===");
 const mkFile = (basename, mtime) => ({ basename, stat: { mtime } });
@@ -109,4 +118,4 @@ assert("数字时间戳", api.ymdFromValue(new Date(2026, 7, 26).getTime()), "20
 assert("null", api.ymdFromValue(null), null);
 
 console.log(`\n单元测试: ${pass} 通过 / ${fail} 失败`);
-process.exit(fail === 0 && ok ? 0 : 1);
+process.exit(fail === 0 ? 0 : 1);

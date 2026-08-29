@@ -58,10 +58,31 @@ const FACTORY_SLOT_COUNT = 5;
 /** 汇总视图（未选定子目录时）「近期修改」列表条数上限 */
 const FACTORY_RECENT_LIMIT = 20;
 /** 界面语言：同时影响设置页与仪表盘正文 */
-const LOCALES = ["zh-Hans", "zh-Hant", "en"];
+const LOCALES = ["en", "zh-Hans", "zh-Hant", "fr", "it", "ja", "ko", "es"];
 const DEFAULT_LOCALE = "en";
 /** 内部 locale id → Intl 用 locale（数字 / 月份格式化） */
-const INTL_LOCALE = { "zh-Hans": "zh-CN", "zh-Hant": "zh-TW", en: "en" };
+const INTL_LOCALE = {
+  "zh-Hans": "zh-CN",
+  "zh-Hant": "zh-TW",
+  en: "en",
+  fr: "fr",
+  it: "it",
+  ja: "ja",
+  ko: "ko",
+  es: "es",
+};
+
+/** 语言名一律用该语言自己的写法，免去 8×8 的互译矩阵 */
+const LOCALE_NAMES = {
+  en: "English",
+  "zh-Hans": "简体中文",
+  "zh-Hant": "繁體中文",
+  fr: "Français",
+  it: "Italiano",
+  ja: "日本語",
+  ko: "한국어",
+  es: "Español",
+};
 
 function formatNumber(n, localeId) {
   return n.toLocaleString(INTL_LOCALE[localeId] || "en");
@@ -109,7 +130,7 @@ const I18N = {
     settingsTitle: "知识库仪表盘设置",
     language: "语言",
     languageDesc: "设置页与仪表盘正文的界面语言。",
-    localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
+    localeName: LOCALE_NAMES,
     appearance: "外观风格",
     appearanceDesc: "选择仪表盘的视觉风格。更改后会立即应用到已打开的仪表盘。",
     dataSourceTitle: "数据源",
@@ -128,7 +149,7 @@ const I18N = {
     excludedPrefixesDesc: "每行一个路径前缀，匹配到的笔记不计入任何统计；留空表示不排除。",
     changelogPathsName: "迭代日志路径",
     changelogPathsDesc: "每行一个文件或文件夹路径；文件夹取其下所有 .md（不递归）。",
-    factoryTitle: "可视文件夹",
+    factoryTitle: "快捷入口",
     factoryDesc:
       "最多可配置 5 个板块。每个板块指定一个文件夹，仪表盘按该文件夹的子目录出二级标签、按修改时间列出笔记。" +
       "「文件夹路径」留空则该板块不显示；填写后若「显示名称」留空，自动取文件夹名并去掉编号前缀。" +
@@ -184,7 +205,7 @@ const I18N = {
     settingsTitle: "知識庫儀表盤設置",
     language: "語言",
     languageDesc: "設定頁與儀表盤正文的介面語言。",
-    localeName: { "zh-Hans": "簡體中文", "zh-Hant": "繁體中文", en: "English" },
+    localeName: LOCALE_NAMES,
     appearance: "外觀風格",
     appearanceDesc: "選擇儀表盤的視覺風格。更改後會立即應用到已打開的儀表盤。",
     dataSourceTitle: "數據源",
@@ -203,7 +224,7 @@ const I18N = {
     excludedPrefixesDesc: "每行一個路徑前綴，符合的筆記不計入任何統計；留空表示不排除。",
     changelogPathsName: "迭代日誌路徑",
     changelogPathsDesc: "每行一個檔案或資料夾路徑；資料夾取其下所有 .md（不遞迴）。",
-    factoryTitle: "可視文件夾",
+    factoryTitle: "快捷入口",
     factoryDesc:
       "最多可配置 5 個板塊。每個板塊指定一個文件夾，儀表盤按該文件夾的子目錄出二級標籤、按修改時間列出筆記。" +
       "「文件夾路徑」留空則該板塊不顯示；填寫後若「顯示名稱」留空，自動取文件夾名並去掉編號前綴。" +
@@ -259,7 +280,7 @@ const I18N = {
     settingsTitle: "Vault Dashboard X Settings",
     language: "Language",
     languageDesc: "Interface language for the settings page and the dashboard.",
-    localeName: { "zh-Hans": "简体中文", "zh-Hant": "繁體中文", en: "English" },
+    localeName: LOCALE_NAMES,
     appearance: "Appearance",
     appearanceDesc: "Choose the dashboard's visual style. Applies immediately to any open dashboard.",
     dataSourceTitle: "Data source",
@@ -279,7 +300,7 @@ const I18N = {
       "One path prefix per line. Matching notes are left out of every statistic. Leave empty to exclude nothing.",
     changelogPathsName: "Changelog paths",
     changelogPathsDesc: "One file or folder per line; a folder takes all .md inside (non-recursive).",
-    factoryTitle: "Visual Folders",
+    factoryTitle: "Quick access",
     factoryDesc:
       "Configure up to 5 blocks. Each block points to a folder; the dashboard shows its subfolders as " +
       "second-level tabs and lists notes by modified time. Leave \"Folder path\" empty to hide the block; " +
@@ -333,6 +354,407 @@ const I18N = {
       `No changelog entries found in ${paths}. The activity overview has no data yet.`,
     logNotFound: (dateKey) => `No changelog entry for ${dateKey}`,
   },
+  fr: {
+    settingsTitle: "Paramètres de Vault Dashboard X",
+    language: "Langue",
+    languageDesc: "Langue de l'interface pour la page des paramètres et le tableau de bord.",
+    localeName: LOCALE_NAMES,
+    appearance: "Apparence",
+    appearanceDesc:
+      "Choisissez le style visuel du tableau de bord. S'applique immédiatement à tout tableau de bord ouvert.",
+    dataSourceTitle: "Source de données",
+    dataSourceName: "Source des données d'activité",
+    dataSourceDesc:
+      "Ce que compte la carte de chaleur. « Activité des notes » fonctionne dans tout coffre ; « Journal des modifications » analyse des fichiers de journal.",
+    dataSourceNoteActivity: "Activité des notes",
+    dataSourceChangelog: "Journal des modifications",
+    activityDateFieldName: "Champ de date d'activité",
+    activityDateFieldDesc:
+      "Utiliser ce champ du frontmatter comme date d'activité, puis se rabattre sur created/date, la date du nom de fichier, puis la date de modification.",
+    useMtimeName: "Se rabattre sur la date de modification",
+    useMtimeDesc:
+      "Désactivé, la date de modification n'est pas utilisée, ce qui évite les faux pics quand un service de synchronisation (iCloud, etc.) réécrit les dates en masse. Désactivé par défaut.",
+    excludedPrefixesName: "Chemins exclus",
+    excludedPrefixesDesc:
+      "Un préfixe de chemin par ligne. Les notes correspondantes sont exclues de toutes les statistiques. Laisser vide pour ne rien exclure.",
+    changelogPathsName: "Chemins du journal",
+    changelogPathsDesc:
+      "Un fichier ou dossier par ligne ; un dossier prend tous les .md qu'il contient (non récursif).",
+    factoryTitle: "Accès rapide",
+    factoryDesc:
+      "Configurez jusqu'à 5 blocs. Chaque bloc pointe vers un dossier ; le tableau de bord affiche ses " +
+      "sous-dossiers comme onglets de second niveau et liste les notes par date de modification. Laissez " +
+      "« Chemin du dossier » vide pour masquer le bloc ; si « Nom affiché » est vide, le nom du dossier " +
+      "(préfixe numérique retiré) est utilisé. À partir de 2 blocs configurés, un sélecteur d'onglets apparaît.",
+    slotName: (i) => `Bloc ${i}`,
+    folderPlaceholder: "Chemin du dossier, p. ex. B_ContentFactory 内容工厂",
+    labelPlaceholder: "Nom affiché (vide = nom du dossier)",
+    statusFound: "✓ Dossier trouvé",
+    statusNotFound: "⚠ Chemin introuvable dans le coffre — vérifiez la casse et le chemin complet",
+
+    appearanceNames: { modern: "Apple", y2k: "Console Y2K", starbucks: "Café Starbucks" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "Aperçu",
+    tabFolders: "Dossiers",
+    tabAll: "Tout",
+    rangeAll: "Tout",
+    range30d: "30 jours",
+    range7d: "7 jours",
+    rootLabel: "Racine du coffre",
+    selfFiles: "Fichiers ici",
+    unitNote: "notes",
+    unitIteration: "itérations",
+    statNoteCount: "Notes",
+    statActiveDays: "Jours actifs",
+    statStreakLabel: "Série en cours",
+    streakDays: (n) => `${n} jours`,
+    statTopBlocks: "Blocs de premier niveau",
+    statMaxDepth: (n) => `${n} niveaux`,
+    statRootScattered: "Fichiers à la racine",
+    statMaxDepthLabel: "Profondeur max",
+    foldersEmpty: "Aucune note dans ce coffre pour l'instant.",
+    addedInDays: (n) => `Ajoutées en ${n} jours`,
+    addedThisMonth: "Ajoutées ce mois-ci",
+    legendLess: "Moins",
+    legendMore: "Plus",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} ${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · Aucune activité`,
+    footerEmpty: (unit) => `Aucune ${unit} sur cette période.`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `${total} ${unit} sur la période, moy. ${average}/jour actif · pic le ${busiestDate} (${busiestValue}).`,
+    foldersFooter: (addedLabel) =>
+      `Les pourcentages et les barres sont relatifs au dossier parent. « ${addedLabel} » compte les fichiers par date de création. Cliquez sur un dossier pour l'explorer.`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} notes (${pct})`,
+    factoryNotFound: (path) => `Dossier introuvable dans le coffre : ${path}`,
+    factoryHint: (n) => `Affiche les ${n} notes modifiées le plus récemment`,
+    factoryEmpty: "Aucune note dans ce dossier pour l'instant.",
+    emptyNoteActivity:
+      "Aucune note avec une date exploitable n'a été trouvée (date du frontmatter, date du nom de fichier ou date de modification). Vous pouvez changer la source de données dans les paramètres.",
+    emptyChangelog: (paths) =>
+      `Aucune entrée de journal trouvée dans ${paths}. L'aperçu d'activité n'a pas encore de données.`,
+    logNotFound: (dateKey) => `Aucune entrée de journal pour ${dateKey}`,
+  },
+
+  it: {
+    settingsTitle: "Impostazioni di Vault Dashboard X",
+    language: "Lingua",
+    languageDesc: "Lingua dell'interfaccia per la pagina delle impostazioni e la dashboard.",
+    localeName: LOCALE_NAMES,
+    appearance: "Aspetto",
+    appearanceDesc:
+      "Scegli lo stile visivo della dashboard. Si applica subito a ogni dashboard aperta.",
+    dataSourceTitle: "Origine dati",
+    dataSourceName: "Origine dei dati di attività",
+    dataSourceDesc:
+      "Ciò che conta la mappa di calore. «Attività delle note» funziona in qualsiasi vault; «Changelog» analizza i file di changelog.",
+    dataSourceNoteActivity: "Attività delle note",
+    dataSourceChangelog: "Changelog",
+    activityDateFieldName: "Campo data attività",
+    activityDateFieldDesc:
+      "Usa questo campo del frontmatter come data di attività; poi ripiega su created/date, sulla data nel nome file e infine sulla data di modifica.",
+    useMtimeName: "Ripiega sulla data di modifica",
+    useMtimeDesc:
+      "Se disattivato, la data di modifica non viene usata, evitando falsi picchi quando un servizio di sincronizzazione (iCloud, ecc.) aggiorna in blocco le date. Disattivato per impostazione predefinita.",
+    excludedPrefixesName: "Percorsi esclusi",
+    excludedPrefixesDesc:
+      "Un prefisso di percorso per riga. Le note corrispondenti sono escluse da ogni statistica. Lascia vuoto per non escludere nulla.",
+    changelogPathsName: "Percorsi del changelog",
+    changelogPathsDesc:
+      "Un file o una cartella per riga; una cartella prende tutti i .md al suo interno (non ricorsivo).",
+    factoryTitle: "Accesso rapido",
+    factoryDesc:
+      "Configura fino a 5 blocchi. Ogni blocco punta a una cartella; la dashboard mostra le sue " +
+      "sottocartelle come schede di secondo livello ed elenca le note per data di modifica. Lascia " +
+      "«Percorso della cartella» vuoto per nascondere il blocco; se «Nome visualizzato» è vuoto viene " +
+      "usato il nome della cartella (senza prefisso numerico). Con 2 o più blocchi compare un selettore di schede.",
+    slotName: (i) => `Blocco ${i}`,
+    folderPlaceholder: "Percorso della cartella, es. B_ContentFactory 内容工厂",
+    labelPlaceholder: "Nome visualizzato (vuoto = nome della cartella)",
+    statusFound: "✓ Cartella trovata",
+    statusNotFound: "⚠ Percorso non trovato nel vault — controlla maiuscole e percorso completo",
+
+    appearanceNames: { modern: "Apple", y2k: "Console Y2K", starbucks: "Caffè Starbucks" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "Panoramica",
+    tabFolders: "Cartelle",
+    tabAll: "Tutto",
+    rangeAll: "Tutto",
+    range30d: "30 giorni",
+    range7d: "7 giorni",
+    rootLabel: "Radice del vault",
+    selfFiles: "File qui",
+    unitNote: "note",
+    unitIteration: "iterazioni",
+    statNoteCount: "Note",
+    statActiveDays: "Giorni attivi",
+    statStreakLabel: "Serie attuale",
+    streakDays: (n) => `${n} giorni`,
+    statTopBlocks: "Blocchi di primo livello",
+    statMaxDepth: (n) => `${n} livelli`,
+    statRootScattered: "File nella radice",
+    statMaxDepthLabel: "Profondità max",
+    foldersEmpty: "Nessuna nota in questo vault.",
+    addedInDays: (n) => `Nuove in ${n} giorni`,
+    addedThisMonth: "Nuove questo mese",
+    legendLess: "Meno",
+    legendMore: "Più",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} ${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · Nessuna attività`,
+    footerEmpty: (unit) => `Nessuna ${unit} in questo intervallo.`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `${total} ${unit} nell'intervallo, media ${average}/giorno attivo · picco il ${busiestDate} (${busiestValue}).`,
+    foldersFooter: (addedLabel) =>
+      `Percentuali e barre sono relative alla cartella superiore. «${addedLabel}» conta i file per data di creazione. Fai clic su una cartella per approfondire.`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} note (${pct})`,
+    factoryNotFound: (path) => `Cartella non trovata nel vault: ${path}`,
+    factoryHint: (n) => `Mostra le ${n} note modificate più di recente`,
+    factoryEmpty: "Nessuna nota in questa cartella.",
+    emptyNoteActivity:
+      "Non è stata trovata alcuna nota con una data utilizzabile (data nel frontmatter, data nel nome file o data di modifica). Puoi cambiare l'origine dati nelle impostazioni.",
+    emptyChangelog: (paths) =>
+      `Nessuna voce di changelog trovata in ${paths}. La panoramica delle attività non ha ancora dati.`,
+    logNotFound: (dateKey) => `Nessuna voce di changelog per ${dateKey}`,
+  },
+
+  ja: {
+    settingsTitle: "Vault Dashboard X の設定",
+    language: "言語",
+    languageDesc: "設定ページとダッシュボードの表示言語。",
+    localeName: LOCALE_NAMES,
+    appearance: "外観",
+    appearanceDesc: "ダッシュボードの外観スタイルを選びます。開いているダッシュボードに即座に適用されます。",
+    dataSourceTitle: "データソース",
+    dataSourceName: "アクティビティのデータソース",
+    dataSourceDesc:
+      "ヒートマップが数える対象。「ノートの更新」はどの保管庫でも動作し、「変更履歴」は変更履歴ファイルを解析します（この保管庫の従来の挙動）。",
+    dataSourceNoteActivity: "ノートの更新",
+    dataSourceChangelog: "変更履歴",
+    activityDateFieldName: "アクティビティ日付フィールド",
+    activityDateFieldDesc:
+      "この frontmatter フィールドを優先して活動日とし、なければ created/date、ファイル名の日付、更新日時の順に遡ります。",
+    useMtimeName: "更新日時で代替する",
+    useMtimeDesc:
+      "オフのとき更新日時は使いません。iCloud などの同期で更新日時が一括で書き換わっても偽の山が出ません。既定はオフです。",
+    excludedPrefixesName: "除外パス",
+    excludedPrefixesDesc:
+      "1 行につき 1 つのパス接頭辞。一致するノートはすべての統計から外れます。空欄なら除外しません。",
+    changelogPathsName: "変更履歴のパス",
+    changelogPathsDesc:
+      "1 行につき 1 つのファイルまたはフォルダー。フォルダーは直下の .md をすべて取ります（再帰しません）。",
+    factoryTitle: "クイックアクセス",
+    factoryDesc:
+      "最大 5 ブロックまで設定できます。各ブロックはフォルダーを指し、ダッシュボードはその" +
+      "サブフォルダーを第 2 階層のタブとして表示し、更新日時順にノートを並べます。" +
+      "「フォルダーのパス」を空欄にするとそのブロックは非表示になります。「表示名」が空欄なら" +
+      "フォルダー名（先頭の連番を除いたもの）を使います。2 つ以上設定すると上部にタブ切り替えが出ます。",
+    slotName: (i) => `ブロック ${i}`,
+    folderPlaceholder: "フォルダーのパス（例：B_ContentFactory 内容工厂）",
+    labelPlaceholder: "表示名（空欄ならフォルダー名）",
+    statusFound: "✓ フォルダーが見つかりました",
+    statusNotFound: "⚠ 保管庫内にパスが見つかりません — 大文字小文字と完全パスを確認してください",
+
+    appearanceNames: { modern: "Apple", y2k: "Y2K コンソール", starbucks: "スターバックス カフェ" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "概要",
+    tabFolders: "フォルダー",
+    tabAll: "すべて",
+    rangeAll: "すべて",
+    range30d: "30 日",
+    range7d: "7 日",
+    rootLabel: "保管庫のルート",
+    selfFiles: "直下のファイル",
+    unitNote: "件",
+    unitIteration: "件",
+    statNoteCount: "ノート数",
+    statActiveDays: "活動日数",
+    statStreakLabel: "継続日数",
+    streakDays: (n) => `${n} 日`,
+    statTopBlocks: "最上位ブロック",
+    statMaxDepth: (n) => `${n} 階層`,
+    statRootScattered: "ルート直下のファイル",
+    statMaxDepthLabel: "最大階層",
+    foldersEmpty: "この保管庫にはまだノートがありません。",
+    addedInDays: (n) => `${n} 日間の新規`,
+    addedThisMonth: "今月の新規",
+    legendLess: "少",
+    legendMore: "多",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} ${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · 活動なし`,
+    footerEmpty: (unit) => `この期間の${unit}はありません。`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `期間内 ${total} ${unit}、活動日あたり平均 ${average} · 最多は ${busiestDate}（${busiestValue}）。`,
+    foldersFooter: (addedLabel) =>
+      `割合とバーは親フォルダーに対する値です。「${addedLabel}」は作成日時で数えます。フォルダーをクリックすると掘り下げます。`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} 件（${pct}）`,
+    factoryNotFound: (path) => `保管庫にフォルダーが見つかりません：${path}`,
+    factoryHint: (n) => `最近更新された ${n} 件を表示しています`,
+    factoryEmpty: "このフォルダーにはまだノートがありません。",
+    emptyNoteActivity:
+      "使用できる日付を持つノートが見つかりませんでした（frontmatter の日付、ファイル名の日付、更新日時のいずれも）。設定でデータソースを変更できます。",
+    emptyChangelog: (paths) => `${paths} に変更履歴の項目が見つかりません。活動概要のデータはまだありません。`,
+    logNotFound: (dateKey) => `${dateKey} の変更履歴項目がありません`,
+  },
+
+  ko: {
+    settingsTitle: "Vault Dashboard X 설정",
+    language: "언어",
+    languageDesc: "설정 페이지와 대시보드의 인터페이스 언어입니다.",
+    localeName: LOCALE_NAMES,
+    appearance: "외관",
+    appearanceDesc: "대시보드의 시각적 스타일을 선택합니다. 열려 있는 대시보드에 즉시 적용됩니다.",
+    dataSourceTitle: "데이터 소스",
+    dataSourceName: "활동 데이터 소스",
+    dataSourceDesc:
+      "히트맵이 세는 대상입니다. '노트 활동'은 모든 보관함에서 작동하고, '변경 기록'은 변경 기록 파일을 해석합니다(이 보관함의 기존 동작).",
+    dataSourceNoteActivity: "노트 활동",
+    dataSourceChangelog: "변경 기록",
+    activityDateFieldName: "활동 날짜 필드",
+    activityDateFieldDesc:
+      "이 frontmatter 필드를 활동 날짜로 우선 사용하고, 없으면 created/date, 파일명 날짜, 수정 시각 순으로 대체합니다.",
+    useMtimeName: "파일 수정 시각으로 대체",
+    useMtimeDesc:
+      "끄면 수정 시각을 사용하지 않아 iCloud 등 동기화가 수정 시각을 일괄 갱신해도 가짜 급증이 생기지 않습니다. 기본값은 꺼짐입니다.",
+    excludedPrefixesName: "제외 경로",
+    excludedPrefixesDesc:
+      "한 줄에 경로 접두사 하나. 일치하는 노트는 모든 통계에서 제외됩니다. 비워 두면 아무것도 제외하지 않습니다.",
+    changelogPathsName: "변경 기록 경로",
+    changelogPathsDesc:
+      "한 줄에 파일 또는 폴더 하나. 폴더는 바로 아래의 .md를 모두 가져옵니다(하위 폴더 제외).",
+    factoryTitle: "바로가기",
+    factoryDesc:
+      "최대 5개 블록을 설정할 수 있습니다. 각 블록은 폴더를 가리키며, 대시보드는 그 하위 폴더를 " +
+      "2단계 탭으로 표시하고 수정 시각순으로 노트를 나열합니다. '폴더 경로'를 비우면 해당 블록은 " +
+      "숨겨집니다. '표시 이름'이 비어 있으면 폴더 이름(앞의 숫자 접두사를 뗀 것)을 사용합니다. " +
+      "2개 이상 설정하면 상단에 탭 전환기가 나타납니다.",
+    slotName: (i) => `블록 ${i}`,
+    folderPlaceholder: "폴더 경로, 예: B_ContentFactory 内容工厂",
+    labelPlaceholder: "표시 이름(비우면 폴더 이름 사용)",
+    statusFound: "✓ 폴더를 찾았습니다",
+    statusNotFound: "⚠ 보관함에서 경로를 찾을 수 없습니다 — 대소문자와 전체 경로를 확인하세요",
+
+    appearanceNames: { modern: "Apple", y2k: "Y2K 콘솔", starbucks: "스타벅스 카페" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "개요",
+    tabFolders: "폴더",
+    tabAll: "전체",
+    rangeAll: "전체",
+    range30d: "30일",
+    range7d: "7일",
+    rootLabel: "보관함 루트",
+    selfFiles: "이 폴더의 파일",
+    unitNote: "개",
+    unitIteration: "건",
+    statNoteCount: "노트 수",
+    statActiveDays: "활동 일수",
+    statStreakLabel: "현재 연속",
+    streakDays: (n) => `${n}일`,
+    statTopBlocks: "최상위 블록",
+    statMaxDepth: (n) => `${n}단계`,
+    statRootScattered: "루트 파일",
+    statMaxDepthLabel: "최대 깊이",
+    foldersEmpty: "이 보관함에는 아직 노트가 없습니다.",
+    addedInDays: (n) => `${n}일간 신규`,
+    addedThisMonth: "이번 달 신규",
+    legendLess: "적음",
+    legendMore: "많음",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count}${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · 활동 없음`,
+    footerEmpty: (unit) => `이 기간에는 ${unit}가 없습니다.`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `기간 내 ${total}${unit}, 활동일 평균 ${average} · 최다는 ${busiestDate}(${busiestValue}).`,
+    foldersFooter: (addedLabel) =>
+      `비율과 막대는 상위 폴더 기준입니다. '${addedLabel}'는 생성 시각으로 셉니다. 폴더를 클릭하면 하위로 들어갑니다.`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count}개 (${pct})`,
+    factoryNotFound: (path) => `보관함에서 폴더를 찾을 수 없습니다: ${path}`,
+    factoryHint: (n) => `최근 수정된 ${n}개를 표시합니다`,
+    factoryEmpty: "이 폴더에는 아직 노트가 없습니다.",
+    emptyNoteActivity:
+      "사용할 수 있는 날짜를 가진 노트를 찾지 못했습니다(frontmatter 날짜, 파일명 날짜, 수정 시각 모두). 설정에서 데이터 소스를 바꿀 수 있습니다.",
+    emptyChangelog: (paths) => `${paths}에서 변경 기록 항목을 찾지 못했습니다. 활동 개요에 데이터가 아직 없습니다.`,
+    logNotFound: (dateKey) => `${dateKey}에 해당하는 변경 기록 항목이 없습니다`,
+  },
+
+  es: {
+    settingsTitle: "Configuración de Vault Dashboard X",
+    language: "Idioma",
+    languageDesc: "Idioma de la interfaz para la página de ajustes y el panel.",
+    localeName: LOCALE_NAMES,
+    appearance: "Apariencia",
+    appearanceDesc:
+      "Elige el estilo visual del panel. Se aplica de inmediato a cualquier panel abierto.",
+    dataSourceTitle: "Origen de datos",
+    dataSourceName: "Origen de los datos de actividad",
+    dataSourceDesc:
+      "Lo que cuenta el mapa de calor. «Actividad de notas» funciona en cualquier bóveda; «Registro de cambios» analiza archivos de registro (el comportamiento original de esta bóveda).",
+    dataSourceNoteActivity: "Actividad de notas",
+    dataSourceChangelog: "Registro de cambios",
+    activityDateFieldName: "Campo de fecha de actividad",
+    activityDateFieldDesc:
+      "Usa este campo del frontmatter como fecha de actividad; si falta, recurre a created/date, la fecha del nombre de archivo y la fecha de modificación.",
+    useMtimeName: "Recurrir a la fecha de modificación",
+    useMtimeDesc:
+      "Si está desactivado, no se usa la fecha de modificación, evitando picos falsos cuando un servicio de sincronización (iCloud, etc.) las actualiza en bloque. Desactivado por defecto.",
+    excludedPrefixesName: "Rutas excluidas",
+    excludedPrefixesDesc:
+      "Un prefijo de ruta por línea. Las notas coincidentes quedan fuera de todas las estadísticas. Déjalo vacío para no excluir nada.",
+    changelogPathsName: "Rutas del registro",
+    changelogPathsDesc:
+      "Un archivo o carpeta por línea; una carpeta toma todos los .md que contiene (sin recursión).",
+    factoryTitle: "Acceso rápido",
+    factoryDesc:
+      "Configura hasta 5 bloques. Cada bloque apunta a una carpeta; el panel muestra sus subcarpetas " +
+      "como pestañas de segundo nivel y lista las notas por fecha de modificación. Deja «Ruta de la " +
+      "carpeta» vacía para ocultar el bloque; si «Nombre visible» está vacío se usa el nombre de la " +
+      "carpeta (sin el prefijo numérico). Con 2 o más bloques aparece un selector de pestañas.",
+    slotName: (i) => `Bloque ${i}`,
+    folderPlaceholder: "Ruta de la carpeta, p. ej. B_ContentFactory 内容工厂",
+    labelPlaceholder: "Nombre visible (vacío = nombre de la carpeta)",
+    statusFound: "✓ Carpeta encontrada",
+    statusNotFound: "⚠ Ruta no encontrada en la bóveda — revisa mayúsculas y la ruta completa",
+
+    appearanceNames: { modern: "Apple", y2k: "Consola Y2K", starbucks: "Café Starbucks" },
+    dashboardTitle: "Vault Dashboard X",
+    tabOverview: "Resumen",
+    tabFolders: "Carpetas",
+    tabAll: "Todo",
+    rangeAll: "Todo",
+    range30d: "30 días",
+    range7d: "7 días",
+    rootLabel: "Raíz de la bóveda",
+    selfFiles: "Archivos aquí",
+    unitNote: "notas",
+    unitIteration: "iteraciones",
+    statNoteCount: "Notas",
+    statActiveDays: "Días activos",
+    statStreakLabel: "Racha actual",
+    streakDays: (n) => `${n} días`,
+    statTopBlocks: "Bloques de nivel superior",
+    statMaxDepth: (n) => `${n} niveles`,
+    statRootScattered: "Archivos en la raíz",
+    statMaxDepthLabel: "Profundidad máx.",
+    foldersEmpty: "Aún no hay notas en esta bóveda.",
+    addedInDays: (n) => `Nuevas en ${n} días`,
+    addedThisMonth: "Nuevas este mes",
+    legendLess: "Menos",
+    legendMore: "Más",
+    heatmapTooltipCount: (key, count, unit) => `${key} · ${count} ${unit}`,
+    heatmapTooltipEmpty: (key) => `${key} · Sin actividad`,
+    footerEmpty: (unit) => `No hay ${unit} en este intervalo.`,
+    footerSummary: (total, unit, average, busiestDate, busiestValue) =>
+      `${total} ${unit} en el intervalo, media ${average}/día activo · el día con más fue ${busiestDate} (${busiestValue}).`,
+    foldersFooter: (addedLabel) =>
+      `Los porcentajes y las barras son relativos a la carpeta superior. «${addedLabel}» cuenta los archivos por fecha de creación. Haz clic en una carpeta para explorarla.`,
+    tooltipFolder: (name, count, pct) => `${name} · ${count} notas (${pct})`,
+    factoryNotFound: (path) => `Carpeta no encontrada en la bóveda: ${path}`,
+    factoryHint: (n) => `Mostrando las ${n} notas modificadas más recientemente`,
+    factoryEmpty: "Aún no hay notas en esta carpeta.",
+    emptyNoteActivity:
+      "No se encontró ninguna nota con una fecha utilizable (fecha del frontmatter, fecha del nombre de archivo o fecha de modificación). Puedes cambiar el origen de datos en los ajustes.",
+    emptyChangelog: (paths) =>
+      `No se encontraron entradas de registro en ${paths}. El resumen de actividad aún no tiene datos.`,
+    logNotFound: (dateKey) => `No hay entrada de registro para ${dateKey}`,
+  },
+
 };
 
 /**
@@ -619,6 +1041,47 @@ class DashboardView extends ItemView {
     this.expanded = new Set(); // 目录页展开的节点路径
     this.factorySlotPath = null; // 内容工厂当前选中板块（设置里配置的文件夹路径），null = 未初始化
     this.factoryL2 = null; // 内容工厂二级标签：子目录路径，null = 全部
+    this._sliderIdx = {}; // 各标签组上一次选中的序号，用于高亮滑块的起点
+  }
+
+  /**
+   * 高亮滑块：点击标签会走 render() 整体重建 DOM，CSS 过渡接不上前一状态，
+   * 故记住上一次选中序号——重建后先无动画落到旧位，下一帧再过渡到新位，
+   * 视觉上即为滑动。组内容变化（如切换一级标签导致二级标签换了一批）时
+   * 旧序号失效，直接落到新位不做动画。
+   */
+  mountSlider(container, key) {
+    const items = [...container.children];
+    const activeIndex = items.findIndex((el) => el.classList.contains("is-active"));
+    if (activeIndex < 0) return;
+
+    const slider = container.createDiv({ cls: "vdash-slider" });
+    container.prepend(slider);
+
+    const place = (idx, animate) => {
+      const el = items[idx];
+      if (!el) return false;
+      slider.style.transition = animate ? "" : "none";
+      slider.style.width = `${el.offsetWidth}px`;
+      slider.style.height = `${el.offsetHeight}px`;
+      slider.style.transform = `translate(${el.offsetLeft}px, ${el.offsetTop}px)`;
+      return true;
+    };
+
+    const prev = this._sliderIdx[key];
+    const from = Number.isInteger(prev) && items[prev] ? prev : activeIndex;
+    this._sliderIdx[key] = activeIndex;
+
+    // 必须等版面落定再量：render() 进行中标签尚未套上 flex 与 min-height，
+    // 此时 offsetWidth 拿到的是块级全宽，滑块会画成一整条。
+    window.requestAnimationFrame(() => {
+      if (!slider.isConnected) return;
+      place(from, false);
+      if (from !== activeIndex) {
+        void slider.offsetWidth; // 强制回流，确保起点落定后才开过渡
+        window.requestAnimationFrame(() => place(activeIndex, true));
+      }
+    });
   }
 
   /** 当前 locale 的字典（缺省回退默认）。 */
@@ -917,6 +1380,7 @@ class DashboardView extends ItemView {
         this.render();
       });
     }
+    this.mountSlider(tabs, "tabs");
 
     const switcher = header.createDiv({ cls: "vdash-range" });
     for (const preset of RANGES) {
@@ -929,6 +1393,7 @@ class DashboardView extends ItemView {
         this.render();
       });
     }
+    this.mountSlider(switcher, "range");
   }
 
   renderStatCards(parent, stats) {
@@ -1209,6 +1674,7 @@ class DashboardView extends ItemView {
           this.factoryL2 = null;
         });
       }
+      this.mountSlider(l1, "factoryL1");
     }
 
     const current = this.app.vault.getAbstractFileByPath(this.factorySlotPath);
@@ -1232,6 +1698,7 @@ class DashboardView extends ItemView {
           this.factoryL2 = sub.path;
         });
       }
+      this.mountSlider(l2, `factoryL2:${this.factorySlotPath}`);
     } else {
       // 该板块没有子目录，二级标签整行不出
       this.factoryL2 = null;
@@ -1620,3 +2087,4 @@ module.exports._internal = {
   ChangelogProvider,
   DEFAULT_CHANGELOG_PATHS,
 };
+/* nosourcemap */

@@ -636,7 +636,7 @@
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-stage {
-  padding: clamp(16px, 3vw, 40px);
+  padding: clamp(12px, 2vw, 24px);
   background-color: var(--vd-canvas);
 }
 
@@ -657,16 +657,15 @@
   top: 0;
   z-index: 5;
   min-height: 52px;
-  margin-bottom: var(--vd-space-xl);
-  padding: 4px 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  background-color: rgba(245, 245, 247, 0.82);
-  backdrop-filter: saturate(180%) blur(20px);
+  margin-bottom: var(--vd-space-lg);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--vd-hairline);
+  background-color: var(--vd-canvas);
 }
 
 .theme-dark .view-content.vdash-content.vdash-style-modern .vdash-header {
-  border-bottom-color: rgba(255, 255, 255, 0.12);
-  background-color: rgba(28, 28, 30, 0.82);
+  border-bottom-color: var(--vd-hairline);
+  background-color: var(--vd-canvas);
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-tab,
@@ -700,13 +699,13 @@
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-cards {
-  gap: var(--vd-space-md);
-  margin-bottom: var(--vd-space-xl);
+  gap: var(--vd-space-sm);
+  margin-bottom: var(--vd-space-md);
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-card {
-  min-height: 148px;
-  padding: var(--vd-space-lg);
+  min-height: 104px;
+  padding: var(--vd-space-md);
   border: 1px solid var(--vd-hairline);
   border-radius: var(--vd-radius-lg);
   background-color: var(--vd-surface-raised);
@@ -727,8 +726,10 @@
 
 .view-content.vdash-content.vdash-style-modern .vdash-heatmap {
   margin: 0;
-  padding: clamp(24px, 4vw, 48px);
-  background-color: var(--vd-canvas-muted);
+  padding: clamp(16px, 2.5vw, 28px);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-surface-raised);
   color: var(--vd-ink);
 }
 
@@ -742,10 +743,10 @@
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-footer {
-  margin: 0 0 var(--vd-space-xl);
-  padding: var(--vd-space-lg) clamp(24px, 4vw, 48px);
+  margin: 0 0 var(--vd-space-sm);
+  padding: var(--vd-space-sm) clamp(16px, 2.5vw, 28px);
   border: none;
-  background-color: var(--vd-canvas-muted);
+  background-color: transparent;
   color: var(--vd-ink-subtle);
   font-size: var(--vd-text-fine);
 }
@@ -768,14 +769,15 @@
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-factory {
-  margin-top: clamp(48px, 7vw, 80px);
-  padding: clamp(40px, 7vw, 80px);
-  border: none;
-  background-color: var(--vd-canvas-muted);
+  margin-top: clamp(16px, 2vw, 24px);
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-surface-raised);
 }
 
 .view-content.vdash-content.vdash-style-modern .vdash-factory-title {
-  margin-bottom: var(--vd-space-lg);
+  margin-bottom: var(--vd-space-md);
   font-family: var(--vd-font-display);
   font-size: var(--vd-text-tagline);
   font-weight: 600;
@@ -1475,8 +1477,8 @@
   }
 
   .view-content.vdash-content.vdash-style-modern .vdash-factory {
-    margin-top: 48px;
-    padding: 40px 24px;
+    margin-top: 16px;
+    padding: 24px 20px;
   }
 }
 
@@ -1504,9 +1506,101 @@
   }
 
   .view-content.vdash-content.vdash-style-modern .vdash-factory {
-    margin-top: 32px;
-    padding: 32px 16px;
+    margin-top: 12px;
+    padding: 20px 14px;
   }
+}
+
+/* ---------------------------- 标签高亮滑块 ---------------------------- */
+/*
+ * 点击标签会重建整个 DOM，CSS 过渡接不上，故由 main.js 的 mountSlider()
+ * 记住上一次选中序号，重建后先落旧位、下一帧再过渡到新位。
+ * 滑块默认不显示；仅 modern 外观启用，并同时撤掉选中项自带的底色，
+ * 否则选中项的实底会盖住滑动过程。
+ */
+.view-content.vdash-content .vdash-tabs,
+.view-content.vdash-content .vdash-range,
+.view-content.vdash-content .vdash-factory-tabs {
+  position: relative;
+}
+
+.view-content.vdash-content .vdash-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  display: none;
+  border-radius: var(--vd-radius-pill);
+  pointer-events: none;
+  transition:
+    transform var(--vd-motion-standard) var(--vd-ease),
+    width var(--vd-motion-standard) var(--vd-ease),
+    height var(--vd-motion-standard) var(--vd-ease);
+}
+
+/* 标签本体压在滑块之上，文字才不被遮 */
+.view-content.vdash-content .vdash-tab,
+.view-content.vdash-content .vdash-range-btn,
+.view-content.vdash-content .vdash-factory-tab {
+  position: relative;
+  z-index: 1;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-slider {
+  display: block;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-tabs .vdash-slider {
+  background-color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-range .vdash-slider {
+  background-color: var(--vd-canvas);
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs .vdash-slider {
+  background-color: rgba(0, 113, 227, 0.1);
+}
+
+/*
+ * 未选中项亦须让出底色：标签层级在滑块之上，若自带实色底（modern 的一级板块
+ * 标签为白色胶囊），滑块行经其下即被遮住，视觉上成「白块压蓝框」。
+ * hover 改用半透明淡色，滑块仍可透出。
+ */
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+/* hover 只换文字色，不描边——描边会与滑块的胶囊边缘打架 */
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab:hover {
+  border-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-modern .vdash-tab:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab:hover {
+  background-color: rgba(120, 120, 128, 0.12);
+}
+
+/* 主标签与区间按钮统一加粗 */
+.view-content.vdash-content.vdash-style-modern .vdash-tab,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn {
+  font-weight: 600;
+}
+
+/* 选中项让位给滑块：只保留文字色与字重 */
+.view-content.vdash-content.vdash-style-modern .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-active:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
 }
 
 /* 尊重「减少动态效果」：只留颜色变化，去掉位移与旋转过渡 */
