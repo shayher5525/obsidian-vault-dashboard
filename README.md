@@ -1,5 +1,7 @@
 # Vault Dashboard X
 
+**English** · [中文](README_zh.md) · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Español](README_es.md) · [Italiano](README_it.md)
+
 A dashboard for your Obsidian vault: an activity heatmap, a folder-distribution
 view, and configurable "visual folder" quick links — all in one pane.
 
@@ -14,8 +16,8 @@ view, and configurable "visual folder" quick links — all in one pane.
 - **Two data sources** — a generic "note activity" source (works in any vault)
   and an optional "changelog" parser for markdown changelogs.
 - **Three themes** — Apple, Y2K Console, and Starbucks Café.
-- **Internationalization** — English (default), Simplified Chinese, and
-  Traditional Chinese.
+- **Internationalization** — English (default), Simplified Chinese, Traditional
+  Chinese, Japanese, Korean, French, Spanish, and Italian.
 
 ## Data sources
 
