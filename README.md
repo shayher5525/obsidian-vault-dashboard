@@ -82,7 +82,7 @@ Install "Vault Dashboard X" from **Settings → Community plugins**, then enable
 
 ## License
 
-[MIT](LICENSE)
+[GNU General Public License v3.0](LICENSE)
 
 ## Development
 
