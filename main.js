@@ -1077,10 +1077,39 @@ class DashboardView extends ItemView {
     window.requestAnimationFrame(() => {
       if (!slider.isConnected) return;
       place(from, false);
-      if (from !== activeIndex) {
-        void slider.offsetWidth; // 强制回流，确保起点落定后才开过渡
-        window.requestAnimationFrame(() => place(activeIndex, true));
+      if (from === activeIndex) return;
+
+      /*
+       * 文字色要跟着滑块走，不能在点击瞬间就换：
+       *   新选中项——挂 is-arriving，维持未选中的文字色，等滑块到位再换成选中色；
+       *   旧选中项——暂时把 is-active 还给它，维持选中的文字色，等滑块离开再撤。
+       * 后者不需要新增任何颜色规则：启用滑块的外观下 is-active 只管文字色与字重，
+       * 底色早已让给滑块，所以短暂多挂一个 is-active 不会画出第二块实底。
+       * y2k 没启用滑块（选中态由标签自身实底承担），这里整段跳过，
+       * 否则会同时出现两块实底。
+       */
+      const usesSlider = window.getComputedStyle(slider).display !== "none";
+      const arriving = items[activeIndex];
+      const leaving = items[from];
+      if (usesSlider) {
+        arriving.classList.add("is-arriving");
+        // is-holding 只为关掉颜色过渡：不加的话旧选中项会先从未选中色渐变回选中色，
+        // 头 120ms 依旧是暗字压在滑块上。
+        leaving.classList.add("is-active", "is-holding");
       }
+      let settled = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        arriving.classList.remove("is-arriving");
+        if (leaving !== arriving) leaving.classList.remove("is-active", "is-holding");
+      };
+      // transitionend 可能因过渡被打断或元素被移除而不触发，故加兜底定时器
+      slider.addEventListener("transitionend", settle, { once: true });
+      window.setTimeout(settle, 600);
+
+      void slider.offsetWidth; // 强制回流，确保起点落定后才开过渡
+      window.requestAnimationFrame(() => place(activeIndex, true));
     });
   }
 
@@ -1448,17 +1477,17 @@ class DashboardView extends ItemView {
     grid.style.setProperty("--vdash-cols", String(columns));
 
     const unit = this.dataUnit();
-    for (let d = new Date(gridStart); d <= gridEnd; d = addDays(d, 1)) {
+    const renderCell = (d) => {
       const key = ymd(d);
 
       // 今天之后的格子留空；区间之前的补白格按「无记录」显示
       if (d > end) {
         grid.createDiv({ cls: "vdash-cell is-void" });
-        continue;
+        return;
       }
       if (d < start) {
         grid.createDiv({ cls: "vdash-cell level-0 is-pad" });
-        continue;
+        return;
       }
 
       const value = this.counts.get(key) || 0;
@@ -1472,6 +1501,16 @@ class DashboardView extends ItemView {
       if (this.plugin.settings.dataSource === "changelog") {
         cell.addEventListener("click", () => this.openLogAt(key));
       }
+    };
+
+    // 自左向右为「新 → 旧」：网格是 grid-auto-flow: column，一列即一周，
+    // 故按列倒序生成；列内仍按周一至周日自上而下，不动。
+    if (stripMode) {
+      for (let i = span - 1; i >= 0; i--) renderCell(addDays(gridStart, i));
+    } else {
+      for (let col = columns - 1; col >= 0; col--) {
+        for (let row = 0; row < 7; row++) renderCell(addDays(gridStart, col * 7 + row));
+      }
     }
 
     this.renderLegend(wrap);
@@ -1481,8 +1520,10 @@ class DashboardView extends ItemView {
     const row = parent.createDiv({ cls: "vdash-months" });
     row.style.setProperty("--vdash-cols", String(columns));
 
+    // 与网格同为「新 → 旧」倒序；换月判定按显示顺序做，
+    // 标签因而落在该月自左数第一列（即该月最晚的那一周）。
     let lastMonth = -1;
-    for (let col = 0; col < columns; col++) {
+    for (let col = columns - 1; col >= 0; col--) {
       const weekStart = addDays(gridStart, col * 7);
       const cell = row.createDiv({ cls: "vdash-month" });
       if (weekStart.getMonth() !== lastMonth) {

@@ -634,6 +634,11 @@
   line-height: 1.47;
 }
 
+/* 滚动容器的顶部内边距会随内容滚动，留着就会在 sticky 导航条上方露缝 */
+.view-content.vdash-content.vdash-style-modern {
+  padding-top: 0;
+}
+
 .view-content.vdash-content.vdash-style-modern .vdash-stage {
   padding: clamp(12px, 2vw, 24px);
   background-color: var(--vd-canvas);
@@ -657,9 +662,19 @@
   z-index: 5;
   min-height: 52px;
   margin-bottom: var(--vd-space-lg);
-  padding: 4px 0;
+  /*
+   * 封顶：导航条 sticky 在滚动容器的 top:0，但上方还隔着两段间距——
+   * 滚动容器自身的顶部内边距（已由上面的 padding-top: 0 归零）与
+   * .vdash-stage 的顶部内边距。两段都会随内容滚动，内容便从缝里透出来。
+   * 这里用负 margin 把绘制区域上提到容器顶端，再用等量 padding 补回布局位置。
+   */
+  margin-top: calc(-1 * clamp(12px, 2vw, 24px));
+  padding: calc(4px + clamp(12px, 2vw, 24px)) 0 4px;
   border-bottom: 1px solid var(--vd-hairline);
-  background-color: var(--vd-canvas);
+  /* 毛玻璃：内容自导航条下方滚过，模糊有折射对象 */
+  background-color: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
 }
 
 .theme-dark .view-content.vdash-content.vdash-style-modern .vdash-header {
@@ -1549,6 +1564,11 @@
   display: block;
 }
 
+/*
+ * 滑块不加 backdrop-filter：其身后是一片平色轨道，模糊平色仍是平色，
+ * 只剩半透明而已，白担一层重绘开销。毛玻璃只用在导航条——
+ * 那里内容会从下面滚过，模糊才有折射对象。
+ */
 .view-content.vdash-content.vdash-style-modern .vdash-tabs .vdash-slider {
   background-color: var(--vd-primary);
 }
@@ -1597,6 +1617,92 @@
 .view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active:hover,
 .view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
 .view-content.vdash-content.vdash-style-modern .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/*
+ * 滑块在途期间，新选中项维持未选中的文字色。
+ * 否则「白字」在滑块到位之前就落到白底上，那 0.2 秒里读不出来。
+ * 只对启用了滑块的两个外观生效；y2k 的选中态由标签自身实底承担，不需要。
+ */
+.view-content.vdash-content.vdash-style-modern .vdash-tab.is-active.is-arriving,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-active.is-arriving,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-active.is-arriving,
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active.is-arriving,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active.is-arriving,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-active.is-arriving {
+  /* 必须瞬时生效：DOM 重建后元素初始即选中色，若走基础规则的颜色过渡，
+     开头 120ms 仍是白字，问题只是变短没有消失。撤类时过渡自动恢复，
+     文字色再平滑换到选中色。 */
+  transition: none;
+  color: var(--vd-body-muted);
+}
+
+/* 旧选中项在滑块离开前维持选中色，同样要瞬时，不能走渐变 */
+.view-content.vdash-content.vdash-style-modern .vdash-tab.is-holding,
+.view-content.vdash-content.vdash-style-modern .vdash-range-btn.is-holding,
+.view-content.vdash-content.vdash-style-modern .vdash-factory-tab.is-holding,
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-holding,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-holding,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-holding {
+  transition: none;
+}
+
+/* --------------------- Starbucks 外观的标签滑块 --------------------- */
+/*
+ * 与 modern 同一套机制：滑块承载选中态，标签本体让出底色。
+ * 配色改走 starbucks 的绿色令牌，阴影沿用该外观原本的三档投影。
+ */
+.view-content.vdash-content.vdash-style-starbucks .vdash-slider {
+  display: block;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-tabs .vdash-slider {
+  background-color: var(--vd-primary);
+  box-shadow: 0 4px 12px rgba(0, 112, 74, 0.28);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-range .vdash-slider {
+  background-color: var(--vd-canvas);
+  box-shadow: 0 2px 6px rgba(74, 52, 40, 0.14);
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs .vdash-slider {
+  background-color: var(--vd-primary);
+  box-shadow: 0 3px 10px rgba(0, 112, 74, 0.22);
+}
+
+/* 二级标签整体降一档：柔色底、无投影 */
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-slider {
+  background-color: var(--vd-primary-soft);
+  box-shadow: none;
+}
+
+/* 未选中项让出底色：标签层级在滑块之上，实色底会遮住滑动过程 */
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab:hover,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn:hover,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab:hover {
+  border-color: transparent;
+  background-color: rgba(0, 112, 74, 0.1);
+}
+
+/* 选中项只保留文字色与字重，底色与投影交给滑块 */
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active:hover,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
   border-color: transparent;
   background-color: transparent;
   box-shadow: none;
