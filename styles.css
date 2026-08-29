@@ -269,8 +269,7 @@
   display: grid;
   grid-template-columns: repeat(var(--vdash-cols), var(--vdash-cell));
   justify-content: space-between;
-  column-gap: var(--vdash-gap);
-  row-gap: var(--vdash-gap);
+  gap: var(--vdash-gap);
   min-width: min-content;
 }
 
