@@ -162,6 +162,8 @@ const I18N = {
     slotSubsDesc:
       "勾选要作为二级标签显示的子目录。全部勾选时，以后新增的子目录会自动出现；全不勾选则该板块不显示二级标签。",
     slotSubsEmpty: "该文件夹下没有子目录",
+    slotSubsAll: "勾选全部",
+    slotSubsNone: "取消勾选",
     statusFound: "✓ 已找到该文件夹",
     statusNotFound: "⚠ 库内未找到该路径，请检查大小写与完整层级",
 
@@ -242,6 +244,8 @@ const I18N = {
     slotSubsDesc:
       "勾選要作為二級標籤顯示的子目錄。全部勾選時，此後新增的子目錄會自動出現；全不勾選則該板塊不顯示二級標籤。",
     slotSubsEmpty: "該資料夾下沒有子目錄",
+    slotSubsAll: "勾選全部",
+    slotSubsNone: "取消勾選",
     statusFound: "✓ 已找到該文件夾",
     statusNotFound: "⚠ 庫內未找到該路徑，請檢查大小寫與完整層級",
 
@@ -324,6 +328,8 @@ const I18N = {
     slotSubsDesc:
       "Pick which subfolders appear as second-level tabs. With all checked, subfolders added later show up automatically; with none checked, this block has no second-level tabs.",
     slotSubsEmpty: "This folder has no subfolders",
+    slotSubsAll: "Select all",
+    slotSubsNone: "Clear all",
     statusFound: "✓ Folder found",
     statusNotFound: "⚠ Path not found in vault — check case and full path",
 
@@ -409,6 +415,8 @@ const I18N = {
     slotSubsDesc:
       "Choisissez les sous-dossiers qui apparaissent comme onglets de second niveau. Si tous sont cochés, les sous-dossiers ajoutés plus tard apparaîtront automatiquement ; si aucun n'est coché, ce bloc n'a pas d'onglets de second niveau.",
     slotSubsEmpty: "Ce dossier n'a pas de sous-dossier",
+    slotSubsAll: "Tout sélectionner",
+    slotSubsNone: "Tout décocher",
     statusFound: "✓ Dossier trouvé",
     statusNotFound: "⚠ Chemin introuvable dans le coffre — vérifiez la casse et le chemin complet",
 
@@ -495,6 +503,8 @@ const I18N = {
     slotSubsDesc:
       "Scegli quali sottocartelle compaiono come schede di secondo livello. Con tutte selezionate, le sottocartelle aggiunte in seguito compaiono automaticamente; senza alcuna selezione questo blocco non ha schede di secondo livello.",
     slotSubsEmpty: "Questa cartella non ha sottocartelle",
+    slotSubsAll: "Seleziona tutto",
+    slotSubsNone: "Deseleziona tutto",
     statusFound: "✓ Cartella trovata",
     statusNotFound: "⚠ Percorso non trovato nel vault — controlla maiuscole e percorso completo",
 
@@ -580,6 +590,8 @@ const I18N = {
     slotSubsDesc:
       "第 2 階層のタブとして表示するサブフォルダーを選びます。すべて選ぶと、以後追加されたサブフォルダーも自動的に表示されます。ひとつも選ばない場合、このブロックに第 2 階層のタブは出ません。",
     slotSubsEmpty: "このフォルダーにサブフォルダーはありません",
+    slotSubsAll: "すべて選択",
+    slotSubsNone: "すべて解除",
     statusFound: "✓ フォルダーが見つかりました",
     statusNotFound: "⚠ 保管庫内にパスが見つかりません — 大文字小文字と完全パスを確認してください",
 
@@ -664,6 +676,8 @@ const I18N = {
     slotSubsDesc:
       "2단계 탭으로 표시할 하위 폴더를 고릅니다. 모두 선택하면 이후 추가된 하위 폴더도 자동으로 나타나고, 하나도 선택하지 않으면 이 블록에 2단계 탭이 없습니다.",
     slotSubsEmpty: "이 폴더에는 하위 폴더가 없습니다",
+    slotSubsAll: "전체 선택",
+    slotSubsNone: "전체 해제",
     statusFound: "✓ 폴더를 찾았습니다",
     statusNotFound: "⚠ 보관함에서 경로를 찾을 수 없습니다 — 대소문자와 전체 경로를 확인하세요",
 
@@ -749,6 +763,8 @@ const I18N = {
     slotSubsDesc:
       "Elige qué subcarpetas aparecen como pestañas de segundo nivel. Con todas marcadas, las subcarpetas añadidas después aparecen automáticamente; sin ninguna marcada, este bloque no tiene pestañas de segundo nivel.",
     slotSubsEmpty: "Esta carpeta no tiene subcarpetas",
+    slotSubsAll: "Seleccionar todo",
+    slotSubsNone: "Desmarcar todo",
     statusFound: "✓ Carpeta encontrada",
     statusNotFound: "⚠ Ruta no encontrada en la bóveda — revisa mayúsculas y la ruta completa",
 
@@ -2076,6 +2092,8 @@ class VaultDashboardSettingTab extends PluginSettingTab {
     };
 
     details.createDiv({ cls: "vdash-setting-slot-subs-desc", text: t.slotSubsDesc });
+
+    const actions = details.createDiv({ cls: "vdash-setting-slot-subs-actions" });
     const list = details.createDiv({ cls: "vdash-setting-slot-subs-list" });
 
     for (const sub of subs) {
@@ -2092,6 +2110,24 @@ class VaultDashboardSettingTab extends PluginSettingTab {
         this.plugin.refreshViews();
       });
     }
+
+    // 批量操作放在列表上方：子目录多时逐个点太累。
+    // 全选写回 null（与逐个勾满同义，此后新增的子目录自动出现），全不选写回空数组。
+    const bulk = async (checked) => {
+      for (const b of boxes) b.cb.checked = checked;
+      slot.subs = checked ? null : [];
+      syncSummary();
+      await this.plugin.saveSettings();
+      this.plugin.refreshViews();
+    };
+    const mkBtn = (text, checked) => {
+      const btn = actions.createEl("button", { cls: "vdash-setting-slot-subs-btn", text });
+      btn.type = "button";
+      btn.addEventListener("click", () => bulk(checked));
+    };
+    mkBtn(t.slotSubsAll, true);
+    mkBtn(t.slotSubsNone, false);
+
     syncSummary();
   }
 

@@ -1,14 +1,14 @@
 # Vault Dashboard X
 
-[English](README.md) · [中文](README_zh.md) · **Français** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Español](README_es.md) · [Italiano](README_it.md)
+[English](../README.md) · [中文](README_zh.md) · **Français** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Español](README_es.md) · [Italiano](README_it.md)
 
-Un tableau de bord pour votre coffre Obsidian : une carte de chaleur d'activité, une vue de répartition par dossier et des liens rapides « dossiers visuels » configurables — le tout dans un seul panneau.
+Un tableau de bord pour votre coffre Obsidian : une carte de chaleur d'activité, une vue de répartition par dossier et des liens « accès rapide » configurables — le tout dans un seul panneau.
 
 ## Fonctionnalités
 
-- **Carte de chaleur d'activité** — une grille de contributions façon GitHub montrant l'activité de votre coffre (ou d'un changelog) dans le temps, avec les plages `Tout / 30 jours / 7 jours`.
+- **Carte de chaleur d'activité** — une grille de contributions façon GitHub montrant l'activité de votre coffre (ou d'un changelog) dans le temps, avec les plages `Tout / 30 jours / 7 jours`. Les semaines les plus récentes sont à gauche.
 - **Répartition par dossier** — une ventilation de vos notes par dossier de premier niveau, avec lignes dépliables, barres de part du parent et compteurs « nouveau ce mois-ci ».
-- **Dossiers visuels** — jusqu'à 5 blocs configurables qui affichent les sous-dossiers d'un dossier choisi sous forme d'onglets et listent ses notes les plus récemment modifiées.
+- **Accès rapide** — jusqu'à 5 blocs configurables. Chacun pointe vers un dossier, liste ses notes les plus récemment modifiées et affiche les sous-dossiers que vous cochez comme onglets de second niveau. Les noms de dossier sont affichés tels quels.
 - **Deux sources de données** — une source générique « activité des notes » (fonctionne dans n'importe quel coffre) et un analyseur « changelog » facultatif pour les changelogs Markdown.
 - **Trois thèmes** — Apple, Y2K Console et Starbucks Café.
 - **Internationalisation** — anglais (par défaut), chinois simplifié, chinois traditionnel, japonais, coréen, français, espagnol et italien.
@@ -60,7 +60,8 @@ Ouvrez le tableau de bord depuis l'icône du ruban ou la commande **« Ouvrir le
 | Champ de date d'activité | Champ du frontmatter utilisé en premier dans la chaîne de repli de l'activité des notes. |
 | Repli sur l'heure de modification du fichier | Utiliser `mtime` comme dernier recours (désactivé par défaut). |
 | Chemins de changelog | Fichiers/dossiers analysés en mode changelog. |
-| Dossiers visuels | Jusqu'à 5 blocs ; chacun pointe vers un dossier et affiche ses sous-dossiers et notes récentes. |
+| Accès rapide | Jusqu'à 5 blocs ; chacun pointe vers un dossier et liste ses notes récentes. |
+| Sous-dossiers à afficher | Par bloc : cochez les sous-dossiers qui deviennent des onglets de second niveau. Tout cocher fait apparaître automatiquement les sous-dossiers ajoutés plus tard. |
 
 ## Installation
 
@@ -77,7 +78,7 @@ Installez « Vault Dashboard X » depuis **Paramètres → Plugins communautaire
 
 ## Licence
 
-[GNU General Public License v3.0](LICENSE)
+[GNU General Public License v3.0](../LICENSE)
 
 ## Développement
 

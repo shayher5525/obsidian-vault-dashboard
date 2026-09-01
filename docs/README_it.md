@@ -1,14 +1,14 @@
 # Vault Dashboard X
 
-[English](README.md) · [中文](README_zh.md) · **Italiano** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Español](README_es.md)
+[English](../README.md) · [中文](README_zh.md) · **Italiano** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Español](README_es.md)
 
-Una dashboard per il tuo vault di Obsidian: una mappa di calore dell'attività, una vista della distribuzione per cartelle e collegamenti rapidi «cartella visiva» configurabili — tutto in un unico pannello.
+Una dashboard per il tuo vault di Obsidian: una mappa di calore dell'attività, una vista della distribuzione per cartelle e collegamenti di accesso rapido configurabili — tutto in un unico pannello.
 
 ## Funzionalità
 
-- **Mappa di calore dell'attività** — una griglia di contributi in stile GitHub che mostra quanto è attivo il tuo vault (o un changelog) nel tempo, con gli intervalli `Tutto / 30 giorni / 7 giorni`.
+- **Mappa di calore dell'attività** — una griglia di contributi in stile GitHub che mostra quanto è attivo il tuo vault (o un changelog) nel tempo, con gli intervalli `Tutto / 30 giorni / 7 giorni`. Le settimane più recenti sono a sinistra.
 - **Distribuzione per cartelle** — una ripartizione delle tue note per cartella di primo livello, con righe espandibili, barre della quota rispetto alla cartella padre e conteggi «nuove questo mese».
-- **Cartelle visive** — fino a 5 blocchi configurabili che mostrano le sottocartelle di una cartella scelta come schede e ne elencano le note modificate più di recente.
+- **Accesso rapido** — fino a 5 blocchi configurabili. Ognuno punta a una cartella, ne elenca le note modificate più di recente e mostra come schede di secondo livello le sottocartelle che selezioni. I nomi delle cartelle sono mostrati così come sono.
 - **Due fonti di dati** — una fonte generica «attività delle note» (funziona in qualsiasi vault) e un parser «changelog» opzionale per i changelog Markdown.
 - **Tre temi** — Apple, Y2K Console e Starbucks Café.
 - **Internazionalizzazione** — inglese (predefinito), cinese semplificato, cinese tradizionale, giapponese, coreano, francese, spagnolo e italiano.
@@ -60,7 +60,8 @@ Apri la dashboard dall'icona della barra multifunzione o dal comando **«Apri da
 | Campo data attività | Campo del frontmatter usato per primo nella catena di fallback dell'attività delle note. |
 | Ripiega sull'ora di modifica del file | Usare `mtime` come ultimo fallback (disattivato per impostazione predefinita). |
 | Percorsi changelog | File/cartelle analizzati in modalità changelog. |
-| Cartelle visive | Fino a 5 blocchi; ognuno punta a una cartella e mostra le sue sottocartelle e note recenti. |
+| Accesso rapido | Fino a 5 blocchi; ognuno punta a una cartella ed elenca le sue note recenti. |
+| Sottocartelle da mostrare | Per blocco: seleziona quali sottocartelle diventano schede di secondo livello. Selezionandole tutte, quelle aggiunte in seguito compaiono automaticamente. |
 
 ## Installazione
 
@@ -77,7 +78,7 @@ Installa «Vault Dashboard X» da **Impostazioni → Plugin della community**, q
 
 ## Licenza
 
-[GNU General Public License v3.0](LICENSE)
+[GNU General Public License v3.0](../LICENSE)
 
 ## Sviluppo
 

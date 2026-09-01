@@ -1,18 +1,20 @@
 # Vault Dashboard X
 
-**English** · [中文](README_zh.md) · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Español](README_es.md) · [Italiano](README_it.md)
+**English** · [中文](docs/README_zh.md) · [日本語](docs/README_ja.md) · [한국어](docs/README_ko.md) · [Français](docs/README_fr.md) · [Español](docs/README_es.md) · [Italiano](docs/README_it.md)
 
 A dashboard for your Obsidian vault: an activity heatmap, a folder-distribution
-view, and configurable "visual folder" quick links — all in one pane.
+view, and configurable "quick access" links — all in one pane.
 
 ## Features
 
 - **Activity heatmap** — GitHub-style contribution grid showing how active your
   vault (or a changelog) is over time, with `All / 30 days / 7 days` ranges.
+  Newest weeks are on the left.
 - **Folder distribution** — a breakdown of your notes by top-level folder, with
   drill-down rows, share-of-parent bars, and "new this month" counts.
-- **Visual folders** — up to 5 configurable blocks that surface a chosen folder's
-  subfolders as tabs and list its most recently modified notes.
+- **Quick access** — up to 5 configurable blocks. Each points to a folder, lists
+  its most recently modified notes, and shows the subfolders you tick as
+  second-level tabs. Folder names are shown exactly as they are on disk.
 - **Two data sources** — a generic "note activity" source (works in any vault)
   and an optional "changelog" parser for markdown changelogs.
 - **Three themes** — Apple, Y2K Console, and Starbucks Café.
@@ -67,7 +69,8 @@ Open the dashboard from the ribbon icon or the **"Open dashboard"** command.
 | Activity date field | Frontmatter field used first in the note-activity fallback chain. |
 | Fall back to file modified time | Use `mtime` as the final fallback (off by default). |
 | Changelog paths | Files/folders parsed in changelog mode. |
-| Visual folders | Up to 5 blocks; each points to a folder and shows its subfolders and recent notes. |
+| Quick access | Up to 5 blocks; each points to a folder and lists its recent notes. |
+| Subfolders to show | Per block: tick which subfolders become second-level tabs. Tick all and subfolders added later appear automatically. |
 
 ## Installation
 

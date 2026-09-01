@@ -1,14 +1,14 @@
 # Vault Dashboard X
 
-[English](README.md) · [中文](README_zh.md) · **Español** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Italiano](README_it.md)
+[English](../README.md) · [中文](README_zh.md) · **Español** · [日本語](README_ja.md) · [한국어](README_ko.md) · [Français](README_fr.md) · [Italiano](README_it.md)
 
-Un panel para tu bóveda de Obsidian: un mapa de calor de actividad, una vista de distribución por carpetas y accesos rápidos de «carpeta visual» configurables, todo en un solo panel.
+Un panel para tu bóveda de Obsidian: un mapa de calor de actividad, una vista de distribución por carpetas y accesos rápidos configurables, todo en un solo panel.
 
 ## Características
 
-- **Mapa de calor de actividad** — una cuadrícula de contribuciones estilo GitHub que muestra cuán activa está tu bóveda (o un changelog) a lo largo del tiempo, con rangos `Todo / 30 días / 7 días`.
+- **Mapa de calor de actividad** — una cuadrícula de contribuciones estilo GitHub que muestra cuán activa está tu bóveda (o un changelog) a lo largo del tiempo, con rangos `Todo / 30 días / 7 días`. Las semanas más recientes están a la izquierda.
 - **Distribución por carpetas** — un desglose de tus notas por carpeta de primer nivel, con filas expandibles, barras de proporción sobre el padre y conteos de «nuevo este mes».
-- **Carpetas visuales** — hasta 5 bloques configurables que muestran las subcarpetas de una carpeta elegida como pestañas y listan sus notas más recientemente modificadas.
+- **Acceso rápido** — hasta 5 bloques configurables. Cada uno apunta a una carpeta, lista sus notas modificadas más recientemente y muestra como pestañas de segundo nivel las subcarpetas que marques. Los nombres de carpeta se muestran tal cual.
 - **Dos fuentes de datos** — una fuente genérica de «actividad de notas» (funciona en cualquier bóveda) y un analizador «changelog» opcional para changelogs de Markdown.
 - **Tres temas** — Apple, Y2K Console y Starbucks Café.
 - **Internacionalización** — inglés (predeterminado), chino simplificado, chino tradicional, japonés, coreano, francés, español e italiano.
@@ -60,7 +60,8 @@ Abre el panel desde el icono de la cinta o el comando **«Abrir panel»**.
 | Campo de fecha de actividad | Campo del frontmatter usado primero en la cadena de respaldo de actividad de notas. |
 | Recurrir a la hora de modificación del archivo | Usar `mtime` como último recurso (desactivado por defecto). |
 | Rutas de changelog | Archivos/carpetas analizados en modo changelog. |
-| Carpetas visuales | Hasta 5 bloques; cada uno apunta a una carpeta y muestra sus subcarpetas y notas recientes. |
+| Acceso rápido | Hasta 5 bloques; cada uno apunta a una carpeta y lista sus notas recientes. |
+| Subcarpetas a mostrar | Por bloque: marca qué subcarpetas se convierten en pestañas de segundo nivel. Si las marcas todas, las añadidas después aparecen automáticamente. |
 
 ## Instalación
 
@@ -77,7 +78,7 @@ Instala «Vault Dashboard X» desde **Ajustes → Plugins de la comunidad** y lu
 
 ## Licencia
 
-[GNU General Public License v3.0](LICENSE)
+[GNU General Public License v3.0](../LICENSE)
 
 ## Desarrollo
 
