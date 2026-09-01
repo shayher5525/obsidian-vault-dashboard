@@ -10,7 +10,7 @@ Una dashboard per il tuo vault di Obsidian: una mappa di calore dell'attività, 
 - **Distribuzione per cartelle** — una ripartizione delle tue note per cartella di primo livello, con righe espandibili, barre della quota rispetto alla cartella padre e conteggi «nuove questo mese».
 - **Accesso rapido** — fino a 5 blocchi configurabili. Ognuno punta a una cartella, ne elenca le note modificate più di recente e mostra come schede di secondo livello le sottocartelle che selezioni. I nomi delle cartelle sono mostrati così come sono.
 - **Due fonti di dati** — una fonte generica «attività delle note» (funziona in qualsiasi vault) e un parser «changelog» opzionale per i changelog Markdown.
-- **Tre temi** — Apple, Y2K Console e Starbucks Café.
+- **Quattro temi** — Tech minimalista, Console Y2K, Casa del Caffè e Fast Food Pop.
 - **Internazionalizzazione** — inglese (predefinito), cinese semplificato, cinese tradizionale, giapponese, coreano, francese, spagnolo e italiano.
 
 ## Fonti di dati
@@ -55,7 +55,7 @@ Apri la dashboard dall'icona della barra multifunzione o dal comando **«Apri da
 | Impostazione | Descrizione |
 | --- | --- |
 | Lingua | Lingua dell'interfaccia per la pagina delle impostazioni e la dashboard. |
-| Aspetto | Stile visivo: Apple, Y2K Console o Starbucks Café. |
+| Aspetto | Stile visivo: Tech minimalista, Console Y2K, Casa del Caffè o Fast Food Pop. |
 | Fonte dati attività | Attività delle note o Changelog. |
 | Campo data attività | Campo del frontmatter usato per primo nella catena di fallback dell'attività delle note. |
 | Ripiega sull'ora di modifica del file | Usare `mtime` come ultimo fallback (attivo per impostazione predefinita). |

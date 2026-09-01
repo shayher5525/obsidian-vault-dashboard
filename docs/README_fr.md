@@ -10,7 +10,7 @@ Un tableau de bord pour votre coffre Obsidian : une carte de chaleur d'activité
 - **Répartition par dossier** — une ventilation de vos notes par dossier de premier niveau, avec lignes dépliables, barres de part du parent et compteurs « nouveau ce mois-ci ».
 - **Accès rapide** — jusqu'à 5 blocs configurables. Chacun pointe vers un dossier, liste ses notes les plus récemment modifiées et affiche les sous-dossiers que vous cochez comme onglets de second niveau. Les noms de dossier sont affichés tels quels.
 - **Deux sources de données** — une source générique « activité des notes » (fonctionne dans n'importe quel coffre) et un analyseur « changelog » facultatif pour les changelogs Markdown.
-- **Trois thèmes** — Apple, Y2K Console et Starbucks Café.
+- **Quatre thèmes** — Tech minimaliste, Console Y2K, Maison du Café et Fast Food Pop.
 - **Internationalisation** — anglais (par défaut), chinois simplifié, chinois traditionnel, japonais, coréen, français, espagnol et italien.
 
 ## Sources de données
@@ -55,7 +55,7 @@ Ouvrez le tableau de bord depuis l'icône du ruban ou la commande **« Ouvrir le
 | Paramètre | Description |
 | --- | --- |
 | Langue | Langue de l'interface pour la page des paramètres et le tableau de bord. |
-| Apparence | Style visuel : Apple, Y2K Console ou Starbucks Café. |
+| Apparence | Style visuel : Tech minimaliste, Console Y2K, Maison du Café ou Fast Food Pop. |
 | Source de données d'activité | Activité des notes ou Changelog. |
 | Champ de date d'activité | Champ du frontmatter utilisé en premier dans la chaîne de repli de l'activité des notes. |
 | Repli sur l'heure de modification du fichier | Utiliser `mtime` comme dernier recours (activé par défaut). |

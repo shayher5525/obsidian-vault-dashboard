@@ -27,6 +27,18 @@
 
 ---
 
+## [0.14.0] — 2026-09-01
+
+### 新增
+
+- 新增外观 **流行快餐**（`fastfood`），依 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-01_麦当劳风格视觉设计规范.md` v1.0 落地。色板严格限定为 Gold `#FFBC0D`、Red `#DB0007`、White 与改编中性色（`#1A1A1A`、`#5C5C5C`、`#E6E6E6`、`#242424`），不取 Speedee 字体、金拱门、Wordmark 等品牌资产，只借色彩语法。浅色模式为 White 画布 + Gold 顶栏与浅金分区底 + 黑字，Red 仅作激活态、关键数据与峰值热力格（「金成面、红成点」）；深色模式为 `#1A1A1A` 画布 + `#242424` 卡面 + Gold 作强调与文字色（规范允许深色模式金色作文字色，唯一例外）。热力图渐变为 gold-tint → gold → red。
+
+### 变更
+
+- `modern` 外观更名为 **Apple → 极简科技**（繁体「極簡科技」，英法意日韩等价译名同步）。内部 id `modern` 与 CSS 类 `vdash-style-modern` 不变，老 `data.json` 选择无需迁移。
+- `starbucks` 外观更名为 **Starbucks 咖啡馆 → 咖啡屋**（英法意日韩等价译名同步）。内部 id `starbucks` 与 CSS 类 `vdash-style-starbucks` 不变，老 `data.json` 选择无需迁移。
+- 七份 README（英文 + 中／日／韩／法／西／意）同步更新为「四套主题」并列出新名称。
+
 ## [0.13.0] — 2026-09-01
 
 ### 新增

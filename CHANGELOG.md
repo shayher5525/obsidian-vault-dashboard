@@ -23,6 +23,18 @@ The source of truth for the version is `version` in `manifest.json`; the release
 
 ---
 
+## [0.14.0] — 2026-09-01
+
+### Added
+
+- New appearance **Pop Fast Food** (`fastfood`), built from the McDonald's-style visual spec at `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-01_麦当劳风格视觉设计规范.md` v1.0. The palette is exactly Gold `#FFBC0D`, Red `#DB0007`, White, and adapted neutrals (`#1A1A1A`, `#5C5C5C`, `#E6E6E6`, `#242424`) — no Speedee, no arches, no wordmark, only the colour grammar. Light mode is White canvas + Gold top bar and gold-tint section blocks + black text, with Red reserved for active states, key data, and heat peaks ("gold forms the surface, red forms the dot"); dark mode is `#1A1A1A` canvas + `#242424` cards + Gold as accent and the only allowed gold-text exception per the spec. Heat ramp runs gold-tint → gold → red.
+
+### Changed
+
+- The `modern` appearance was renamed **Apple → Minimal Tech** (极简科技 / 極簡科技 / Tech minimaliste / Tech minimalista / ミニマルテック / 미니멀 테크). Internal id `modern` and CSS class `vdash-style-modern` are unchanged, so existing `data.json` selections carry over without migration.
+- The `starbucks` appearance was renamed **Starbucks Café → Coffee House** (咖啡屋 / Maison du Café / Casa del Caffè / コーヒーハウス / 커피 하우스 / Casa del Café). Internal id `starbucks` and CSS class `vdash-style-starbucks` are unchanged, so existing `data.json` selections carry over without migration.
+- All seven READMEs (English + Chinese / Japanese / Korean / French / Spanish / Italian) updated to list four themes and the new appearance names.
+
 ## [0.13.0] — 2026-09-01
 
 ### Added

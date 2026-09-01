@@ -18,6 +18,18 @@ La fonte di verità della versione è `version` in `manifest.json`; il tag di ri
 
 ---
 
+## [0.14.0] — 2026-09-01
+
+### Aggiunto
+
+- Nuovo aspetto **Fast Food Pop** (`fastfood`), costruito dalla spec visiva stile McDonald's v1.0. Tavolozza limitata a Gold `#FFBC0D`, Red `#DB0007`, White e neutri adattati (`#1A1A1A`, `#5C5C5C`, `#E6E6E6`, `#242424`) — niente Speedee, archi né wordmark, solo la grammatica del colore. Light: White + barra Gold + testo nero, Red riservato agli stati attivi, ai dati chiave e ai picchi di calore (« l'oro fa la superficie, il rosso il punto »). Dark: `#1A1A1A` + `#242424` + Gold come accento e unica eccezione di testo oro. Gradiente di calore gold-tint → gold → red.
+
+### Modificato
+
+- L'aspetto `modern` rinominato **Apple → Tech minimalista** (ed equivalenti localizzati). L'id interno `modern` e la classe CSS `vdash-style-modern` non cambiano, le selezioni esistenti in `data.json` sono mantenute.
+- L'aspetto `starbucks` rinominato **Starbucks Café → Casa del Caffè**. L'id interno e la classe CSS non cambiano.
+- I sette README (inglese + zh/ja/ko/fr/es/it) aggiornati per elencare quattro temi e i nuovi nomi.
+
 ## [0.13.0] — 2026-09-01
 
 ### Aggiunto

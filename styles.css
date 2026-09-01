@@ -1747,6 +1747,297 @@
   box-shadow: none;
 }
 
+/* -------------------------------- 流行快餐（麦当劳风格）-------------------------------- */
+
+/*
+ * 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-01_麦当劳风格视觉设计规范.md` v1.0。
+ * 只借「Gold + Red + White + 中性黑」这套视觉语法，不使用金拱门、Token、Wordmark、"i'm lovin' it" 等品牌资产；
+ * Speedee 字体亦不取，按规范 §4.2 落地 Poppins / Inter / 思源黑体替代栈。
+ * Light：White 画布 + Gold 顶栏与分区大色块 + 黑字，Red 作激活态与焦点点缀；
+ * Dark ：#1A1A1A 画布 + #242424 卡面 + Gold 作强调与文字色（规范允许深色模式金色作文字色，此为唯一例外）。
+ * 「金成面、红成点」：Gold 作大面积底（顶栏、分区背景、热力格中低档），Red 仅用于激活态、关键数据与峰值热力格。
+ */
+.workspace-leaf-content .view-content.vdash-content.vdash-style-fastfood {
+  /* Primitive tokens — 标准色全集（手册原载 + 改编中性色）*/
+  --vd-ff-gold: #FFBC0D;
+  --vd-ff-gold-deep: #E5A800;        /* 改编：Gold 悬停/按下态 */
+  --vd-ff-gold-tint: #FFF4D6;       /* 改编：浅金信息底 */
+  --vd-ff-red: #DB0007;
+  --vd-ff-red-deep: #B00006;        /* 改编：Red 悬停/按下态 */
+  --vd-ff-red-tint: #FDE7E7;        /* 改编：警示浅底 */
+  --vd-ff-white: #FFFFFF;
+  --vd-ff-ink: #1A1A1A;             /* 改编：正文近黑 */
+  --vd-ff-ink-muted: #5C5C5C;       /* 改编：次级文字 */
+  --vd-ff-line: #E6E6E6;            /* 改编：分隔线 */
+  --vd-ff-surface-dark: #242424;    /* 改编：深色卡面 */
+
+  /* Semantic tokens */
+  --vd-primary: var(--vd-ff-red);           /* 强调色：Red 作激活态与焦点 */
+  --vd-primary-hover: var(--vd-ff-red-deep);
+  --vd-primary-focus: var(--vd-ff-red);
+  --vd-primary-soft: var(--vd-ff-red-tint);
+  --vd-on-primary: var(--vd-ff-white);      /* 红底用白字 */
+  --vd-brand: var(--vd-ff-gold);            /* 主品牌色：Gold，大色块与顶栏底 */
+  --vd-brand-hover: var(--vd-ff-gold-deep);
+  --vd-brand-soft: var(--vd-ff-gold-tint);
+
+  --vd-canvas: var(--vd-ff-white);          /* White 留白画布 */
+  --vd-canvas-muted: var(--vd-ff-gold-tint); /* Gold 作分区大色块 */
+  --vd-surface-raised: var(--vd-ff-white);
+
+  --vd-ink: var(--vd-ff-ink);               /* 金底与白底均首选近黑 */
+  --vd-body-muted: rgba(26, 26, 26, 0.68);
+  --vd-ink-subtle: rgba(26, 26, 26, 0.54);
+
+  --vd-divider-soft: rgba(26, 26, 26, 0.12);
+  --vd-hairline: var(--vd-ff-line);
+  --vd-shadow-brand: rgba(219, 0, 7, 0.28);
+  --vd-shadow-brand-soft: rgba(219, 0, 7, 0.20);
+  --vd-shadow-ink: rgba(26, 26, 26, 0.14);
+  --vd-shadow-ink-soft: rgba(26, 26, 26, 0.08);
+  --vd-shadow-ink-raised: rgba(26, 26, 26, 0.12);
+  --vd-state-hover: rgba(255, 188, 13, 0.18);  /* 浅金 hover 底 */
+
+  --vd-viz-purple: var(--vd-ff-gold);
+  --vd-viz-cyan: var(--vd-ff-gold-deep);
+  --vd-viz-green: var(--vd-ff-red);
+  --vd-viz-amber: var(--vd-ff-gold-tint);
+  --vd-viz-pink: var(--vd-ff-ink);
+
+  /* 热力图：浅金（空）→ 金（中）→ 红（峰），对应「金成面、红成点」 */
+  --vd-heat-0: var(--vd-ff-gold-tint);
+  --vd-heat-1: rgba(255, 188, 13, 0.40);
+  --vd-heat-2: var(--vd-ff-gold);
+  --vd-heat-3: var(--vd-ff-gold-deep);
+  --vd-heat-4: var(--vd-ff-red);
+
+  /* Component tokens */
+  --vd-tab-shadow: 0 4px 12px var(--vd-shadow-brand);
+  --vd-control-shadow: 0 2px 6px var(--vd-shadow-ink);
+  --vd-factory-tab-shadow: 0 3px 10px var(--vd-shadow-brand-soft);
+  --vd-card-shadow: 0 4px 14px var(--vd-shadow-ink-soft);
+  --vd-hover-tint: var(--vd-state-hover);
+
+  --vd-font-display: "Poppins", "Inter", "Helvetica Neue", Arial, "Source Han Sans SC", "Alibaba PuHuiTi", "PingFang SC", sans-serif;
+  --vd-font-body: "Inter", "Helvetica Neue", Arial, "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --vd-font-num: var(--vd-font-display);
+
+  --vd-text-display: clamp(1.875rem, 4vw, 2.5rem);
+  --vd-text-tagline: 1.25rem;
+  --vd-text-body: 1rem;
+  --vd-text-fine: 0.8125rem;
+
+  --vd-space-md: 16px;
+  --vd-space-lg: 24px;
+  --vd-space-xl: 32px;
+
+  --vd-radius-xs: 8px;
+  --vd-radius-sm: 8px;
+  --vd-radius-md: 16px;
+  --vd-radius-lg: 24px;
+  --vd-radius-pill: 9999px;
+
+  --vd-motion-fast: 150ms;
+  --vd-motion-standard: 280ms;
+  --vd-ease: cubic-bezier(.2, .7, .3, 1);   /* 快出慢入，对应「明快」 */
+  --vd-elevation-subtle: 0 8px 24px var(--vd-shadow-ink-raised);
+
+  font-family: var(--vd-font-body);
+  line-height: 1.6;
+}
+
+/* Dark：#1A1A1A 画布 + #242424 卡面 + Gold 作强调与文字色（深色模式唯一允许金色作文字色）*/
+.theme-dark .workspace-leaf-content .view-content.vdash-content.vdash-style-fastfood {
+  --vd-canvas: #1A1A1A;
+  --vd-canvas-muted: var(--vd-ff-surface-dark);
+  --vd-surface-raised: rgba(255, 255, 255, 0.08);
+
+  --vd-ink: var(--vd-ff-white);
+  --vd-body-muted: rgba(255, 255, 255, 0.78);
+  --vd-ink-subtle: rgba(255, 255, 255, 0.62);
+
+  --vd-divider-soft: rgba(255, 255, 255, 0.14);
+  --vd-hairline: rgba(255, 255, 255, 0.2);
+  --vd-shadow-brand: rgba(0, 0, 0, 0.28);
+  --vd-shadow-brand-soft: rgba(0, 0, 0, 0.24);
+  --vd-shadow-ink: rgba(0, 0, 0, 0.22);
+  --vd-shadow-ink-soft: rgba(0, 0, 0, 0.18);
+  --vd-shadow-ink-raised: rgba(0, 0, 0, 0.22);
+  --vd-state-hover: rgba(255, 188, 13, 0.16);
+
+  /* 热力图：深底上以 White 作峰值，金色在中低档承担「面」的角色 */
+  --vd-heat-0: rgba(255, 255, 255, 0.1);
+  --vd-heat-1: rgba(255, 188, 13, 0.32);
+  --vd-heat-2: var(--vd-ff-gold);
+  --vd-heat-3: var(--vd-ff-gold-deep);
+  --vd-heat-4: var(--vd-ff-white);
+
+  --vd-tab-shadow: 0 4px 12px var(--vd-shadow-brand);
+  --vd-control-shadow: 0 2px 6px var(--vd-shadow-ink);
+  --vd-factory-tab-shadow: 0 3px 10px var(--vd-shadow-brand-soft);
+  --vd-card-shadow: 0 4px 14px var(--vd-shadow-ink-soft);
+  --vd-elevation-subtle: 0 8px 24px var(--vd-shadow-ink-raised);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-stage {
+  padding: clamp(16px, 3vw, 32px);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-panel {
+  max-width: 1080px;
+  padding: var(--vd-space-lg);
+  border: 1px solid var(--vd-hairline);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas);
+  box-shadow: var(--vd-elevation-subtle);
+}
+
+/* Gold 顶栏 + 黑字：规范 §7.3 「顶栏 Gold 底 + 黑字」*/
+.view-content.vdash-content.vdash-style-fastfood .vdash-header {
+  margin-bottom: var(--vd-space-lg);
+  padding: var(--vd-space-md) var(--vd-space-lg);
+  border-bottom: none;
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-brand);
+  color: var(--vd-ink);
+  box-shadow: var(--vd-card-shadow);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-tab,
+.view-content.vdash-content.vdash-style-fastfood .vdash-range-btn,
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-tab {
+  min-height: 44px;
+  border-radius: var(--vd-radius-pill);
+  font-weight: 500;
+}
+
+/* 选中态：pill 形 Red 底白字（规范 §7.3 选中态选项之一）*/
+.view-content.vdash-content.vdash-style-fastfood .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-fastfood .vdash-tab.is-active:hover {
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  box-shadow: var(--vd-tab-shadow);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-range {
+  padding: 3px;
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-fastfood .vdash-range-btn.is-active:hover {
+  background-color: var(--vd-canvas);
+  box-shadow: var(--vd-control-shadow);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-cards {
+  gap: var(--vd-space-md);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-card {
+  padding: var(--vd-space-lg);
+  border: none;
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-surface-raised);
+  box-shadow: var(--vd-card-shadow);
+}
+
+/* 关键数据用 Red 作焦点点缀（规范 §2.2 强调色「一点点就足够」）*/
+.view-content.vdash-content.vdash-style-fastfood .vdash-card-value {
+  font-family: var(--vd-font-display);
+  color: var(--vd-primary);
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-heatmap {
+  padding: var(--vd-space-lg);
+  border-radius: var(--vd-radius-lg);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-cell {
+  border-radius: var(--vd-radius-xs);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-stack {
+  height: 14px;
+  border-radius: var(--vd-radius-pill);
+  background-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-rows {
+  padding: var(--vd-space-xs);
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-row {
+  border-radius: var(--vd-radius-sm);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-row.is-openable:hover {
+  background-color: var(--vd-brand-soft);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-row-added {
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory {
+  margin-top: var(--vd-space-xl);
+  padding-top: var(--vd-space-lg);
+  border-top: 1px solid var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-title {
+  font-family: var(--vd-font-display);
+  color: var(--vd-primary);
+  font-weight: 700;
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-tab.is-active:hover {
+  border-color: var(--vd-primary);
+  background-color: var(--vd-primary);
+  color: var(--vd-on-primary);
+  box-shadow: var(--vd-factory-tab-shadow);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  background-color: var(--vd-primary-soft);
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-list {
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-item {
+  border-radius: var(--vd-radius-sm);
+  border-bottom-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-item:hover {
+  background-color: var(--vd-brand-soft);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-link {
+  color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-factory-link:hover {
+  color: var(--vd-primary-hover);
+}
+
+.view-content.vdash-content.vdash-style-fastfood .vdash-empty {
+  border-radius: var(--vd-radius-md);
+  background-color: var(--vd-surface-raised);
+}
+
 /* 尊重「减少动态效果」：只留颜色变化，去掉位移与旋转过渡 */
 @media (prefers-reduced-motion: reduce) {
   .view-content.vdash-content *,

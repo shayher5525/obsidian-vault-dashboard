@@ -18,6 +18,18 @@
 
 ---
 
+## [0.14.0] — 2026-09-01
+
+### 추가
+
+- 새 외관 **팝 패스트푸드**(`fastfood`)를 추가. `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-01_麦当劳风格视觉设计规范.md` v1.0에 따라 Gold `#FFBC0D`, Red `#DB0007`, White, 개편 중성색(`#1A1A1A`, `#5C5C5C`, `#E6E6E6`, `#242424`)만 사용. Speedee, 아치, 워드마크 없이 색 문법만 차용. 라이트는 White + Gold 상단바 + 흑색이며 Red는 활성 상태·주요 데이터·히트 피크에만(「금이 면, 적이 점」). 다크는 `#1A1A1A` + `#242424` + Gold를 강조와 문자색으로(다크 모드에서 Gold가 문자색이 되는 유일한 예외). 히트맵은 gold-tint → gold → red.
+
+### 변경
+
+- `modern` 외관을 **Apple → 미니멀 테크**로 개명(다른 언어 동등 번역도 동기화). 내부 id `modern`과 CSS 클래스 `vdash-style-modern`은 불변이라 `data.json` 마이그레이션 불필요.
+- `starbucks` 외관을 **Starbucks Café → 커피 하우스**로 개명. 내부 id `starbucks`와 CSS 클래스 `vdash-style-starbucks`는 불변.
+- 7개 README를 「네 가지 테마」로 갱신하고 새 이름을 명시.
+
 ## [0.13.0] — 2026-09-01
 
 ### 추가
