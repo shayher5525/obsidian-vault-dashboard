@@ -102,8 +102,12 @@ const DEFAULT_SETTINGS = {
   dataSource: "noteActivity",
   /** 笔记活跃度：优先取的 frontmatter 字段（取不到再回退 created/date → 文件名 → mtime） */
   activityDateField: "updated",
-  /** 笔记活跃度：是否允许用 mtime 兜底。同步盘会批量刷新 mtime，默认关闭避免假柱。 */
-  useMtime: false,
+  /**
+   * 笔记活跃度：是否允许用 mtime 兜底。默认开启——多数库的笔记既没有日期
+   * frontmatter 也没有文件名日期，关掉的话热力图会几乎全空。同步盘批量刷新
+   * mtime 会造出假柱，那种情况下用户可自行关掉。
+   */
+  useMtime: true,
   /** 迭代日志模式：一条为文件、一条为文件夹（取其下所有 .md，不递归） */
   changelogPaths: DEFAULT_CHANGELOG_PATHS.slice(),
   /** 统计时排除的路径前缀，逐行配置；默认空 */
@@ -144,7 +148,7 @@ const I18N = {
       "优先取笔记 frontmatter 的这个字段作为活跃日期；取不到再依次回退 created / date → 文件名日期 → 文件修改时间。",
     useMtimeName: "用文件修改时间兜底",
     useMtimeDesc:
-      "关闭时不用 mtime，避免同步盘（iCloud 等）批量刷新 mtime 造成「某天改几千篇」的假柱。默认关闭。",
+      "默认开启。多数库的笔记既没有日期 frontmatter 也没有文件名日期，关掉后热力图会几乎全空。若你用同步盘（iCloud 等），它可能批量刷新 mtime 造出「某天改几千篇」的假柱，那时再关掉。",
     excludedPrefixesName: "排除路径",
     excludedPrefixesDesc: "每行一个路径前缀，匹配到的笔记不计入任何统计；留空表示不排除。",
     changelogPathsName: "迭代日志路径",
@@ -226,7 +230,7 @@ const I18N = {
       "優先取筆記 frontmatter 的這個欄位作為活躍日期；取不到再依次回退 created / date → 檔名日期 → 檔案修改時間。",
     useMtimeName: "用檔案修改時間兜底",
     useMtimeDesc:
-      "關閉時不用 mtime，避免同步盤（iCloud 等）批量刷新 mtime 造成「某天改幾千篇」的假柱。預設關閉。",
+      "預設開啟。多數庫的筆記既沒有日期 frontmatter 也沒有檔名日期，關掉後熱力圖會幾乎全空。若你用同步盤（iCloud 等），它可能批量刷新 mtime 造出「某天改幾千篇」的假柱，那時再關掉。",
     excludedPrefixesName: "排除路徑",
     excludedPrefixesDesc: "每行一個路徑前綴，符合的筆記不計入任何統計；留空表示不排除。",
     changelogPathsName: "迭代日誌路徑",
@@ -308,7 +312,7 @@ const I18N = {
       "Prefer this frontmatter field as the activity date; then fall back to created/date → filename date → file modified time.",
     useMtimeName: "Fall back to file modified time",
     useMtimeDesc:
-      "When off, mtime is not used, avoiding false spikes when a sync drive (iCloud, etc.) bulk-refreshes mtimes. Off by default.",
+      "On by default. Most vaults have notes with neither a date in frontmatter nor one in the filename, so turning this off leaves the heatmap nearly empty. If you use a sync drive (iCloud, etc.) it may bulk-refresh mtimes and create a false spike — turn it off then.",
     excludedPrefixesName: "Excluded paths",
     excludedPrefixesDesc:
       "One path prefix per line. Matching notes are left out of every statistic. Leave empty to exclude nothing.",
@@ -394,7 +398,7 @@ const I18N = {
       "Utiliser ce champ du frontmatter comme date d'activité, puis se rabattre sur created/date, la date du nom de fichier, puis la date de modification.",
     useMtimeName: "Se rabattre sur la date de modification",
     useMtimeDesc:
-      "Désactivé, la date de modification n'est pas utilisée, ce qui évite les faux pics quand un service de synchronisation (iCloud, etc.) réécrit les dates en masse. Désactivé par défaut.",
+      "Activé par défaut. Dans la plupart des coffres, les notes n'ont ni date dans le frontmatter ni date dans le nom de fichier ; désactiver cette option laisse donc la carte de chaleur presque vide. Si vous utilisez un service de synchronisation (iCloud, etc.), il peut réécrire les dates en masse et créer un faux pic — désactivez-la alors.",
     excludedPrefixesName: "Chemins exclus",
     excludedPrefixesDesc:
       "Un préfixe de chemin par ligne. Les notes correspondantes sont exclues de toutes les statistiques. Laisser vide pour ne rien exclure.",
@@ -482,7 +486,7 @@ const I18N = {
       "Usa questo campo del frontmatter come data di attività; poi ripiega su created/date, sulla data nel nome file e infine sulla data di modifica.",
     useMtimeName: "Ripiega sulla data di modifica",
     useMtimeDesc:
-      "Se disattivato, la data di modifica non viene usata, evitando falsi picchi quando un servizio di sincronizzazione (iCloud, ecc.) aggiorna in blocco le date. Disattivato per impostazione predefinita.",
+      "Attivo per impostazione predefinita. Nella maggior parte dei vault le note non hanno né una data nel frontmatter né una nel nome file, quindi disattivarlo lascia la mappa di calore quasi vuota. Se usi un servizio di sincronizzazione (iCloud, ecc.) potrebbe aggiornare in blocco le date e creare un falso picco: in quel caso disattivalo.",
     excludedPrefixesName: "Percorsi esclusi",
     excludedPrefixesDesc:
       "Un prefisso di percorso per riga. Le note corrispondenti sono escluse da ogni statistica. Lascia vuoto per non escludere nulla.",
@@ -569,7 +573,7 @@ const I18N = {
       "この frontmatter フィールドを優先して活動日とし、なければ created/date、ファイル名の日付、更新日時の順に遡ります。",
     useMtimeName: "更新日時で代替する",
     useMtimeDesc:
-      "オフのとき更新日時は使いません。iCloud などの同期で更新日時が一括で書き換わっても偽の山が出ません。既定はオフです。",
+      "既定はオンです。多くの保管庫のノートには frontmatter の日付もファイル名の日付もないため、オフにするとヒートマップはほぼ空になります。iCloud などの同期で更新日時が一括で書き換わり偽の山が出る場合に、オフにしてください。",
     excludedPrefixesName: "除外パス",
     excludedPrefixesDesc:
       "1 行につき 1 つのパス接頭辞。一致するノートはすべての統計から外れます。空欄なら除外しません。",
@@ -655,7 +659,7 @@ const I18N = {
       "이 frontmatter 필드를 활동 날짜로 우선 사용하고, 없으면 created/date, 파일명 날짜, 수정 시각 순으로 대체합니다.",
     useMtimeName: "파일 수정 시각으로 대체",
     useMtimeDesc:
-      "끄면 수정 시각을 사용하지 않아 iCloud 등 동기화가 수정 시각을 일괄 갱신해도 가짜 급증이 생기지 않습니다. 기본값은 꺼짐입니다.",
+      "기본값은 켜짐입니다. 대부분의 보관함에는 frontmatter 날짜도 파일명 날짜도 없는 노트가 많아, 끄면 히트맵이 거의 비게 됩니다. iCloud 등 동기화가 수정 시각을 일괄 갱신해 가짜 급증이 생길 때만 끄세요.",
     excludedPrefixesName: "제외 경로",
     excludedPrefixesDesc:
       "한 줄에 경로 접두사 하나. 일치하는 노트는 모든 통계에서 제외됩니다. 비워 두면 아무것도 제외하지 않습니다.",
@@ -742,7 +746,7 @@ const I18N = {
       "Usa este campo del frontmatter como fecha de actividad; si falta, recurre a created/date, la fecha del nombre de archivo y la fecha de modificación.",
     useMtimeName: "Recurrir a la fecha de modificación",
     useMtimeDesc:
-      "Si está desactivado, no se usa la fecha de modificación, evitando picos falsos cuando un servicio de sincronización (iCloud, etc.) las actualiza en bloque. Desactivado por defecto.",
+      "Activado por defecto. En la mayoría de bóvedas las notas no tienen fecha ni en el frontmatter ni en el nombre de archivo, así que desactivarlo deja el mapa de calor casi vacío. Si usas un servicio de sincronización (iCloud, etc.) puede actualizar las fechas en bloque y crear un pico falso: desactívalo entonces.",
     excludedPrefixesName: "Rutas excluidas",
     excludedPrefixesDesc:
       "Un prefijo de ruta por línea. Las notas coincidentes quedan fuera de todas las estadísticas. Déjalo vacío para no excluir nada.",
@@ -1750,7 +1754,11 @@ class DashboardView extends ItemView {
     if (!slots.length) return;
 
     const box = parent.createDiv({ cls: "vdash-factory" });
-    box.createDiv({ cls: "vdash-factory-title", text: this.t("factoryTitle") });
+    // 只有一个板块时不渲染一级标签（一个孤零零的标签点了也没用），
+    // 但那样该文件夹的名字就无处可见，故并进标题。
+    const title =
+      slots.length === 1 ? `${this.t("factoryTitle")} · ${slots[0].label}` : this.t("factoryTitle");
+    box.createDiv({ cls: "vdash-factory-title", text: title });
 
     // 选中板块被删配置或改路径后失效，回落第一个
     if (!slots.some((s) => s.path === this.factorySlotPath)) {
