@@ -110,15 +110,15 @@ const DEFAULT_SETTINGS = {
   excludedPrefixes: DEFAULT_EXCLUDED_PREFIXES.slice(),
   /**
    * 可视文件夹最多 5 个自定义板块（标签）：每项 { folder, label }。
-   * folder 留空 = 该板块不显示；label 留空则用文件夹名自动去编号前缀。
+   * folder 留空 = 该板块不显示；label 留空则用文件夹名原样显示。
    * 板块 1 默认指向原「内容工厂」根目录，升级用户视觉不变；2—5 默认留空。
    */
   factoryTabs: [
-    { folder: FACTORY_ROOT_DEFAULT, label: "" },
-    { folder: "", label: "" },
-    { folder: "", label: "" },
-    { folder: "", label: "" },
-    { folder: "", label: "" },
+    { folder: FACTORY_ROOT_DEFAULT, label: "", subs: null },
+    { folder: "", label: "", subs: null },
+    { folder: "", label: "", subs: null },
+    { folder: "", label: "", subs: null },
+    { folder: "", label: "", subs: null },
   ],
 };
 
@@ -152,11 +152,16 @@ const I18N = {
     factoryTitle: "快捷入口",
     factoryDesc:
       "最多可配置 5 个板块。每个板块指定一个文件夹，仪表盘按该文件夹的子目录出二级标签、按修改时间列出笔记。" +
-      "「文件夹路径」留空则该板块不显示；填写后若「显示名称」留空，自动取文件夹名并去掉编号前缀。" +
+      "「文件夹路径」留空则该板块不显示；填写后若「显示名称」留空，直接用文件夹名。" +
       "配置 2 个及以上板块时，仪表盘上会出现一级标签供切换。",
     slotName: (i) => `板块 ${i}`,
     folderPlaceholder: "文件夹路径，如 B_ContentFactory 内容工厂",
     labelPlaceholder: "显示名称（留空用文件夹名）",
+    slotSubsName: "显示的子目录",
+    slotSubsSummary: (n, total) => (n === total ? `全部 ${total} 个` : `已选 ${n} / ${total}`),
+    slotSubsDesc:
+      "勾选要作为二级标签显示的子目录。全部勾选时，以后新增的子目录会自动出现；全不勾选则该板块不显示二级标签。",
+    slotSubsEmpty: "该文件夹下没有子目录",
     statusFound: "✓ 已找到该文件夹",
     statusNotFound: "⚠ 库内未找到该路径，请检查大小写与完整层级",
 
@@ -227,11 +232,16 @@ const I18N = {
     factoryTitle: "快捷入口",
     factoryDesc:
       "最多可配置 5 個板塊。每個板塊指定一個文件夾，儀表盤按該文件夾的子目錄出二級標籤、按修改時間列出筆記。" +
-      "「文件夾路徑」留空則該板塊不顯示；填寫後若「顯示名稱」留空，自動取文件夾名並去掉編號前綴。" +
+      "「文件夾路徑」留空則該板塊不顯示；填寫後若「顯示名稱」留空，直接用資料夾名。" +
       "配置 2 個及以上板塊時，儀表盤上會出現一級標籤供切換。",
     slotName: (i) => `板塊 ${i}`,
     folderPlaceholder: "文件夾路徑，如 B_ContentFactory 內容工廠",
     labelPlaceholder: "顯示名稱（留空用文件夾名）",
+    slotSubsName: "顯示的子目錄",
+    slotSubsSummary: (n, total) => (n === total ? `全部 ${total} 個` : `已選 ${n} / ${total}`),
+    slotSubsDesc:
+      "勾選要作為二級標籤顯示的子目錄。全部勾選時，此後新增的子目錄會自動出現；全不勾選則該板塊不顯示二級標籤。",
+    slotSubsEmpty: "該資料夾下沒有子目錄",
     statusFound: "✓ 已找到該文件夾",
     statusNotFound: "⚠ 庫內未找到該路徑，請檢查大小寫與完整層級",
 
@@ -304,11 +314,16 @@ const I18N = {
     factoryDesc:
       "Configure up to 5 blocks. Each block points to a folder; the dashboard shows its subfolders as " +
       "second-level tabs and lists notes by modified time. Leave \"Folder path\" empty to hide the block; " +
-      "if \"Display name\" is empty, the folder name (with any numeric prefix stripped) is used instead. " +
+      "if \"Display name\" is empty, the folder name is used as-is. " +
       "With 2 or more blocks configured, a top-level tab switcher appears on the dashboard.",
     slotName: (i) => `Block ${i}`,
     folderPlaceholder: "Folder path, e.g. B_ContentFactory 内容工厂",
     labelPlaceholder: "Display name (blank = use folder name)",
+    slotSubsName: "Subfolders to show",
+    slotSubsSummary: (n, total) => (n === total ? `All ${total}` : `${n} of ${total} selected`),
+    slotSubsDesc:
+      "Pick which subfolders appear as second-level tabs. With all checked, subfolders added later show up automatically; with none checked, this block has no second-level tabs.",
+    slotSubsEmpty: "This folder has no subfolders",
     statusFound: "✓ Folder found",
     statusNotFound: "⚠ Path not found in vault — check case and full path",
 
@@ -385,10 +400,15 @@ const I18N = {
       "Configurez jusqu'à 5 blocs. Chaque bloc pointe vers un dossier ; le tableau de bord affiche ses " +
       "sous-dossiers comme onglets de second niveau et liste les notes par date de modification. Laissez " +
       "« Chemin du dossier » vide pour masquer le bloc ; si « Nom affiché » est vide, le nom du dossier " +
-      "(préfixe numérique retiré) est utilisé. À partir de 2 blocs configurés, un sélecteur d'onglets apparaît.",
+      "est utilisé tel quel. À partir de 2 blocs configurés, un sélecteur d'onglets apparaît.",
     slotName: (i) => `Bloc ${i}`,
     folderPlaceholder: "Chemin du dossier, p. ex. B_ContentFactory 内容工厂",
     labelPlaceholder: "Nom affiché (vide = nom du dossier)",
+    slotSubsName: "Sous-dossiers à afficher",
+    slotSubsSummary: (n, total) => (n === total ? `Tous les ${total}` : `${n} sur ${total} sélectionnés`),
+    slotSubsDesc:
+      "Choisissez les sous-dossiers qui apparaissent comme onglets de second niveau. Si tous sont cochés, les sous-dossiers ajoutés plus tard apparaîtront automatiquement ; si aucun n'est coché, ce bloc n'a pas d'onglets de second niveau.",
+    slotSubsEmpty: "Ce dossier n'a pas de sous-dossier",
     statusFound: "✓ Dossier trouvé",
     statusNotFound: "⚠ Chemin introuvable dans le coffre — vérifiez la casse et le chemin complet",
 
@@ -466,10 +486,15 @@ const I18N = {
       "Configura fino a 5 blocchi. Ogni blocco punta a una cartella; la dashboard mostra le sue " +
       "sottocartelle come schede di secondo livello ed elenca le note per data di modifica. Lascia " +
       "«Percorso della cartella» vuoto per nascondere il blocco; se «Nome visualizzato» è vuoto viene " +
-      "usato il nome della cartella (senza prefisso numerico). Con 2 o più blocchi compare un selettore di schede.",
+      "usato il nome della cartella così com'è. Con 2 o più blocchi compare un selettore di schede.",
     slotName: (i) => `Blocco ${i}`,
     folderPlaceholder: "Percorso della cartella, es. B_ContentFactory 内容工厂",
     labelPlaceholder: "Nome visualizzato (vuoto = nome della cartella)",
+    slotSubsName: "Sottocartelle da mostrare",
+    slotSubsSummary: (n, total) => (n === total ? `Tutte (${total})` : `${n} di ${total} selezionate`),
+    slotSubsDesc:
+      "Scegli quali sottocartelle compaiono come schede di secondo livello. Con tutte selezionate, le sottocartelle aggiunte in seguito compaiono automaticamente; senza alcuna selezione questo blocco non ha schede di secondo livello.",
+    slotSubsEmpty: "Questa cartella non ha sottocartelle",
     statusFound: "✓ Cartella trovata",
     statusNotFound: "⚠ Percorso non trovato nel vault — controlla maiuscole e percorso completo",
 
@@ -546,10 +571,15 @@ const I18N = {
       "最大 5 ブロックまで設定できます。各ブロックはフォルダーを指し、ダッシュボードはその" +
       "サブフォルダーを第 2 階層のタブとして表示し、更新日時順にノートを並べます。" +
       "「フォルダーのパス」を空欄にするとそのブロックは非表示になります。「表示名」が空欄なら" +
-      "フォルダー名（先頭の連番を除いたもの）を使います。2 つ以上設定すると上部にタブ切り替えが出ます。",
+      "フォルダー名をそのまま使います。2 つ以上設定すると上部にタブ切り替えが出ます。",
     slotName: (i) => `ブロック ${i}`,
     folderPlaceholder: "フォルダーのパス（例：B_ContentFactory 内容工厂）",
     labelPlaceholder: "表示名（空欄ならフォルダー名）",
+    slotSubsName: "表示するサブフォルダー",
+    slotSubsSummary: (n, total) => (n === total ? `すべて ${total} 件` : `${total} 件中 ${n} 件を選択`),
+    slotSubsDesc:
+      "第 2 階層のタブとして表示するサブフォルダーを選びます。すべて選ぶと、以後追加されたサブフォルダーも自動的に表示されます。ひとつも選ばない場合、このブロックに第 2 階層のタブは出ません。",
+    slotSubsEmpty: "このフォルダーにサブフォルダーはありません",
     statusFound: "✓ フォルダーが見つかりました",
     statusNotFound: "⚠ 保管庫内にパスが見つかりません — 大文字小文字と完全パスを確認してください",
 
@@ -624,11 +654,16 @@ const I18N = {
     factoryDesc:
       "최대 5개 블록을 설정할 수 있습니다. 각 블록은 폴더를 가리키며, 대시보드는 그 하위 폴더를 " +
       "2단계 탭으로 표시하고 수정 시각순으로 노트를 나열합니다. '폴더 경로'를 비우면 해당 블록은 " +
-      "숨겨집니다. '표시 이름'이 비어 있으면 폴더 이름(앞의 숫자 접두사를 뗀 것)을 사용합니다. " +
+      "숨겨집니다. '표시 이름'이 비어 있으면 폴더 이름을 그대로 사용합니다. " +
       "2개 이상 설정하면 상단에 탭 전환기가 나타납니다.",
     slotName: (i) => `블록 ${i}`,
     folderPlaceholder: "폴더 경로, 예: B_ContentFactory 内容工厂",
     labelPlaceholder: "표시 이름(비우면 폴더 이름 사용)",
+    slotSubsName: "표시할 하위 폴더",
+    slotSubsSummary: (n, total) => (n === total ? `전체 ${total}개` : `${total}개 중 ${n}개 선택`),
+    slotSubsDesc:
+      "2단계 탭으로 표시할 하위 폴더를 고릅니다. 모두 선택하면 이후 추가된 하위 폴더도 자동으로 나타나고, 하나도 선택하지 않으면 이 블록에 2단계 탭이 없습니다.",
+    slotSubsEmpty: "이 폴더에는 하위 폴더가 없습니다",
     statusFound: "✓ 폴더를 찾았습니다",
     statusNotFound: "⚠ 보관함에서 경로를 찾을 수 없습니다 — 대소문자와 전체 경로를 확인하세요",
 
@@ -705,10 +740,15 @@ const I18N = {
       "Configura hasta 5 bloques. Cada bloque apunta a una carpeta; el panel muestra sus subcarpetas " +
       "como pestañas de segundo nivel y lista las notas por fecha de modificación. Deja «Ruta de la " +
       "carpeta» vacía para ocultar el bloque; si «Nombre visible» está vacío se usa el nombre de la " +
-      "carpeta (sin el prefijo numérico). Con 2 o más bloques aparece un selector de pestañas.",
+      "carpeta tal cual. Con 2 o más bloques aparece un selector de pestañas.",
     slotName: (i) => `Bloque ${i}`,
     folderPlaceholder: "Ruta de la carpeta, p. ej. B_ContentFactory 内容工厂",
     labelPlaceholder: "Nombre visible (vacío = nombre de la carpeta)",
+    slotSubsName: "Subcarpetas a mostrar",
+    slotSubsSummary: (n, total) => (n === total ? `Todas (${total})` : `${n} de ${total} seleccionadas`),
+    slotSubsDesc:
+      "Elige qué subcarpetas aparecen como pestañas de segundo nivel. Con todas marcadas, las subcarpetas añadidas después aparecen automáticamente; sin ninguna marcada, este bloque no tiene pestañas de segundo nivel.",
+    slotSubsEmpty: "Esta carpeta no tiene subcarpetas",
     statusFound: "✓ Carpeta encontrada",
     statusNotFound: "⚠ Ruta no encontrada en la bóveda — revisa mayúsculas y la ruta completa",
 
@@ -780,11 +820,6 @@ const RANGE_LABEL_KEYS = { all: "rangeAll", "30d": "range30d", "7d": "range7d" }
 
 
 /** `01_NewMediaCopy 新媒体文案` → `新媒体文案`；取不到中文名时退回原名 */
-function factoryLabel(name) {
-  const match = name.match(/^[\d-]+_\S*\s+(.+)$/);
-  return match ? match[1] : name;
-}
-
 /* ---------------------------------- 日期工具 --------------------------------- */
 
 function ymd(date) {
@@ -1665,7 +1700,7 @@ class DashboardView extends ItemView {
 
   /**
    * 读取设置里最多 5 个自定义板块：folder 留空即视为未配置、不出现在仪表盘。
-   * label 留空则回退为文件夹名（去掉编号前缀），彻底留空的板块两者皆无则不返回。
+   * label 留空则回退为文件夹名原样，彻底留空的板块两者皆无则不返回。
    */
   getFactorySlots() {
     const tabs = this.plugin.settings.factoryTabs || [];
@@ -1675,7 +1710,7 @@ class DashboardView extends ItemView {
       if (!folder) continue;
       const customLabel = (raw?.label || "").trim();
       const baseName = folder.split("/").filter(Boolean).pop() || folder;
-      slots.push({ path: folder, label: customLabel || factoryLabel(baseName) });
+      slots.push({ path: folder, label: customLabel || baseName });
     }
     return slots;
   }
@@ -1724,8 +1759,14 @@ class DashboardView extends ItemView {
       return;
     }
 
+    // 只显示设置里勾选的子目录；subs 为 null 表示不筛选
+    const slot = this.plugin.settings.factoryTabs.find(
+      (x) => (x.folder || "").trim() === this.factorySlotPath,
+    );
+    const picked = slot && Array.isArray(slot.subs) ? slot.subs : null;
     const subs = current.children
       .filter((f) => f.children)
+      .filter((f) => picked === null || picked.includes(f.path))
       .sort((a, b) => a.name.localeCompare(b.name, INTL_LOCALE[this.plugin.settings.locale] || "en"));
 
     if (subs.length) {
@@ -1735,7 +1776,7 @@ class DashboardView extends ItemView {
         this.factoryL2 = null;
       });
       for (const sub of subs) {
-        this.factoryTab(l2, factoryLabel(sub.name), this.factoryL2 === sub.path, () => {
+        this.factoryTab(l2, sub.name, this.factoryL2 === sub.path, () => {
           this.factoryL2 = sub.path;
         });
       }
@@ -1949,7 +1990,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
 
     containerEl.createEl("h3", { text: t.factoryTitle });
     containerEl.createEl("p", {
-      cls: "setting-item-description",
+      cls: "setting-item-description vdash-setting-desc",
       text: t.factoryDesc,
     });
 
@@ -1973,8 +2014,11 @@ class VaultDashboardSettingTab extends PluginSettingTab {
     folderInput.value = slot.folder;
     folderInput.addEventListener("input", async () => {
       slot.folder = folderInput.value;
+      // 换了文件夹，原先勾选的子目录已无意义，重置为「全部显示」
+      slot.subs = null;
       await this.plugin.saveSettings();
       this.updateFolderStatus(status, folderInput.value, t);
+      this.renderSlotSubs(subsBox, slot, t);
       this.plugin.refreshViews();
     });
 
@@ -1991,6 +2035,64 @@ class VaultDashboardSettingTab extends PluginSettingTab {
     const statusRow = wrap.createDiv({ cls: "vdash-setting-slot-status-row" });
     const status = statusRow.createDiv({ cls: "vdash-setting-slot-status" });
     this.updateFolderStatus(status, slot.folder, t);
+
+    const subsBox = wrap.createDiv({ cls: "vdash-setting-slot-subs" });
+    this.renderSlotSubs(subsBox, slot, t);
+  }
+
+  /**
+   * 列出该板块文件夹下一级的子目录，勾选哪些作为仪表盘的二级标签。
+   * 语义：slot.subs 为 null 表示全部显示，此后新增的子目录会自动出现；
+   * 为数组则只显示列出的，空数组即一个都不显示。故「全勾选」写回 null 而非
+   * 完整列表——否则以后新建的子目录不会自动出现，与勾选界面呈现的状态不符。
+   */
+  renderSlotSubs(box, slot, t) {
+    box.empty();
+    const path = (slot.folder || "").trim();
+    if (!path) return;
+    const folder = this.app.vault.getAbstractFileByPath(path);
+    if (!(folder instanceof TFolder)) return;
+
+    const subs = folder.children
+      .filter((f) => f instanceof TFolder)
+      .sort((a, b) => a.name.localeCompare(b.name, INTL_LOCALE[this.plugin.settings.locale] || "en"));
+
+    if (!subs.length) {
+      box.createDiv({ cls: "vdash-setting-slot-subs-name", text: t.slotSubsName });
+      box.createDiv({ cls: "vdash-setting-slot-subs-empty", text: t.slotSubsEmpty });
+      return;
+    }
+
+    // 收进折叠面板：子目录多时（本库首个板块就有 12 个）铺开会把设置页撑得很长。
+    // 不用 <select multiple>：macOS 上它渲染成滚动列表框，多选要按住 Cmd 点，
+    // 既不像下拉也不好发现。<details> 是原生折叠件，键盘可达，且能装下复选框。
+    const details = box.createEl("details", { cls: "vdash-setting-slot-subs-details" });
+    const summary = details.createEl("summary", { cls: "vdash-setting-slot-subs-summary" });
+
+    const boxes = [];
+    const syncSummary = () => {
+      const n = boxes.filter((b) => b.cb.checked).length;
+      summary.setText(`${t.slotSubsName} · ${t.slotSubsSummary(n, boxes.length)}`);
+    };
+
+    details.createDiv({ cls: "vdash-setting-slot-subs-desc", text: t.slotSubsDesc });
+    const list = details.createDiv({ cls: "vdash-setting-slot-subs-list" });
+
+    for (const sub of subs) {
+      const item = list.createEl("label", { cls: "vdash-setting-slot-sub" });
+      const cb = item.createEl("input", { type: "checkbox" });
+      cb.checked = slot.subs === null || slot.subs.includes(sub.path);
+      item.createSpan({ text: sub.name });
+      boxes.push({ cb, path: sub.path });
+      cb.addEventListener("change", async () => {
+        const checked = boxes.filter((b) => b.cb.checked).map((b) => b.path);
+        slot.subs = checked.length === boxes.length ? null : checked;
+        syncSummary();
+        await this.plugin.saveSettings();
+        this.plugin.refreshViews();
+      });
+    }
+    syncSummary();
   }
 
   /** 文件夹路径实时校验：留空不提示，填了但库内找不到就给警示，避免用户以为已生效 */
@@ -2077,6 +2179,9 @@ module.exports = class VaultDashboardPlugin extends Plugin {
       normalized.push({
         folder: typeof raw?.folder === "string" ? raw.folder : "",
         label: typeof raw?.label === "string" ? raw.label : "",
+        // subs: null = 全部显示（此后新增的子目录会自动出现）；数组 = 只显示列出的，
+        // 空数组即一个都不显示。老存档没有该字段，按 null 处理，行为不变。
+        subs: Array.isArray(raw?.subs) ? raw.subs.filter((x) => typeof x === "string") : null,
       });
     }
     this.settings.factoryTabs = normalized;
