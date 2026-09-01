@@ -76,6 +76,10 @@ Installez « Vault Dashboard X » depuis **Paramètres → Plugins communautaire
 3. Copiez les trois fichiers dans ce dossier.
 4. Activez le plugin sous **Paramètres → Plugins communautaires**.
 
+## Journal des modifications
+
+[Journal complet](CHANGELOG_fr.md) — ce qui a changé à chaque version, et pourquoi.
+
 ## Licence
 
 [GNU General Public License v3.0](../LICENSE)

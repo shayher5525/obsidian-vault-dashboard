@@ -1,7 +1,7 @@
 {
 	"id": "vault-dashboard-x",
 	"name": "Vault Dashboard X",
-	"version": "0.12.0",
+	"version": "0.12.1",
 	"minAppVersion": "1.4.0",
 	"description": "A vault dashboard with an activity heatmap, folder distribution, and configurable visual-folder quick links.",
 	"author": "shayherchen",

@@ -3,7 +3,7 @@
  *
  * 数据源抽象：provider 接口 `getDailyCounts(app, notes) → Map<'YYYY-MM-DD', number>`。
  *   默认「笔记活跃度」（每篇笔记按 frontmatter 日期 → 文件名日期 → mtime 逐级取活跃日）；
- *   「迭代日志」解析（`## YYYY-MM-DD` 小节 + 顶层列表项）保留为可选模式，本库继续用。
+ *   「迭代日志」解析（`## YYYY-MM-DD` 小节 + 顶层列表项）为可选模式，供维护 Markdown 变更日志的用户选用。
  *
  * 无构建步骤：本文件即插件产物，改完在 Obsidian 里禁用/启用插件即可生效。
  */
@@ -92,7 +92,7 @@ function monthShort(date, localeId) {
   return new Intl.DateTimeFormat(INTL_LOCALE[localeId] || "en", { month: "short" }).format(date);
 }
 
-/** 数据源取值：笔记活跃度（通用默认）/ 迭代日志（本库原行为） */
+/** 数据源取值：笔记活跃度（通用默认）/ 迭代日志（解析 Markdown 变更日志） */
 const DATA_SOURCES = ["noteActivity", "changelog"];
 
 const DEFAULT_SETTINGS = {
@@ -140,7 +140,7 @@ const I18N = {
     dataSourceTitle: "数据源",
     dataSourceName: "活跃度数据来源",
     dataSourceDesc:
-      "决定热力图按什么统计。「笔记活跃度」在任意库都能用；「迭代日志」按 changelog 文件解析（本库原有行为）。",
+      "决定热力图按什么统计。「笔记活跃度」在任意库都能用；「迭代日志」适合在库里维护 Markdown 变更日志的人，按日期小节解析条目数。",
     dataSourceNoteActivity: "笔记活跃度",
     dataSourceChangelog: "迭代日志",
     activityDateFieldName: "活跃日期字段",
@@ -222,7 +222,7 @@ const I18N = {
     dataSourceTitle: "數據源",
     dataSourceName: "活躍度資料來源",
     dataSourceDesc:
-      "決定熱力圖按什麼統計。「筆記活躍度」在任意庫都能用；「迭代日誌」按 changelog 檔案解析（本庫原有行為）。",
+      "決定熱力圖按什麼統計。「筆記活躍度」在任意庫都能用；「迭代日誌」適合在庫裡維護 Markdown 變更日誌的人，按日期小節解析條目數。",
     dataSourceNoteActivity: "筆記活躍度",
     dataSourceChangelog: "迭代日誌",
     activityDateFieldName: "活躍日期欄位",
@@ -304,7 +304,7 @@ const I18N = {
     dataSourceTitle: "Data source",
     dataSourceName: "Activity data source",
     dataSourceDesc:
-      "What the heatmap counts. \"Note activity\" works in any vault; \"Changelog\" parses changelog files (this vault's original behavior).",
+      "What the heatmap counts. \"Note activity\" works in any vault; \"Changelog\" is for people who keep a markdown changelog, counting entries under each date heading.",
     dataSourceNoteActivity: "Note activity",
     dataSourceChangelog: "Changelog",
     activityDateFieldName: "Activity date field",
@@ -390,7 +390,7 @@ const I18N = {
     dataSourceTitle: "Source de données",
     dataSourceName: "Source des données d'activité",
     dataSourceDesc:
-      "Ce que compte la carte de chaleur. « Activité des notes » fonctionne dans tout coffre ; « Journal des modifications » analyse des fichiers de journal.",
+      "Ce que compte la carte de chaleur. « Activité des notes » fonctionne dans tout coffre ; « Journal des modifications » s'adresse à ceux qui tiennent un changelog Markdown et compte les entrées sous chaque date.",
     dataSourceNoteActivity: "Activité des notes",
     dataSourceChangelog: "Journal des modifications",
     activityDateFieldName: "Champ de date d'activité",
@@ -478,7 +478,7 @@ const I18N = {
     dataSourceTitle: "Origine dati",
     dataSourceName: "Origine dei dati di attività",
     dataSourceDesc:
-      "Ciò che conta la mappa di calore. «Attività delle note» funziona in qualsiasi vault; «Changelog» analizza i file di changelog.",
+      "Ciò che conta la mappa di calore. «Attività delle note» funziona in qualsiasi vault; «Changelog» è per chi tiene un changelog Markdown e conta le voci sotto ogni data.",
     dataSourceNoteActivity: "Attività delle note",
     dataSourceChangelog: "Changelog",
     activityDateFieldName: "Campo data attività",
@@ -565,7 +565,7 @@ const I18N = {
     dataSourceTitle: "データソース",
     dataSourceName: "アクティビティのデータソース",
     dataSourceDesc:
-      "ヒートマップが数える対象。「ノートの更新」はどの保管庫でも動作し、「変更履歴」は変更履歴ファイルを解析します（この保管庫の従来の挙動）。",
+      "ヒートマップが数える対象。「ノートの更新」はどの保管庫でも動作します。「変更履歴」は Markdown の変更履歴を書いている人向けで、日付見出しごとの項目数を数えます。",
     dataSourceNoteActivity: "ノートの更新",
     dataSourceChangelog: "変更履歴",
     activityDateFieldName: "アクティビティ日付フィールド",
@@ -651,7 +651,7 @@ const I18N = {
     dataSourceTitle: "데이터 소스",
     dataSourceName: "활동 데이터 소스",
     dataSourceDesc:
-      "히트맵이 세는 대상입니다. '노트 활동'은 모든 보관함에서 작동하고, '변경 기록'은 변경 기록 파일을 해석합니다(이 보관함의 기존 동작).",
+      "히트맵이 세는 대상입니다. '노트 활동'은 모든 보관함에서 작동합니다. '변경 기록'은 Markdown 변경 기록을 관리하는 사용자를 위한 것으로, 날짜 제목 아래의 항목 수를 셉니다.",
     dataSourceNoteActivity: "노트 활동",
     dataSourceChangelog: "변경 기록",
     activityDateFieldName: "활동 날짜 필드",
@@ -738,7 +738,7 @@ const I18N = {
     dataSourceTitle: "Origen de datos",
     dataSourceName: "Origen de los datos de actividad",
     dataSourceDesc:
-      "Lo que cuenta el mapa de calor. «Actividad de notas» funciona en cualquier bóveda; «Registro de cambios» analiza archivos de registro (el comportamiento original de esta bóveda).",
+      "Lo que cuenta el mapa de calor. «Actividad de notas» funciona en cualquier bóveda; «Registro de cambios» es para quien mantiene un changelog en Markdown y cuenta las entradas bajo cada fecha.",
     dataSourceNoteActivity: "Actividad de notas",
     dataSourceChangelog: "Registro de cambios",
     activityDateFieldName: "Campo de fecha de actividad",
@@ -968,7 +968,7 @@ class NoteActivityProvider {
   }
 }
 
-/** 迭代日志数据源：解析 `## YYYY-MM-DD` 小节 + 顶层列表项（本库原有行为，保留为可选）。 */
+/** 迭代日志数据源：解析 `## YYYY-MM-DD` 小节 + 顶层列表项，供维护 Markdown 变更日志的用户选用。 */
 class ChangelogProvider {
   constructor(settings) {
     this.settings = settings;
@@ -2087,7 +2087,7 @@ class VaultDashboardSettingTab extends PluginSettingTab {
       return;
     }
 
-    // 收进折叠面板：子目录多时（本库首个板块就有 12 个）铺开会把设置页撑得很长。
+    // 收进折叠面板：子目录多时（十几个并不罕见）铺开会把设置页撑得很长。
     // 不用 <select multiple>：macOS 上它渲染成滚动列表框，多选要按住 Cmd 点，
     // 既不像下拉也不好发现。<details> 是原生折叠件，键盘可达，且能装下复选框。
     const details = box.createEl("details", { cls: "vdash-setting-slot-subs-details" });

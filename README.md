@@ -85,6 +85,10 @@ Install "Vault Dashboard X" from **Settings → Community plugins**, then enable
 3. Copy the three files into that folder.
 4. Enable the plugin under **Settings → Community plugins**.
 
+## Changelog
+
+[Full changelog](CHANGELOG.md) — every release with what changed and why.
+
 ## License
 
 [GNU General Public License v3.0](LICENSE)

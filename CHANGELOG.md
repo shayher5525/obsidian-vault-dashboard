@@ -1,194 +1,193 @@
-# Vault Dashboard X 变更记录
+# Vault Dashboard X Changelog
 
-## 版本约定
+**English** · [中文](docs/CHANGELOG_zh.md) · [日本語](docs/CHANGELOG_ja.md) · [한국어](docs/CHANGELOG_ko.md) · [Français](docs/CHANGELOG_fr.md) · [Español](docs/CHANGELOG_es.md) · [Italiano](docs/CHANGELOG_it.md)
 
-本项目遵循语义化版本（MAJOR.MINOR.PATCH）。
+## Versioning
 
-| 号段 | 什么时候进位 | 例子 |
+This project follows semantic versioning (MAJOR.MINOR.PATCH).
+
+| Part | When it goes up | Example |
 | --- | --- | --- |
-| MAJOR | 破坏性变更：`data.json` 结构或设置项不兼容、需要用户手动迁移、移除既有功能 | 设置项改名且不做兼容读取 |
-| MINOR | 新增功能、新增面板或标签页、可见的交互与视觉改版 | 新增快捷入口板块；整套视觉换令牌 |
-| PATCH | 修 bug、改文案、样式微调，不改功能边界 | 修一处色阶被覆盖、调间距 |
+| MAJOR | Breaking change: incompatible `data.json` or settings, manual migration required, a feature removed | A setting is renamed without a compatibility read |
+| MINOR | New feature, new pane or tab, visible interaction or visual rework | Add the quick-access blocks; re-do the whole visual token set |
+| PATCH | Bug fix, wording change, style tweak — no change to what the plugin does | Fix a colour step being overridden; adjust spacing |
 
-版本号的真源是 `manifest.json` 的 `version`；发布 tag 与之相等且不带 `v` 前缀。
+The source of truth for the version is `version` in `manifest.json`; the release tag equals it, without a `v` prefix.
 
-### 内部引用清理
+### Entry conventions
 
-- 0.12.0 起，本文件不再引用与本插件无关的库内规则（原先写着与另一插件共用版本规则、需在某个知识库的迭代日志里记一行等）。版本管理只依据上表与 `manifest.json`。
-
-### 条目写法
-
-- 小节标题固定 `## [x.y.z] — YYYY-MM-DD`，日期为实际改动日。
-- 小节内按 `### 新增` / `### 变更` / `### 修复` 分组，只写出现的组。
-- **同一天的多次改动合并进同一个版本号**，不为中间态单独发号。
-- **不回溯补写历史版本**：无记录可考的旧版本一律写「未留记录」，不按文件时间或代码推断臆造条目。
+- Section headings are always `## [x.y.z] — YYYY-MM-DD`, dated by the day the change was made.
+- Inside a section, entries are grouped under `### Added` / `### Changed` / `### Fixed`; only the groups that apply are written.
+- **Several changes on the same day are merged into one version** — no separate number for intermediate states.
+- **History is never back-filled.** Versions with no surviving record are marked as such rather than inferred from file timestamps or code.
 
 ---
 
+## [0.12.1] — 2026-09-01
+
+### Changed
+
+- Settings wording no longer refers to the author's own vault. "Changelog" is now described by who it is for and how it counts ("for people who keep a markdown changelog, counting entries under each date heading") instead of being called "this vault's original behavior", which meant nothing to anyone else. Three code comments carrying the same assumption were cleaned up as well — the plugin has no build step, so `main.js` is what users read.
+- Translated changelogs added under `docs/`, one per README language, linked from every README. The root `CHANGELOG.md` is now English, matching `README.md`.
+
 ## [0.12.0] — 2026-09-01
 
-### 变更
+### Changed
 
-- **`useMtime` 默认改为开启。** 原先默认关闭是为了防同步盘批量刷新 `mtime` 造出假柱，但那是特定环境的问题：多数库的笔记既没有日期 frontmatter 也没有文件名日期，关掉后热力图几乎全空，装上插件看到的是一片空白。空白比偶尔一根假柱更劝退，且假柱看得见、可解释、有开关可关。八种语言的设置说明同步改写，把取舍讲清楚而非只报状态。**已有配置不受影响**——`Object.assign` 保留已存值。
-- 只配置了一个板块时，快捷入口的标题改为「快捷入口 · 板块名」。此前只有一个板块时不渲染一级标签（一个孤零零的标签点了也没用），导致该文件夹的名字在界面上无处可见。配置 2 个及以上时标题与一级标签行维持原样。
-- 本文件的「版本约定」改为面向公共用户：移除与另一插件共用版本规则、需在某个知识库的迭代日志里记一行等仅对原作者环境有意义的内容。
+- **`useMtime` now defaults to on.** It defaulted to off to avoid false spikes when a sync drive bulk-refreshes `mtime`, but that is a specific environment's problem: most vaults have notes with neither a date in frontmatter nor one in the filename, so with it off the heatmap is nearly empty and a fresh install shows a blank page. A blank page drives people away faster than an occasional false spike, and a spike is visible, explainable, and switchable. The setting's description was rewritten in all eight languages to explain the trade-off rather than just state the default. **Existing configurations are unaffected** — `Object.assign` keeps stored values.
+- With only one block configured, the quick-access heading becomes "Quick access · Block name". Previously a single block rendered no first-level tabs (a lone tab you cannot switch away from is useless), which left that folder's name nowhere to be seen. With two or more blocks, the heading and tab row are unchanged.
+- The versioning section of this file was rewritten for public readers: material that only made sense in the author's own environment was removed.
 
 ## [0.11.0] — 2026-09-01
 
-### 新增
+### Added
 
-- 子目录勾选面板加「勾选全部」「取消勾选」两个按钮。「勾选全部」写回 `subs = null`（与逐个勾满同义，此后新增的子目录自动出现），「取消勾选」写回空数组（该板块不显示二级标签）——沿用既有三态语义，未另立新状态。
+- The subfolder picker gained **Select all** and **Clear all** buttons. "Select all" writes `subs = null` (equivalent to ticking every box, so subfolders added later appear automatically); "Clear all" writes an empty array (that block shows no second-level tabs) — reusing the existing three-state semantics rather than inventing a fourth.
 
-### 变更
+### Changed
 
-- 六份翻译版 README 移入 `docs/`，仓库根目录只留英文版（GitHub 需要根 README 才能在仓库首页展示）。各文件的语言导航、`English` 回链与 `LICENSE` 链接同步改为相对新位置，已逐条核验本地链接全部可达。
-- 七份 README 内容同步到当前版本：「视觉文件夹」按 UI 实际改称「快捷入口」；补充子目录勾选的说明与设置表行；注明文件夹名按磁盘原样显示（0.10.0 已移除前缀剥离）；注明热力图最新的周在最左（0.9.0 已反转方向）。
+- The six translated READMEs moved into `docs/`; only the English one stays in the repository root (GitHub needs a root README to render on the repository page). Language navigation, the `English` back-link, and the `LICENSE` link were repointed, and every local link was verified as reachable.
+- All seven READMEs were brought up to date: "visual folders" renamed to "quick access" to match the UI; the subfolder picker documented and added to the settings table; folder names noted as shown exactly as they are on disk; the heatmap noted as having the newest weeks on the left.
 
 ## [0.10.0] — 2026-09-01
 
-### 新增
+### Added
 
-- 快捷入口每个板块的文件夹路径下方，自动列出该文件夹**一级子目录**并逐个勾选，决定哪些作为仪表盘的二级标签。存值 `factoryTabs[i].subs` 为三态：`null` 表示全部显示且此后新增的子目录自动出现；数组表示只显示列出的；空数组表示一个都不显示。「全部勾选」写回 `null` 而非完整列表——若写完整列表，日后新建的子目录不会自动出现，与界面上「全部勾选」的观感相悖；而「全不勾选」与「全部显示」必须可区分，故不能用空数组兼表二义。老存档没有该字段，按 `null` 处理，行为不变。改动文件夹路径时 `subs` 自动重置为 `null`。
-- 子目录勾选收进原生 `<details>` 折叠面板，默认收起，摘要行显示「全部 N 个」或「已选 n / N」。未用 `<select multiple>`：macOS 上它渲染成滚动列表框，多选需按住 Cmd 点，既不像下拉也不好发现。
+- Under each quick-access block's folder path, its **immediate subfolders** are listed with checkboxes that decide which become second-level tabs. `factoryTabs[i].subs` has three states: `null` shows everything and lets subfolders added later appear automatically; an array shows only what it lists; an empty array shows none. "Select all" stores `null` rather than the full list — storing the full list would mean newly created subfolders never appear, contradicting what the checked UI implies, while "none selected" and "show everything" must stay distinguishable, so an empty array cannot mean both. Older saved settings have no such field and are read as `null`, so behaviour is unchanged. Changing a block's folder path resets `subs` to `null`.
+- The picker lives in a native `<details>` panel, collapsed by default, with a summary reading "All N" or "n of N selected". `<select multiple>` was rejected: on macOS it renders as a scrolling list box that needs Cmd-click for multi-select — neither obviously a dropdown nor easy to discover.
 
-### 变更
+### Changed
 
-- **不再剥离文件夹名的编号前缀，一律显示完整名称。** 原先用正则 `^[\d-]+_\S*\s+(.+)$` 取末段，是照本库 `编号_EnglishName 中文名` 的约定写的，对通用用户会静默吃掉内容：`2024_Q1 Reports` 显示成 `Reports`、`01_Meeting Notes` 显示成 `Notes`、`01_Draft v2 final` 显示成 `v2 final`——被吃掉的不止编号，还有下划线后的第一个词，且无开关、无提示。公共插件不应擅改用户的文件夹名，故整个函数移除。需要短名的用户仍可在「显示名称」里自填。八种语言的设置说明与相关代码注释同步订正。
-- 设置页快捷入口区左缘对齐：自定义的板块行与说明段原先没有水平内边距，比 `h3` 标题和原生设置行左出 16px。两者补 `padding: 0 16px` 后，标题、原生行、说明段、板块行左缘一致（实测均为同一像素），右缘亦齐。
+- **Folder names are no longer stripped of a numeric prefix; the full name is shown.** The old regex `^[\d-]+_\S*\s+(.+)$` took the trailing segment, written for the author's `NN_EnglishName LocalName` convention. For anyone else it silently ate content: `2024_Q1 Reports` displayed as `Reports`, `01_Meeting Notes` as `Notes`, `01_Draft v2 final` as `v2 final` — what disappeared was not only the number but the first word after the underscore, with no toggle and no notice. A public plugin should not rewrite the user's folder names, so the function was removed. Anyone wanting a short name can still type one in "Display name". Settings text in all eight languages and the related code comments were corrected to match.
+- Settings page: the quick-access rows now align on the left. The custom block rows and the description paragraph had no horizontal padding and sat 16px to the left of the `h3` heading and the native setting rows. With `padding: 0 16px` on both, heading, native rows, description, and block rows share the same left edge (measured identical), and the right edges line up too.
 
 ## [0.9.0] — 2026-08-29
 
-### 新增
+### Added
 
-- Starbucks 外观的标签也改用滑动高亮，机制与 Apple 外观相同：滑块承载选中态，标签本体让出底色。配色走该外观的绿色令牌，三档投影沿用其原本 `is-active` 规则里的取值；二级子目录标签用柔色底、无投影。
-- 顶部导航条改为毛玻璃：`background-color: rgba(255,255,255,.62)` + `backdrop-filter: blur(20px) saturate(180%)`。仅用在导航条——它是 sticky 的，内容会从下方滚过，模糊才有折射对象；滑块背后是一片平色轨道，加了也只是半透明，故不加。
+- The Starbucks appearance now uses the sliding highlight too, on the same mechanism as the Apple appearance: the slider carries the selected state and the tab itself gives up its background. Colours come from that appearance's green tokens, and the three shadow levels reuse the values from its own `is-active` rules; second-level tabs use a soft fill with no shadow.
+- The top navigation bar became frosted glass: `background-color: rgba(255,255,255,.62)` plus `backdrop-filter: blur(20px) saturate(180%)`. Only the navigation bar — it is sticky, so content scrolls beneath it and the blur has something to refract; behind a slider there is only a flat track, where the blur would amount to plain translucency.
 
-### 变更
+### Changed
 
-- **热力图方向反转，自左至右为「新 → 旧」。** 网格是 `grid-auto-flow: column`（一列即一周），故按列倒序生成，列内仍按周一至周日自上而下。月份标签同步倒序，换月判定按显示顺序做，标签落在该月自左数第一列。带状模式（区间 ≤31 天）同样倒序。附带好处：热力图宽于容器时，横向滚动条停在左端即是最新数据，不必再拖到右端。
-- 导航条封顶，滚动时上方不再露出内容细缝。缝隙有两个来源：`.vdash-stage` 的顶部内边距（用负 margin 上提、等量 padding 补回布局位置），以及滚动容器 `.vdash-content` 自身的 12px 顶部内边距（归零——这段区域会随内容一起滚动）。
+- **The heatmap now runs newest-to-oldest, left to right.** The grid is `grid-auto-flow: column` (one column per week), so columns are emitted in reverse while each column still runs Monday to Sunday. Month labels are reversed to match, with the month-change test applied in display order so a label lands on that month's leftmost column. Strip mode (ranges of 31 days or fewer) is reversed as well. A side benefit: when the heatmap is wider than its container, the horizontal scrollbar rests at the left on the most recent data instead of having to be dragged right.
+- The navigation bar is sealed at the top, so no sliver of content shows above it while scrolling. The gap had two sources: the top padding of `.vdash-stage` (pulled up with a negative margin and given back as padding to keep the layout position) and the scroll container's own 12px top padding (zeroed — that strip scrolls along with the content).
 
-### 修复
+### Fixed
 
-- **切换标签时文字色不再抢在滑块之前变化。** 此前点击瞬间新标签就拿到 `is-active`，文字转白，而滑块要 0.22—0.28 秒才到位，那段时间白字落在白底上读不出来；旧选中项同时转暗，压在尚未离开的滑块上，是同一问题的镜像。现在新选中项挂 `is-arriving` 维持未选中色、旧选中项暂还 `is-active` 维持选中色，均在滑块到位后撤销。两侧都要 `transition: none`，否则头 120ms 仍在渐变途中，问题只是变短没有消失。y2k 未启用滑块，整段逻辑以 `getComputedStyle(slider).display` 为闸跳过。
+- **Tab text no longer changes colour ahead of the slider.** A click gave the new tab `is-active` immediately, turning the text white while the slider still needed 0.22–0.28s to arrive, leaving white text on a white background; the outgoing tab dimmed at the same moment while the slider was still under it — the same problem mirrored. The incoming tab now carries `is-arriving` to keep the unselected colour and the outgoing one temporarily keeps `is-active`, both released once the slider lands. Both sides need `transition: none`, otherwise the first 120ms are still mid-fade and the problem is merely shortened. The y2k appearance has no slider, so the whole block is gated on `getComputedStyle(slider).display`.
 
 ## [0.8.1] — 2026-08-29
 
-### 变更
+### Changed
 
-- 热力图网格的 `column-gap` / `row-gap` 两行合并为 `gap` 简写。两者取值本就相同，合并后视觉无变化，同时避开社区目录 CSS Lint 把属性名 `column-gap` 误归入「multicolumn 特性部分支持」的假阳性告警。
+- The heatmap grid's `column-gap` and `row-gap` were merged into the `gap` shorthand. They already held the same value, so nothing changes visually, and it sidesteps the community-directory CSS lint filing the property name `column-gap` under a false-positive "multicolumn partially supported" warning.
 
 ## [0.8.0] — 2026-08-29
 
-### 新增
+### Added
 
-- 界面语言从 3 种扩充到 8 种：新增法语、意大利语、日语、韩语、西班牙语，与原有 English / 简体中文 / 繁體中文 并列，63 个词条逐语齐备。语言名统一改用各语言自称（Français / 日本語 / 한국어 / Español），由新增的 `LOCALE_NAMES` 常量共用。`INTL_LOCALE` 同步扩充，数字与月份名按所选语言格式化。
-- 标签切换新增滑动高亮：主标签（总览 / 目录）、区间切换（全部 / 30 天 / 7 天）、快捷入口的一级板块与二级子目录四组标签，选中态改由一枚滑块承载，切换时从旧位平滑移动到新位。因每次点击都会重建 DOM，滑块由 `mountSlider()` 记住上一次选中序号后，在重建后先落旧位、下一帧再过渡到新位。`prefers-reduced-motion: reduce` 下自动停用。
+- Interface languages went from 3 to 8: French, Italian, Japanese, Korean, and Spanish join English, Simplified Chinese, and Traditional Chinese, with all 63 strings present in every language. Language names now use each language's own word for itself (Français / 日本語 / 한국어 / Español) from a shared `LOCALE_NAMES` constant. `INTL_LOCALE` was extended to match, so numbers and month names format per the chosen language.
+- Tab switching gained a sliding highlight across four tab groups (main tabs, range switcher, and the quick-access first- and second-level tabs): the selected state is carried by a slider that glides from the old position to the new one. Because every click rebuilds the DOM, `mountSlider()` remembers the previously selected index, drops the slider there without animation, and transitions it on the next frame. It is disabled automatically under `prefers-reduced-motion: reduce`.
 
-### 变更
+### Changed
 
-- 「可视文件夹」更名为「快捷入口」，8 种语言同步（en `Quick access` / fr `Accès rapide` / it `Accesso rapido` / ja `クイックアクセス` / ko `바로가기` / es `Acceso rápido`）。
-- Apple 外观视觉调整：热力图与快捷入口两个容器由浅蓝直角底改为白底 + 18px 圆角 + 细边框，与上方数据卡片统一；热力图下方统计行去掉底色；顶部导航条去掉半透明灰底与 `backdrop-filter`，改为与画布同色并保留一条分隔线。
-- Apple 外观布局收紧：快捷入口容器外距 `clamp(48,7vw,80)` → `clamp(16,2vw,24)`、内距 `clamp(40,7vw,80)` → `clamp(20,3vw,32)`，热力图内距、页面外距、卡片高度与各处组间距同步下调。热力图底部到快捷入口标题的间距由约 200px 降至 68px。
-- Apple 外观下所有标签去掉描边与选中环，仅以滑块底色表示选中；主标签与区间按钮文字加粗至 600。
+- "Visual folders" renamed to "Quick access" in all 8 languages (fr `Accès rapide` / it `Accesso rapido` / ja `クイックアクセス` / ko `바로가기` / es `Acceso rápido`).
+- Apple appearance: the heatmap and quick-access containers changed from a pale blue square-cornered fill to a white surface with an 18px radius and a hairline border, matching the stat cards above; the summary line under the heatmap lost its fill; the navigation bar dropped its translucent grey and `backdrop-filter` in favour of the canvas colour with a single divider line.
+- Apple appearance, tighter layout: the quick-access container's margin went from `clamp(48,7vw,80)` to `clamp(16,2vw,24)` and its padding from `clamp(40,7vw,80)` to `clamp(20,3vw,32)`, with heatmap padding, page margin, card height, and inter-group spacing reduced to match. The gap between the bottom of the heatmap and the quick-access heading fell from roughly 200px to 68px.
+- Under the Apple appearance all tabs lost their outlines and selection rings, leaving the slider's fill to indicate selection; main tabs and range buttons are now weight 600.
 
-### 修复
+### Fixed
 
-- 修复滑块被标签自身底色遮挡：一级板块标签原带白色胶囊底（`--vd-canvas`），层级在滑块之上，滑动经过时呈现「白色圆角矩形压在选框上」。未选中项底色改为透明，`:hover` 底色由实色改为半透明。
-- 修复设置项 `excludedPrefixes` 变更后笔记总数不刷新：`invalidate()` 原先只清 `_fileDates`，未清 `_notes` 缓存。
+- The slider was being hidden behind the tabs' own backgrounds: first-level block tabs carried a white pill (`--vd-canvas`) sitting above the slider, so passing under one looked like "a white rounded rectangle covering the selection". Unselected tabs are now transparent and `:hover` uses a translucent tint instead of a solid one.
+- Changing `excludedPrefixes` did not refresh the note total: `invalidate()` cleared `_fileDates` but not the `_notes` cache.
 
 ## [0.7.1] — 2026-08-26
 
-### 修复
+### Fixed
 
-- **修复 `styles.css` 中两处被批量正则改写损坏的规则**（`styles.css:163` 与 `:506`）。此前给选择器批量添加 `.view-content.vdash-content` 前缀时误伤了跨行的 `transition` 声明，并压塌了规则边界，导致：①社区目录 CSS Lint 报 `Unknown word transition` 错误；②`.vdash-tab` / `.vdash-range-btn` / `.vdash-factory-tab` 的过渡动画与 `:hover` 样式**一直未生效**。
+- **Two rules in `styles.css` damaged by an earlier bulk regex rewrite** (`styles.css:163` and `:506`). Adding the `.view-content.vdash-content` prefix to selectors in bulk had caught a multi-line `transition` declaration and collapsed a rule boundary, which meant the community directory's CSS lint reported `Unknown word transition`, and the transitions and `:hover` styles of `.vdash-tab` / `.vdash-range-btn` / `.vdash-factory-tab` **had never been in effect**.
 
-### 变更
+### Changed
 
-- 发布工作流新增 GitHub artifact attestations（`actions/attest-build-provenance`），用户可用 `gh attestation verify` 验证 `main.js` / `manifest.json` / `styles.css` 确由本仓库构建。
-- 发布工作流开启 `generate_release_notes`，避免 Release 描述为空。
-- 新增 `package-lock.json`，使构建可复现（社区目录构建验证需要 lockfile）。
+- The release workflow now produces GitHub artifact attestations (`actions/attest-build-provenance`), so `gh attestation verify` can confirm `main.js` / `manifest.json` / `styles.css` were built from this repository.
+- The release workflow enables `generate_release_notes`, so releases are no longer published with an empty description.
+- Added `package-lock.json` for reproducible builds (the community directory's build verification needs a lockfile).
 
 ## [0.7.0] — 2026-08-24
 
-### 新增
+### Added
 
-- 设置页新增「设置语言」下拉（置于「外观风格」之上）：简体中文 / 繁體中文 / English 三选一，仅影响设置页本身的界面文字（标题、说明、占位符、状态提示），不影响仪表盘正文（正文固定简体中文）。
+- A "settings language" dropdown (above "Appearance"): Simplified Chinese / Traditional Chinese / English, affecting the settings page's own text (headings, descriptions, placeholders, status hints) only; the dashboard body remained Simplified Chinese.
 
-### 变更
+### Changed
 
-- 插件显示名称由「知识库仪表盘」改为英文 `Vault Dashboard`（`manifest.json` 的 `name` 字段，影响社区插件列表与设置侧栏显示）；插件 `id`、指令、功能区图标提示文字等中文标签不变。
-- 「内容工厂板块」设置区更名为「可视文件夹」，仪表盘正文对应标题同步由「内容工厂」改为「可视文件夹」。
-- 设置页板块行排版调整为 CSS Grid 三列（板块名 64px / 文件夹路径 3fr / 显示名称 2fr），板块名与两个输入框同一行垂直居中、间距收紧；文件夹存在性提示文字从紧贴输入框右侧改为换行至第二个输入框正下方、左对齐，不再挤压整行排版。
+- The plugin's display name changed to `Vault Dashboard` in `manifest.json`, which is what the community plugin list and the settings sidebar show; the plugin `id`, commands, and ribbon tooltip were untouched.
+- The block settings area was renamed, and the matching heading in the dashboard body changed with it.
+- Block rows became a three-column CSS grid (name 64px / folder path 3fr / display name 2fr), with the name and both inputs vertically centred on one row; the folder-exists hint moved from beside the input to its own line under the second input, left-aligned, so it no longer squeezes the row.
 
 ## [0.6.0] — 2026-08-24
 
-### 新增
+### Added
 
-- 「内容工厂」板块改为可在设置页自定义：最多配置 5 个板块，每个板块指定任意文件夹路径 + 自定义显示名称；文件夹留空则该板块不出现，填写才显示。配置 2 个及以上板块时，仪表盘上出现一级标签可切换。
-- 设置页文件夹路径输入框带实时校验：库内找不到该路径会显示警示提示，避免误以为已生效。
+- Blocks became configurable in settings: up to 5, each pointing at any folder path with its own display name; a block with an empty path does not appear. With two or more configured, first-level tabs appear on the dashboard for switching.
+- The folder-path input validates live: a path not found in the vault shows a warning, so a typo cannot be mistaken for a working setting.
 
-### 变更
+### Changed
 
-- 板块不再限定为 `B_ContentFactory` 下 01—08 编号目录，可指向库内任意文件夹（如部门管理、工作台账等）；升级用户默认保留板块 1 指向原「内容工厂」根目录，视觉与既有用户习惯不变。
-- 内容工厂列表不再有「首页汇总/分类下钻」两层结构，改为「选中板块 → 该文件夹子目录二级标签 → 笔记列表」的统一结构，二级标签仍支持「全部」与逐个子目录切换。
+- Blocks are no longer restricted to numbered directories under one particular folder and can point anywhere in the vault. Upgrading users kept block 1 pointed at the previous root, so nothing changed visually for them.
+- The list dropped its two-level "summary / drill-down" structure for a single "selected block → that folder's subfolders as second-level tabs → note list" shape, still with an "All" tab alongside each subfolder.
 
 ## [0.5.0] — 2026-08-24
 
-### 新增
+### Added
 
-- 新增第三套外观「Starbucks 咖啡馆」，参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/Starbucks_Inspired_Design_System.md`：深绿主色、暖米色背景、咖啡棕辅色，圆润卡片、柔和阴影与舒缓过渡，设置页下拉框新增第三个选项。
+- A third appearance, "Starbucks Café": deep green primary, warm beige background, coffee-brown accents, rounded cards, soft shadows, and unhurried transitions, added as a third option in the settings dropdown.
 
-### 变更
+### Changed
 
-- 外观显示名精简：「现代高端（当前）」更名为「Apple」，「Y2K 控制台（第二套）」去掉「（第二套）」后缀，改为「Y2K 控制台」；`DEFAULT_SETTINGS.appearance` 仍为 `modern`（即 Apple），不影响既有用户的持久化选择。
+- Appearance names were shortened — the first became "Apple" and the second "Y2K Console". `DEFAULT_SETTINGS.appearance` remained `modern` (Apple), so existing choices were unaffected.
 
-### 修复
+### Fixed
 
-- Starbucks 皮肤内容工厂选中标签文字不可见：选中态 `.is-active` 规则被同优先级的通用标签底色规则压过，选中背景变回白色导致浅色文字消失；移除该通用底色规则，选中态改用主色实底+米白文字。
-- Starbucks 皮肤热力图无记录格（`level-0`）与画布底色同为 `#f5f1e8` 融为一体，看不见方块；`--vd-heat-0` 改为更深的暖米色 `#e6dac2`，与其余色阶保持同一纯色块风格（不加描边）。
+- Starbucks: the selected tab's text was invisible because a general tab-background rule of equal specificity overrode `.is-active`, turning the selected background white under pale text. The general rule was removed and the selected state now uses a solid primary fill with off-white text.
+- Starbucks: heatmap cells with no activity (`level-0`) shared `#f5f1e8` with the canvas and vanished into it; `--vd-heat-0` became a deeper warm beige `#e6dac2`, keeping the flat-colour style of the rest of the scale.
 
 ## [0.4.0] — 2026-08-24
 
-### 新增
+### Added
 
-- 设置页新增「外观风格」下拉框，可在「现代高端（当前）」与「Y2K 控制台（第二套）」之间切换，选择结果持久化保存并即时刷新已打开的仪表盘。
-- 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/DESIGN.md — Y2K Console Interface Style.md`，新增冷色塑料机壳、深色控制面板、橙色信号控件、硬倒角、内嵌屏与机械按压态，响应式布局保留同一视觉语法。
-- Y2K 控制台全界面改用本机已安装的 `Ark Pixel 10px monospaced zh_cn` 像素字体，缺失时回退至等宽字体。
-- 「现代高端」按 `DESIGN-apple-style-rewritten.md` 优化：SF Pro Display／Text 字体栈、16px 正文、无边框主画布、磨砂标签栏、浅色工具卡与热力图区、80px 板块留白及单一蓝色交互信号。
-- 总览与目录保留为同一主板块内的标签切换；内容工厂改为主板块下方的独立常驻板块，切换总览或目录时均保持显示。
-- 修复现代高端外观下内容工厂选中标签白底白字；选中态改为浅蓝底、蓝字与蓝色描边。热力图改为浅灰表面并匹配深色文字，界面正文基准由 17px 调整为 16px。
+- An "Appearance" dropdown in settings, switching between the original look and a "Y2K Console" style; the choice persists and refreshes any open dashboard immediately.
+- The Y2K Console style: cool plastic housing, dark control panel, orange signal controls, hard bevels, inset screens, and mechanical press states, with the same visual grammar preserved across responsive layouts.
+- The Y2K Console uses a locally installed pixel font, falling back to a monospace stack when it is absent.
+- The original appearance was refined into "Apple": an SF Pro Display/Text stack, 16px body text, a borderless main canvas, a frosted tab bar, light tool cards and heatmap area, generous block spacing, and a single blue interaction signal.
+- Overview and Folders stayed as tabs within one main block, while the quick-access list became a separate always-visible block below, kept on screen when switching between Overview and Folders.
 
-### 变更
+### Changed
 
-- 仪表盘视图根据设置为根容器挂载外观类；现有「现代高端」外观保持默认且视觉不变；旧 `universal` 设置自动迁移为 `y2k`。
+- The dashboard mounts an appearance class on its root container; the default appearance was unchanged, and the old `universal` setting migrates to `y2k` automatically.
 
 ## [0.3.0] — 2026-08-24
 
-### 新增
+### Added
 
-- 总览页底部新增「内容工厂」快捷入口板块：一级标签为 `B_ContentFactory 内容工厂` 的
-  01—08 分类目录，选中分类后按需出二级标签（该分类的子目录，含「全部」）。
-- 「首页」标签按修改时间倒序列出内容工厂最近 20 篇笔记，带所属分类与日期。
-- 笔记链接一律用 `getLeaf("tab")` 开新标签页，不顶掉仪表盘本身。
-- 内容工厂内的 `create` / `delete` / `rename` / `modify` 事件触发防抖刷新。
+- A quick-access block at the bottom of the Overview page, with first-level tabs for a set of category folders and second-level tabs for their subfolders (including "All").
+- A "Home" tab listing the 20 most recently modified notes with their category and date.
+- Note links always open in a new tab via `getLeaf("tab")` instead of taking over the dashboard pane.
+- `create` / `delete` / `rename` / `modify` events inside the watched folders trigger a debounced refresh.
 
-### 变更
+### Changed
 
-- 视觉整体按 `MODERN_PREMIUM_WEB_DESIGN` 设计规范重做：新增颜色、排版、间距、圆角、
-  动效令牌层，深色主题单独配一套表面与文字令牌，不做整体反转。
-- 热力图由「主色 + 透明度」改为 5 级实色阶，浅色与深色各一套。
-- 主标签选中态改主色实底，区间切换降为胶囊描边态；统计卡改 `surface-raised` 底 +
-  hairline 边框 + 12px 圆角；目录分布识别色改用 `--vd-viz-*`，首色即界面主色。
-- 新增统一 `:focus-visible` 焦点环、`prefers-reduced-motion` 降级与 419px 触摸断点。
-- 面板底色改由新建的 `.vdash-stage` 容器承担——主题对 `.view-content` 的规则会压过
-  插件样式，挂在自定义类上才不必用 `!important`。
+- The whole visual layer was rebuilt on a token system — colour, typography, spacing, radius, and motion tokens — with dark mode given its own surface and text tokens rather than a blanket inversion.
+- The heatmap moved from "primary colour plus opacity" to a five-step scale of solid colours, one set for light and one for dark.
+- The selected main tab became a solid primary fill, the range switcher dropped to an outlined pill; stat cards moved to a raised surface with a hairline border and 12px radius; folder-distribution colours moved to `--vd-viz-*`, the first of which is the interface's primary colour.
+- Added a unified `:focus-visible` ring, a `prefers-reduced-motion` fallback, and a 419px touch breakpoint.
+- The panel background moved to a new `.vdash-stage` container — themes style `.view-content` strongly enough to override plugin rules, and mounting on a custom class avoids resorting to `!important`.
 
-### 修复
+### Fixed
 
-- 热力图 `level-0`—`level-4` 五条单行规则漏加作用域前缀，特异性低于基础规则，导致所有
-  格子渲染成 4 级色。
+- The five `level-0`–`level-4` heatmap rules were missing their scope prefix, so their specificity fell below the base rule and every cell rendered at the highest level's colour.
 
-## [0.2.1] 及更早
+## [0.2.1] and earlier
 
-未留记录。本文件自 0.3.0 起维护。
+No records kept. This file starts at 0.3.0.
