@@ -30,7 +30,10 @@ Each note contributes one "activity day", resolved with this fallback chain:
 1. Frontmatter field `updated` (the field name is configurable).
 2. Frontmatter `created` / `date`.
 3. A `YYYY-MM-DD` prefix in the filename.
-4. File modified time (`mtime`) — **off by default**; enabled via settings.
+4. File modified time (`mtime`) — **on by default**. Most vaults have notes with
+   neither a frontmatter date nor a filename date, so without this fallback the
+   heatmap would be nearly empty. If a sync drive bulk-refreshes mtimes and
+   creates a false spike, turn it off in settings.
 
 Note activity works out of the box in any vault with no extra configuration.
 
@@ -67,7 +70,7 @@ Open the dashboard from the ribbon icon or the **"Open dashboard"** command.
 | Appearance | Visual style: Apple, Y2K Console, or Starbucks Café. |
 | Activity data source | Note activity or Changelog. |
 | Activity date field | Frontmatter field used first in the note-activity fallback chain. |
-| Fall back to file modified time | Use `mtime` as the final fallback (off by default). |
+| Fall back to file modified time | Use `mtime` as the final fallback (on by default). |
 | Changelog paths | Files/folders parsed in changelog mode. |
 | Quick access | Up to 5 blocks; each points to a folder and lists its recent notes. |
 | Subfolders to show | Per block: tick which subfolders become second-level tabs. Tick all and subfolders added later appear automatically. |

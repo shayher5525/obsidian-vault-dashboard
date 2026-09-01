@@ -22,7 +22,7 @@ Cada nota contribuye con un «día de actividad», resuelto con esta cadena de r
 1. El campo `updated` del frontmatter (el nombre del campo es configurable).
 2. `created` / `date` del frontmatter.
 3. Un prefijo `YYYY-MM-DD` en el nombre del archivo.
-4. La hora de modificación del archivo (`mtime`) — **desactivada por defecto**; se activa en los ajustes.
+4. La hora de modificación del archivo (`mtime`) — **activada por defecto**. En la mayoría de bóvedas las notas no tienen fecha ni en el frontmatter ni en el nombre de archivo; sin este recurso el mapa de calor quedaría casi vacío. Si un servicio de sincronización actualiza las fechas en bloque y crea un pico falso, desactívala en los ajustes.
 
 La actividad de notas funciona de inmediato en cualquier bóveda, sin configuración adicional.
 
@@ -58,7 +58,7 @@ Abre el panel desde el icono de la cinta o el comando **«Abrir panel»**.
 | Apariencia | Estilo visual: Apple, Y2K Console o Starbucks Café. |
 | Fuente de datos de actividad | Actividad de notas o Changelog. |
 | Campo de fecha de actividad | Campo del frontmatter usado primero en la cadena de respaldo de actividad de notas. |
-| Recurrir a la hora de modificación del archivo | Usar `mtime` como último recurso (desactivado por defecto). |
+| Recurrir a la hora de modificación del archivo | Usar `mtime` como último recurso (activado por defecto). |
 | Rutas de changelog | Archivos/carpetas analizados en modo changelog. |
 | Acceso rápido | Hasta 5 bloques; cada uno apunta a una carpeta y lista sus notas recientes. |
 | Subcarpetas a mostrar | Por bloque: marca qué subcarpetas se convierten en pestañas de segundo nivel. Si las marcas todas, las añadidas después aparecen automáticamente. |

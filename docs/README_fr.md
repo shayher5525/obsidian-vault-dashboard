@@ -22,7 +22,7 @@ Chaque note contribue à un « jour d'activité », résolu par cette chaîne de
 1. Le champ `updated` du frontmatter (le nom du champ est configurable).
 2. `created` / `date` du frontmatter.
 3. Un préfixe `YYYY-MM-DD` dans le nom du fichier.
-4. L'heure de modification du fichier (`mtime`) — **désactivé par défaut** ; activable dans les paramètres.
+4. L'heure de modification du fichier (`mtime`) — **activé par défaut**. Dans la plupart des coffres, les notes n'ont ni date dans le frontmatter ni date dans le nom de fichier ; sans ce recours, la carte de chaleur resterait presque vide. Si un service de synchronisation réécrit les dates en masse et crée un faux pic, désactivez-le dans les paramètres.
 
 L'activité des notes fonctionne immédiatement dans n'importe quel coffre, sans configuration supplémentaire.
 
@@ -58,7 +58,7 @@ Ouvrez le tableau de bord depuis l'icône du ruban ou la commande **« Ouvrir le
 | Apparence | Style visuel : Apple, Y2K Console ou Starbucks Café. |
 | Source de données d'activité | Activité des notes ou Changelog. |
 | Champ de date d'activité | Champ du frontmatter utilisé en premier dans la chaîne de repli de l'activité des notes. |
-| Repli sur l'heure de modification du fichier | Utiliser `mtime` comme dernier recours (désactivé par défaut). |
+| Repli sur l'heure de modification du fichier | Utiliser `mtime` comme dernier recours (activé par défaut). |
 | Chemins de changelog | Fichiers/dossiers analysés en mode changelog. |
 | Accès rapide | Jusqu'à 5 blocs ; chacun pointe vers un dossier et liste ses notes récentes. |
 | Sous-dossiers à afficher | Par bloc : cochez les sous-dossiers qui deviennent des onglets de second niveau. Tout cocher fait apparaître automatiquement les sous-dossiers ajoutés plus tard. |

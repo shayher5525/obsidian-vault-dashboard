@@ -22,7 +22,7 @@ Ogni nota contribuisce con un «giorno di attività», risolto con questa catena
 1. Il campo `updated` del frontmatter (il nome del campo è configurabile).
 2. `created` / `date` del frontmatter.
 3. Un prefisso `YYYY-MM-DD` nel nome del file.
-4. L'ora di modifica del file (`mtime`) — **disattivata per impostazione predefinita**; attivabile nelle impostazioni.
+4. L'ora di modifica del file (`mtime`) — **attiva per impostazione predefinita**. Nella maggior parte dei vault le note non hanno né una data nel frontmatter né una nel nome file; senza questo ripiego la mappa di calore resterebbe quasi vuota. Se un servizio di sincronizzazione aggiorna in blocco le date e crea un falso picco, disattivala nelle impostazioni.
 
 L'attività delle note funziona subito in qualsiasi vault, senza configurazione aggiuntiva.
 
@@ -58,7 +58,7 @@ Apri la dashboard dall'icona della barra multifunzione o dal comando **«Apri da
 | Aspetto | Stile visivo: Apple, Y2K Console o Starbucks Café. |
 | Fonte dati attività | Attività delle note o Changelog. |
 | Campo data attività | Campo del frontmatter usato per primo nella catena di fallback dell'attività delle note. |
-| Ripiega sull'ora di modifica del file | Usare `mtime` come ultimo fallback (disattivato per impostazione predefinita). |
+| Ripiega sull'ora di modifica del file | Usare `mtime` come ultimo fallback (attivo per impostazione predefinita). |
 | Percorsi changelog | File/cartelle analizzati in modalità changelog. |
 | Accesso rapido | Fino a 5 blocchi; ognuno punta a una cartella ed elenca le sue note recenti. |
 | Sottocartelle da mostrare | Per blocco: seleziona quali sottocartelle diventano schede di secondo livello. Selezionandole tutte, quelle aggiunte in seguito compaiono automaticamente. |
