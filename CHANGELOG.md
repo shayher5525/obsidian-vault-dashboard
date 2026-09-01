@@ -23,6 +23,16 @@ The source of truth for the version is `version` in `manifest.json`; the release
 
 ---
 
+## [0.13.0] — 2026-09-01
+
+### Added
+
+- The offline harness now guards the Starbucks appearance's colour gamut: all eight standard HEX values must be declared, no other HEX may appear in Starbucks rules, and every translucent colour must derive from one of those eight RGB values.
+
+### Changed
+
+- **The Starbucks Café appearance was rebuilt from the v2.0 visual standard.** Its primitive layer is now exactly Starbucks Green `#006241`, Accent Green `#00754A`, Light Green `#D4E9E2`, House Green `#1E3932`, Black, Warm Neutral `#F2F0EB`, Cool Neutral `#F9F9F9`, and White. The former invented greens, coffee browns, beige shades, and unrelated chart colours were removed. Semantic and component tokens now reference those primitives; shadows, muted text, dividers, hover fills, and dark-mode surfaces use opacity derived only from the same palette. The 8px spacing/radius scale and 44px control minimum were aligned with the new specification as well. Heatmap cells now expose accessible labels and support keyboard activation when clickable.
+
 ## [0.12.1] — 2026-09-01
 
 ### Changed

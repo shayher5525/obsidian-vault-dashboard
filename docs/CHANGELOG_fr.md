@@ -18,6 +18,16 @@ La référence de version est `version` dans `manifest.json` ; le tag de publica
 
 ---
 
+## [0.13.0] — 2026-09-01
+
+### Ajouté
+
+- Le test hors ligne protège désormais la gamme Starbucks : les huit HEX standard doivent être déclarés, aucun autre HEX n'est admis et chaque couleur translucide doit dériver du RGB de l'une de ces huit couleurs.
+
+### Modifié
+
+- **L'apparence « Starbucks Café » a été reconstruite selon la norme visuelle v2.0.** Les primitives sont limitées à `#006241`, `#00754A`, `#D4E9E2`, `#1E3932`, noir, `#F2F0EB`, `#F9F9F9` et blanc. Les anciens verts inventés, bruns café, beiges et couleurs de graphique sans rapport ont été retirés. Les tokens sémantiques et de composants, le mode sombre, les ombres et les transparences dérivent uniquement de cette palette. L'échelle de 8px et la hauteur minimale de 44px ont aussi été alignées ; les cellules de la carte thermique ont des noms accessibles et sont utilisables au clavier lorsqu'elles sont interactives.
+
 ## [0.12.1] — 2026-09-01
 
 ### Modifié

@@ -18,6 +18,16 @@ La fuente de verdad de la versión es `version` en `manifest.json`; la etiqueta 
 
 ---
 
+## [0.13.0] — 2026-09-01
+
+### Añadido
+
+- La prueba sin conexión protege ahora la gama Starbucks: deben declararse los ocho HEX estándar, no puede aparecer ningún otro HEX y cada color translúcido debe derivarse del RGB de uno de esos ocho colores.
+
+### Cambiado
+
+- **La apariencia «Starbucks Café» se reconstruyó según la norma visual v2.0.** Las primitivas quedan limitadas a `#006241`, `#00754A`, `#D4E9E2`, `#1E3932`, negro, `#F2F0EB`, `#F9F9F9` y blanco. Se eliminaron los verdes inventados, marrones café, beiges y colores de gráfico ajenos. Los tokens semánticos y de componente, el modo oscuro, las sombras y transparencias derivan solo de esta paleta. También se alinearon la escala de 8px y la altura mínima de 44px; las celdas del mapa de calor tienen nombres accesibles y admiten teclado cuando son interactivas.
+
 ## [0.12.1] — 2026-09-01
 
 ### Cambiado

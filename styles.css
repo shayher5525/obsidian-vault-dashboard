@@ -1236,41 +1236,65 @@
 /* --------------------------- Starbucks 咖啡馆 --------------------------- */
 
 /*
- * 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/Starbucks_Inspired_Design_System.md`：
- * 深绿主色 + 暖调米色背景 + 咖啡棕辅色，圆润有机形态、柔和阴影与舒缓过渡，
- * 传达「温暖、天然、高级但可亲」的咖啡馆氛围；避免冷调科技感与强烈商业化视觉。
+ * 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-08-24_星巴克风格视觉设计规范.md` v2.0。
+ * primitive 只取八个标准色；semantic 与 component 令牌不得另造 HEX，透明色亦只由标准色派生。
  */
 .workspace-leaf-content .view-content.vdash-content.vdash-style-starbucks {
-  --vd-primary: #00704a;
-  --vd-primary-hover: #006241;
-  --vd-primary-focus: #00704a;
-  --vd-primary-soft: #d4e9d7;
-  --vd-on-primary: #f7f3ed;
+  /* Primitive tokens — standard colour guide */
+  --vd-sb-starbucks-green: #006241;
+  --vd-sb-accent-green: #00754a;
+  --vd-sb-light-green: #d4e9e2;
+  --vd-sb-house-green: #1e3932;
+  --vd-sb-black: #000000;
+  --vd-sb-warm-neutral: #f2f0eb;
+  --vd-sb-cool-neutral: #f9f9f9;
+  --vd-sb-white: #ffffff;
 
-  --vd-canvas: #f7f3ed;
-  --vd-canvas-muted: #f5f1e8;
-  --vd-surface-raised: #ffffff;
+  /* Semantic tokens */
+  --vd-primary: var(--vd-sb-starbucks-green);
+  --vd-primary-hover: var(--vd-sb-house-green);
+  --vd-primary-focus: var(--vd-sb-accent-green);
+  --vd-primary-soft: var(--vd-sb-light-green);
+  --vd-deep-green: var(--vd-sb-starbucks-green);
+  --vd-on-primary: var(--vd-sb-white);
 
-  --vd-ink: #1e1e1e;
-  --vd-body-muted: #6b4f3a;
-  --vd-ink-subtle: #8a7a6a;
+  --vd-canvas: var(--vd-sb-warm-neutral);
+  --vd-canvas-muted: var(--vd-sb-cool-neutral);
+  --vd-surface-raised: var(--vd-sb-white);
 
-  --vd-divider-soft: #ece4d8;
-  --vd-hairline: #e2d8c8;
+  --vd-ink: var(--vd-sb-black);
+  --vd-body-muted: rgba(0, 0, 0, 0.68);
+  --vd-ink-subtle: rgba(0, 0, 0, 0.54);
 
-  --vd-viz-purple: #8b5fbf;
-  --vd-viz-cyan: #3a8f8f;
-  --vd-viz-green: #a8763e;
-  --vd-viz-amber: #b8860b;
-  --vd-viz-pink: #c17a5a;
+  --vd-divider-soft: rgba(0, 0, 0, 0.12);
+  --vd-hairline: rgba(0, 0, 0, 0.16);
+  --vd-shadow-brand: rgba(0, 98, 65, 0.28);
+  --vd-shadow-brand-soft: rgba(0, 98, 65, 0.22);
+  --vd-shadow-house: rgba(30, 57, 50, 0.14);
+  --vd-shadow-house-soft: rgba(30, 57, 50, 0.08);
+  --vd-shadow-house-raised: rgba(30, 57, 50, 0.12);
+  --vd-state-hover: rgba(0, 117, 74, 0.1);
 
-  --vd-heat-0: #e6dac2;
-  --vd-heat-1: #d4e9d7;
-  --vd-heat-2: #a8d5ba;
-  --vd-heat-3: #00704a;
-  --vd-heat-4: #004d40;
+  --vd-viz-purple: var(--vd-sb-starbucks-green);
+  --vd-viz-cyan: var(--vd-sb-house-green);
+  --vd-viz-green: var(--vd-sb-accent-green);
+  --vd-viz-amber: var(--vd-sb-light-green);
+  --vd-viz-pink: var(--vd-sb-black);
 
-  --vd-font-display: Georgia, "Iowan Old Style", "Songti SC", serif;
+  --vd-heat-0: var(--vd-sb-warm-neutral);
+  --vd-heat-1: var(--vd-sb-light-green);
+  --vd-heat-2: var(--vd-sb-accent-green);
+  --vd-heat-3: var(--vd-sb-starbucks-green);
+  --vd-heat-4: var(--vd-sb-house-green);
+
+  /* Component tokens */
+  --vd-tab-shadow: 0 4px 12px var(--vd-shadow-brand);
+  --vd-control-shadow: 0 2px 6px var(--vd-shadow-house);
+  --vd-factory-tab-shadow: 0 3px 10px var(--vd-shadow-brand-soft);
+  --vd-card-shadow: 0 4px 14px var(--vd-shadow-house-soft);
+  --vd-hover-tint: var(--vd-state-hover);
+
+  --vd-font-display: "Avenir Next", "SF Pro Display", "PingFang SC", system-ui, sans-serif;
   --vd-font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", system-ui, sans-serif;
   --vd-font-num: var(--vd-font-body);
   --vd-text-display: clamp(1.875rem, 3.4vw, 2.25rem);
@@ -1278,11 +1302,11 @@
   --vd-text-body: 0.9375rem;
   --vd-text-fine: 0.8125rem;
 
-  --vd-space-md: 18px;
-  --vd-space-lg: 26px;
-  --vd-space-xl: 34px;
+  --vd-space-md: 16px;
+  --vd-space-lg: 24px;
+  --vd-space-xl: 32px;
 
-  --vd-radius-xs: 6px;
+  --vd-radius-xs: 8px;
   --vd-radius-sm: 8px;
   --vd-radius-md: 16px;
   --vd-radius-lg: 24px;
@@ -1291,38 +1315,53 @@
   --vd-motion-fast: 150ms;
   --vd-motion-standard: 280ms;
   --vd-ease: ease-in-out;
-  --vd-elevation-subtle: 0 8px 24px rgba(74, 52, 40, 0.12);
+  --vd-elevation-subtle: 0 8px 24px var(--vd-shadow-house-raised);
 
   font-family: var(--vd-font-body);
   line-height: 1.6;
 }
 
 .theme-dark .workspace-leaf-content .view-content.vdash-content.vdash-style-starbucks {
-  --vd-primary: #3fa87a;
-  --vd-primary-hover: #58c093;
-  --vd-primary-focus: #3fa87a;
-  --vd-on-primary: #0a1512;
+  --vd-primary: var(--vd-sb-light-green);
+  --vd-primary-hover: var(--vd-sb-white);
+  --vd-primary-focus: var(--vd-sb-light-green);
+  --vd-primary-soft: var(--vd-sb-light-green);
+  --vd-deep-green: var(--vd-sb-house-green);
+  --vd-on-primary: var(--vd-sb-house-green);
 
-  --vd-canvas: #1d1a15;
-  --vd-canvas-muted: #171410;
-  --vd-surface-raised: #26221b;
+  --vd-canvas: var(--vd-sb-house-green);
+  --vd-canvas-muted: var(--vd-sb-starbucks-green);
+  --vd-surface-raised: rgba(255, 255, 255, 0.08);
 
-  --vd-ink: #f5f1e8;
-  --vd-body-muted: #cdb9a3;
-  --vd-ink-subtle: #9c8a76;
+  --vd-ink: var(--vd-sb-white);
+  --vd-body-muted: rgba(255, 255, 255, 0.78);
+  --vd-ink-subtle: rgba(255, 255, 255, 0.62);
 
-  --vd-divider-soft: #332c22;
-  --vd-hairline: #3a3226;
+  --vd-divider-soft: rgba(255, 255, 255, 0.14);
+  --vd-hairline: rgba(255, 255, 255, 0.2);
+  --vd-shadow-brand: rgba(0, 0, 0, 0.28);
+  --vd-shadow-brand-soft: rgba(0, 0, 0, 0.24);
+  --vd-shadow-house: rgba(0, 0, 0, 0.22);
+  --vd-shadow-house-soft: rgba(0, 0, 0, 0.18);
+  --vd-shadow-house-raised: rgba(0, 0, 0, 0.22);
+  --vd-state-hover: rgba(212, 233, 226, 0.12);
 
-  --vd-heat-0: #26221b;
-  --vd-heat-1: #1f3a2e;
-  --vd-heat-2: #275a41;
-  --vd-heat-3: #2f8058;
-  --vd-heat-4: #3fa87a;
+  --vd-heat-0: rgba(255, 255, 255, 0.1);
+  --vd-heat-1: var(--vd-sb-starbucks-green);
+  --vd-heat-2: var(--vd-sb-accent-green);
+  --vd-heat-3: var(--vd-sb-light-green);
+  --vd-heat-4: var(--vd-sb-white);
+
+  --vd-tab-shadow: 0 4px 12px var(--vd-shadow-brand);
+  --vd-control-shadow: 0 2px 6px var(--vd-shadow-house);
+  --vd-factory-tab-shadow: 0 3px 10px var(--vd-shadow-brand-soft);
+  --vd-card-shadow: 0 4px 14px var(--vd-shadow-house-soft);
+  --vd-hover-tint: var(--vd-state-hover);
+  --vd-elevation-subtle: 0 8px 24px var(--vd-shadow-house-raised);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-stage {
-  padding: clamp(16px, 3vw, 34px);
+  padding: clamp(16px, 3vw, 32px);
   background-color: var(--vd-canvas-muted);
 }
 
@@ -1344,14 +1383,14 @@
 .view-content.vdash-content.vdash-style-starbucks .vdash-tab,
 .view-content.vdash-content.vdash-style-starbucks .vdash-range-btn,
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab {
-  min-height: 36px;
+  min-height: 44px;
   border-radius: var(--vd-radius-pill);
   font-weight: 500;
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active,
 .view-content.vdash-content.vdash-style-starbucks .vdash-tab.is-active:hover {
-  box-shadow: 0 4px 12px rgba(0, 112, 74, 0.28);
+  box-shadow: var(--vd-tab-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-range {
@@ -1363,7 +1402,7 @@
 .view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active,
 .view-content.vdash-content.vdash-style-starbucks .vdash-range-btn.is-active:hover {
   background-color: var(--vd-canvas);
-  box-shadow: 0 2px 6px rgba(74, 52, 40, 0.14);
+  box-shadow: var(--vd-control-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-cards {
@@ -1375,7 +1414,7 @@
   border: none;
   border-radius: var(--vd-radius-lg);
   background-color: var(--vd-surface-raised);
-  box-shadow: 0 4px 14px rgba(74, 52, 40, 0.08);
+  box-shadow: var(--vd-card-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-card-value {
@@ -1435,13 +1474,13 @@
   border-color: var(--vd-primary);
   background-color: var(--vd-primary);
   color: var(--vd-on-primary);
-  box-shadow: 0 3px 10px rgba(0, 112, 74, 0.22);
+  box-shadow: var(--vd-factory-tab-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
   background-color: var(--vd-primary-soft);
-  color: var(--vd-deep-green, #006241);
+  color: var(--vd-deep-green);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-list {
@@ -1661,17 +1700,17 @@
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-tabs .vdash-slider {
   background-color: var(--vd-primary);
-  box-shadow: 0 4px 12px rgba(0, 112, 74, 0.28);
+  box-shadow: var(--vd-tab-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-range .vdash-slider {
   background-color: var(--vd-canvas);
-  box-shadow: 0 2px 6px rgba(74, 52, 40, 0.14);
+  box-shadow: var(--vd-control-shadow);
 }
 
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-tabs .vdash-slider {
   background-color: var(--vd-primary);
-  box-shadow: 0 3px 10px rgba(0, 112, 74, 0.22);
+  box-shadow: var(--vd-factory-tab-shadow);
 }
 
 /* 二级标签整体降一档：柔色底、无投影 */
@@ -1691,7 +1730,7 @@
 .view-content.vdash-content.vdash-style-starbucks .vdash-range-btn:hover,
 .view-content.vdash-content.vdash-style-starbucks .vdash-factory-tab:hover {
   border-color: transparent;
-  background-color: rgba(0, 112, 74, 0.1);
+  background-color: var(--vd-hover-tint);
 }
 
 /* 选中项只保留文字色与字重，底色与投影交给滑块 */
@@ -1843,4 +1882,3 @@
   font-size: var(--font-ui-smaller);
   text-align: left;
 }
-

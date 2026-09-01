@@ -27,6 +27,16 @@
 
 ---
 
+## [0.13.0] — 2026-09-01
+
+### 新增
+
+- 脱机测试新增 Starbucks 色域守卫：必须声明 8 个标准 HEX，规则内不得出现其他 HEX，透明色也只能由这 8 色的 RGB 派生。
+
+### 变更
+
+- **「Starbucks 咖啡馆」按 v2.0 视觉规范重建。** primitive 层严格限定为 Starbucks Green `#006241`、Accent Green `#00754A`、Light Green `#D4E9E2`、House Green `#1E3932`、黑、Warm Neutral `#F2F0EB`、Cool Neutral `#F9F9F9`、白；删除旧版自拟绿、咖啡棕、米色与无关图表色。semantic／component token、深色模式、阴影及透明态均只从该色板派生，并同步对齐 8px 间距／圆角尺度与 44px 控件下限；热力格新增可访问名称与可点击态键盘操作。
+
 ## [0.12.1] — 2026-09-01
 
 ### 变更

@@ -1546,15 +1546,23 @@ class DashboardView extends ItemView {
       }
 
       const value = this.counts.get(key) || 0;
-      const cell = grid.createDiv({ cls: `vdash-cell level-${levelOf(value)}` });
-      setTooltip?.(
-        cell,
-        value ? this.t("heatmapTooltipCount", key, value, unit) : this.t("heatmapTooltipEmpty", key),
-        { placement: "top" },
-      );
+      const level = levelOf(value);
+      const label = value ? this.t("heatmapTooltipCount", key, value, unit) : this.t("heatmapTooltipEmpty", key);
+      const cell = grid.createDiv({ cls: `vdash-cell level-${level}` });
+      cell.setAttr("aria-label", label);
+      cell.setAttr("role", "img");
+      setTooltip?.(cell, label, { placement: "top" });
       // 只有迭代日志模式才有点格子跳转对应小节的能力（笔记活跃度无单一落点）
       if (this.plugin.settings.dataSource === "changelog") {
-        cell.addEventListener("click", () => this.openLogAt(key));
+        const openCell = () => this.openLogAt(key);
+        cell.setAttr("role", "button");
+        cell.setAttr("tabindex", "0");
+        cell.addEventListener("click", openCell);
+        cell.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          openCell();
+        });
       }
     };
 

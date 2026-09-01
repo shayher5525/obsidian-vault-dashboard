@@ -117,5 +117,34 @@ assert("Date 对象", api.ymdFromValue(new Date(2026, 7, 26)), "2026-08-26");
 assert("数字时间戳", api.ymdFromValue(new Date(2026, 7, 26).getTime()), "2026-08-26");
 assert("null", api.ymdFromValue(null), null);
 
+// 5) Starbucks 外观只能使用规范内的八个基础色，透明色亦须由其 RGB 派生。
+console.log("\n=== Starbucks 标准色域 ===");
+const css = fs.readFileSync(path.join(pluginDir, "styles.css"), "utf8");
+const starbucksBlocks = [...css.matchAll(/[^{}]*\.vdash-style-starbucks[^{}]*\{([^{}]*)\}/g)]
+  .map((match) => match[1])
+  .join("\n");
+const allowedHex = new Set([
+  "#006241", "#00754a", "#d4e9e2", "#1e3932",
+  "#000000", "#f2f0eb", "#f9f9f9", "#ffffff",
+]);
+const allowedRgb = new Set([
+  "0,98,65", "0,117,74", "212,233,226", "30,57,50",
+  "0,0,0", "242,240,235", "249,249,249", "255,255,255",
+]);
+const usedHex = [...starbucksBlocks.matchAll(/#[0-9a-f]{6}\b/gi)]
+  .map((match) => match[0].toLowerCase());
+const usedRgb = [...starbucksBlocks.matchAll(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/gi)]
+  .map((match) => `${match[1]},${match[2]},${match[3]}`);
+const disallowedHex = [...new Set(usedHex.filter((value) => !allowedHex.has(value)))];
+const disallowedRgb = [...new Set(usedRgb.filter((value) => !allowedRgb.has(value)))];
+
+assert("八个标准 HEX 均已声明", [...allowedHex].every((value) => usedHex.includes(value)), true);
+assert("无规范外 HEX", disallowedHex.join(", ") || null, null);
+assert("透明色只由标准色派生", disallowedRgb.join(", ") || null, null);
+
+const source = fs.readFileSync(path.join(pluginDir, "main.js"), "utf8");
+assert("热力格含无障碍名称", source.includes('cell.setAttr("aria-label", label)'), true);
+assert("可点击热力格支持键盘", source.includes('event.key !== "Enter" && event.key !== " "'), true);
+
 console.log(`\n单元测试: ${pass} 通过 / ${fail} 失败`);
 process.exit(fail === 0 ? 0 : 1);
