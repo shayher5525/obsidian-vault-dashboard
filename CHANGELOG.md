@@ -23,6 +23,17 @@ The source of truth for the version is `version` in `manifest.json`; the release
 
 ---
 
+## [0.16.0] — 2026-09-02
+
+### Added
+
+- New appearance **Blue Sky** (`nio`), built from the NIO-style visual spec at `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_蔚来风格视觉设计规范.md` v1.0 (drawn from a public showcase of the NIO Visual Identity System manual 1.4). Only the visual grammar is borrowed — a single teal accent over a blue-tinted brand white, Nocturnal Black dark canvas, same-family blue-green luminance layering. No logo, no slogan, no licensed typeface: Blue Sky is replaced by a Montserrat / Inter / Source Han Sans stack. Exactly one accent hue per screen: Tonal Teal `#004B64` in light mode (≈7.0:1 on white) and Teal `#00BEBE` in dark mode (≈8.3:1 on black); bright Teal `#00BEBE` is reserved for graphical emphasis — progress bars, heatmap peak, the 2px slider underline. Large surfaces use Soft Blue and blue-tinted whites, grey stays on text, corners are medium-rounded (8–16px) with soft low-alpha shadows, and the heatmap uses a single Teal luminance ramp. The active main tab is a 2px teal underline slider; factory quick-access tabs are bordered capsules with a teal-tinted active state.
+- The offline harness gained fifteen Blue Sky guards: a closed HEX palette, all eight base colours declared, shadow primitives kept at ≤ 0.30 alpha, the main-tab underline matching the 2px teal rule, the heatmap peaking at the brand Teal, radii staying ≤ 16px, and the `nio` id plus all eight localised display names registered. 42/42 checks pass.
+
+### Changed
+
+- The seven READMEs now list six themes.
+
 ## [0.15.1] — 2026-09-02
 
 ### Fixed

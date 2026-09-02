@@ -49,7 +49,7 @@ const MAX_WEEKS = 53;
 /** 库根散落笔记在目录树里的内部键（非显示文本，显示走 I18N.rootLabel） */
 const ROOT_KEY = "__vault_root__";
 
-const APPEARANCE_IDS = ["modern", "y2k", "starbucks", "fastfood", "sony"];
+const APPEARANCE_IDS = ["modern", "y2k", "starbucks", "fastfood", "sony", "nio"];
 
 /** 可视文件夹板块 1 的出厂默认：留空，由用户在设置里选择文件夹 */
 const FACTORY_ROOT_DEFAULT = "";
@@ -171,7 +171,7 @@ const I18N = {
     statusFound: "✓ 已找到该文件夹",
     statusNotFound: "⚠ 库内未找到该路径，请检查大小写与完整层级",
 
-    appearanceNames: { modern: "极简科技", y2k: "Y2K 控制台", starbucks: "咖啡屋", fastfood: "流行快餐", sony: "黑场光点" },
+    appearanceNames: { modern: "极简科技", y2k: "Y2K 控制台", starbucks: "咖啡屋", fastfood: "流行快餐", sony: "黑场光点", nio: "蔚蓝天空" },
     dashboardTitle: "知识库仪表盘",
     tabOverview: "总览",
     tabFolders: "目录",
@@ -253,7 +253,7 @@ const I18N = {
     statusFound: "✓ 已找到該文件夾",
     statusNotFound: "⚠ 庫內未找到該路徑，請檢查大小寫與完整層級",
 
-    appearanceNames: { modern: "極簡科技", y2k: "Y2K 控制臺", starbucks: "咖啡屋", fastfood: "流行快餐", sony: "黑場光點" },
+    appearanceNames: { modern: "極簡科技", y2k: "Y2K 控制臺", starbucks: "咖啡屋", fastfood: "流行快餐", sony: "黑場光點", nio: "蔚藍天空" },
     dashboardTitle: "知識庫儀表盤",
     tabOverview: "總覽",
     tabFolders: "目錄",
@@ -337,7 +337,7 @@ const I18N = {
     statusFound: "✓ Folder found",
     statusNotFound: "⚠ Path not found in vault — check case and full path",
 
-    appearanceNames: { modern: "Minimal Tech", y2k: "Y2K Console", starbucks: "Coffee House", fastfood: "Pop Fast Food", sony: "Black Stage" },
+    appearanceNames: { modern: "Minimal Tech", y2k: "Y2K Console", starbucks: "Coffee House", fastfood: "Pop Fast Food", sony: "Black Stage", nio: "Blue Sky" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "Overview",
     tabFolders: "Folders",
@@ -424,7 +424,7 @@ const I18N = {
     statusFound: "✓ Dossier trouvé",
     statusNotFound: "⚠ Chemin introuvable dans le coffre — vérifiez la casse et le chemin complet",
 
-    appearanceNames: { modern: "Tech minimaliste", y2k: "Console Y2K", starbucks: "Maison du Café", fastfood: "Fast Food Pop", sony: "Scène noire" },
+    appearanceNames: { modern: "Tech minimaliste", y2k: "Console Y2K", starbucks: "Maison du Café", fastfood: "Fast Food Pop", sony: "Scène noire", nio: "Ciel bleu" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "Aperçu",
     tabFolders: "Dossiers",
@@ -512,7 +512,7 @@ const I18N = {
     statusFound: "✓ Cartella trovata",
     statusNotFound: "⚠ Percorso non trovato nel vault — controlla maiuscole e percorso completo",
 
-    appearanceNames: { modern: "Tech minimalista", y2k: "Console Y2K", starbucks: "Casa del Caffè", fastfood: "Fast Food Pop", sony: "Scena nera" },
+    appearanceNames: { modern: "Tech minimalista", y2k: "Console Y2K", starbucks: "Casa del Caffè", fastfood: "Fast Food Pop", sony: "Scena nera", nio: "Cielo blu" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "Panoramica",
     tabFolders: "Cartelle",
@@ -599,7 +599,7 @@ const I18N = {
     statusFound: "✓ フォルダーが見つかりました",
     statusNotFound: "⚠ 保管庫内にパスが見つかりません — 大文字小文字と完全パスを確認してください",
 
-    appearanceNames: { modern: "ミニマルテック", y2k: "Y2K コンソール", starbucks: "コーヒーハウス", fastfood: "ポップファストフード", sony: "ブラックステージ" },
+    appearanceNames: { modern: "ミニマルテック", y2k: "Y2K コンソール", starbucks: "コーヒーハウス", fastfood: "ポップファストフード", sony: "ブラックステージ", nio: "青空" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "概要",
     tabFolders: "フォルダー",
@@ -685,7 +685,7 @@ const I18N = {
     statusFound: "✓ 폴더를 찾았습니다",
     statusNotFound: "⚠ 보관함에서 경로를 찾을 수 없습니다 — 대소문자와 전체 경로를 확인하세요",
 
-    appearanceNames: { modern: "미니멀 테크", y2k: "Y2K 콘솔", starbucks: "커피 하우스", fastfood: "팝 패스트푸드", sony: "블랙 스테이지" },
+    appearanceNames: { modern: "미니멀 테크", y2k: "Y2K 콘솔", starbucks: "커피 하우스", fastfood: "팝 패스트푸드", sony: "블랙 스테이지", nio: "푸른 하늘" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "개요",
     tabFolders: "폴더",
@@ -772,7 +772,7 @@ const I18N = {
     statusFound: "✓ Carpeta encontrada",
     statusNotFound: "⚠ Ruta no encontrada en la bóveda — revisa mayúsculas y la ruta completa",
 
-    appearanceNames: { modern: "Tech minimalista", y2k: "Consola Y2K", starbucks: "Casa del Café", fastfood: "Fast Food Pop", sony: "Escena negra" },
+    appearanceNames: { modern: "Tech minimalista", y2k: "Consola Y2K", starbucks: "Casa del Café", fastfood: "Fast Food Pop", sony: "Escena negra", nio: "Cielo azul" },
     dashboardTitle: "Vault Dashboard X",
     tabOverview: "Resumen",
     tabFolders: "Carpetas",

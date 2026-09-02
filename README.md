@@ -17,7 +17,7 @@ view, and configurable "quick access" links — all in one pane.
   second-level tabs. Folder names are shown exactly as they are on disk.
 - **Two data sources** — a generic "note activity" source (works in any vault)
   and an optional "changelog" parser for markdown changelogs.
-- **Five themes** — Minimal Tech, Y2K Console, Coffee House, Pop Fast Food, and Black Stage.
+- **Six themes** — Minimal Tech, Y2K Console, Coffee House, Pop Fast Food, Black Stage, and Blue Sky.
 - **Internationalization** — English (default), Simplified Chinese, Traditional
   Chinese, Japanese, Korean, French, Spanish, and Italian.
 
@@ -67,7 +67,7 @@ Open the dashboard from the ribbon icon or the **"Open dashboard"** command.
 | Setting | Description |
 | --- | --- |
 | Language | Interface language for the settings page and the dashboard. |
-| Appearance | Visual style: Minimal Tech, Y2K Console, Coffee House, Pop Fast Food, or Black Stage. |
+| Appearance | Visual style: Minimal Tech, Y2K Console, Coffee House, Pop Fast Food, Black Stage, or Blue Sky. |
 | Activity data source | Note activity or Changelog. |
 | Activity date field | Frontmatter field used first in the note-activity fallback chain. |
 | Fall back to file modified time | Use `mtime` as the final fallback (on by default). |

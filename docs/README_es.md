@@ -10,7 +10,7 @@ Un panel para tu bóveda de Obsidian: un mapa de calor de actividad, una vista d
 - **Distribución por carpetas** — un desglose de tus notas por carpeta de primer nivel, con filas expandibles, barras de proporción sobre el padre y conteos de «nuevo este mes».
 - **Acceso rápido** — hasta 5 bloques configurables. Cada uno apunta a una carpeta, lista sus notas modificadas más recientemente y muestra como pestañas de segundo nivel las subcarpetas que marques. Los nombres de carpeta se muestran tal cual.
 - **Dos fuentes de datos** — una fuente genérica de «actividad de notas» (funciona en cualquier bóveda) y un analizador «changelog» opcional para changelogs de Markdown.
-- **Cinco temas** — Tech minimalista, Consola Y2K, Casa del Café, Fast Food Pop y Escena negra.
+- **Seis temas** — Tech minimalista, Consola Y2K, Casa del Café, Fast Food Pop, Escena negra y Cielo azul.
 - **Internacionalización** — inglés (predeterminado), chino simplificado, chino tradicional, japonés, coreano, francés, español e italiano.
 
 ## Fuentes de datos
@@ -55,7 +55,7 @@ Abre el panel desde el icono de la cinta o el comando **«Abrir panel»**.
 | Ajuste | Descripción |
 | --- | --- |
 | Idioma | Idioma de la interfaz para la página de ajustes y el panel. |
-| Apariencia | Estilo visual: Tech minimalista, Consola Y2K, Casa del Café, Fast Food Pop o Escena negra. |
+| Apariencia | Estilo visual: Tech minimalista, Consola Y2K, Casa del Café, Fast Food Pop, Escena negra o Cielo azul. |
 | Fuente de datos de actividad | Actividad de notas o Changelog. |
 | Campo de fecha de actividad | Campo del frontmatter usado primero en la cadena de respaldo de actividad de notas. |
 | Recurrir a la hora de modificación del archivo | Usar `mtime` como último recurso (activado por defecto). |

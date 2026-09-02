@@ -18,6 +18,17 @@ La fuente de verdad de la versión es `version` en `manifest.json`; la etiqueta 
 
 ---
 
+## [0.16.0] — 2026-09-02
+
+### Añadido
+
+- Nueva apariencia **Cielo azul** (`nio`), construida según la spec visual estilo NIO `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_蔚来风格视觉设计规范.md` v1.0 (tomada de una presentación pública del manual NIO Visual Identity System 1.4). Solo se toma prestada la gramática visual: un único acento turquesa sobre un blanco de marca teñido de azul, lienzo oscuro Nocturnal Black y escalones de luminosidad azul-verde de la misma familia. Sin logotipo, sin eslogan y sin tipografía con licencia: Blue Sky se sustituye por una pila Montserrat / Inter / Source Han Sans. Un solo acento por pantalla: Tonal Teal `#004B64` en modo claro (≈7,0:1 sobre blanco) y Teal `#00BEBE` en modo oscuro (≈8,3:1 sobre negro); el Teal vivo `#00BEBE` queda reservado a la énfasis gráfica: barras de progreso, pico del mapa de calor y subrayado deslizante de 2px. Las grandes superficies usan Soft Blue y blancos azulados, el gris se queda en el texto, las esquinas son medianamente redondeadas (8–16px) con sombras suaves de baja opacidad, y el mapa de calor sigue una sola rampa de luminosidad Teal. La pestaña activa es un subrayado turquesa de 2px; las pestañas de acceso rápido son cápsulas con borde y estado activo teñido de turquesa.
+- La prueba sin conexión suma quince guardas de Cielo azul: paleta HEX cerrada, ocho colores base declarados, alpha de las sombras primitivas ≤ 0,30, subrayado de la pestaña principal conforme a la regla de 2px, pico de calor en el Teal de marca, radios ≤ 16px, y el id `nio` más los ocho nombres localizados registrados. 42/42 comprobaciones pasan.
+
+### Cambiado
+
+- Los siete README pasan a listar seis temas.
+
 ## [0.15.1] — 2026-09-02
 
 ### Corregido

@@ -180,9 +180,67 @@ const sonyRadii = [...sonyBlocks.matchAll(/(?:border-radius|--vd-radius-[a-z]+):
 assert("圆角 ≤ 2px",
   sonyRadii.filter((v) => !/^0(px)?$/.test(v) && v !== "2px").join(", ") || null, null);
 
+// 7) NIO 外观（蔚蓝天空）：色板闭集 + 单强调色 + 中圆角柔影 + 2px 青绿下划线。
+console.log("\n=== NIO 蔚蓝天空规范 ===");
+const nioBlocks = [...css.matchAll(/[^{}]*\.vdash-style-nio[^{}]*\{([^{}]*)\}/g)]
+  .map((match) => match[1])
+  .join("\n");
+// 规范 §2.1—§2.3 八个核心基准色，逐个在样式表注释里标明出处。
+const nioRequired = [
+  "#00bebe", "#000f16", "#e6fafa", "#00263c",
+  "#004b64", "#b7ebea", "#ffffff", "#f0f0f2",
+];
+const nioAllowed = new Set([
+  ...nioRequired,
+  // §2.2 中性阶其余值
+  "#eff4f6", "#dcdcdd", "#bdbdbf", "#58585a",
+  // §2.4 暖色（点缀）
+  "#fff794", "#ff231e",
+  // 改编明度阶与柔面，逐个在样式表注释里标明出处
+  "#33cbcb", "#008491", "#9fe8e8",
+  "#bfefef", "#80dede", "#40cece",
+  "#0e4a50", "#006e6e", "#00999a",
+  "#f7fbfb", "#8b9598", "#e4ebee", "#d2dce0", "#eff7f7",
+  "#0e2a32", "#0a1b24", "#12313d", "#f0f2f3",
+  "#a8c4cb", "#6e838a", "#14313c", "#1e4654", "#16343f",
+  "#00a3a3", "#5fd4d4", "#1a3844",
+]);
+const nioHex = [...nioBlocks.matchAll(/#[0-9a-f]{6}\b/gi)].map((m) => m[0].toLowerCase());
+assert("八个基准色均已声明", nioRequired.every((v) => nioHex.includes(v)), true);
+assert("无色板外 HEX",
+  [...new Set(nioHex.filter((v) => !nioAllowed.has(v)))].join(", ") || null, null);
+// §2.6 铁律一「一屏一个强调色」：色板闭集已保证除 Teal 族外无第二强调色，
+// 暖色（Sun Yellow / Glowing Red）仅出现在点缀 token，未参与主强调。
+// §6 柔影：阴影原色 alpha 不得 > 0.30（大半径低透明度柔影，不用硬投影）。
+const nioShadowPrim = [...nioBlocks.matchAll(/--vd-shadow-[a-z-]+\s*:\s*rgba?\(([^)]*)\)/gi)]
+  .map((m) => parseFloat((m[1].match(/,([\d.]+)$/) || [, 0])[1]))
+  .filter((a) => a > 0.30);
+assert("阴影原色低透明度（≤ 0.30）", nioShadowPrim.join(", ") || null, null);
+// §7.3 主标签选中态 = 2px 青绿下划线滑块（图形级强调）。
+assert("主标签为 2px 青绿下划线", nioBlocks.includes("border-bottom: 2px solid var(--vd-nio-teal)"), true);
+// §10.3 热力图取 Teal 单色明度阶，峰值即品牌主色。
+assert("热力峰值取 Teal", /--vd-heat-4:\s*var\(--vd-nio-teal\)/.test(nioBlocks), true);
+// §6 圆角 ≤ 16px（0 与胶囊 999px 除外）。
+const nioRadii = [...nioBlocks.matchAll(/(?:border-radius|--vd-radius-[a-z]+):\s*([^;]+);/gi)]
+  .map((m) => m[1].trim())
+  .filter((v) => !v.startsWith("var("));
+assert("圆角 ≤ 16px（胶囊除外）",
+  nioRadii.filter((v) => !/^0(px)?$/.test(v) && v !== "999px" && v !== "9999px" && parseFloat(v) > 16).join(", ") || null,
+  null);
+
 const source = fs.readFileSync(path.join(pluginDir, "main.js"), "utf8");
 assert("热力格含无障碍名称", source.includes('cell.setAttr("aria-label", label)'), true);
 assert("可点击热力格支持键盘", source.includes('event.key !== "Enter" && event.key !== " "'), true);
+// 8) nio 皮肤在主 JS 已注册：外观清单 + 8 语显示名。
+assert("nio 已注册进外观清单", /APPEARANCE_IDS\s*=\s*\[[^\]]*"nio"/.test(source), true);
+assert("简体中文名", source.includes('nio: "蔚蓝天空"'), true);
+assert("繁体中文名", source.includes('nio: "蔚藍天空"'), true);
+assert("英文名", source.includes('nio: "Blue Sky"'), true);
+assert("法文名", source.includes('nio: "Ciel bleu"'), true);
+assert("意文名", source.includes('nio: "Cielo blu"'), true);
+assert("日文名", source.includes('nio: "青空"'), true);
+assert("韩文名", source.includes('nio: "푸른 하늘"'), true);
+assert("西文名", source.includes('nio: "Cielo azul"'), true);
 
 console.log(`\n单元测试: ${pass} 通过 / ${fail} 失败`);
 process.exit(fail === 0 ? 0 : 1);
