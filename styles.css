@@ -2038,6 +2038,398 @@
   background-color: var(--vd-surface-raised);
 }
 
+/* -------------------------------- 黑场光点（索尼风格）-------------------------------- */
+
+/*
+ * 参考 `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_索尼风格视觉设计规范.md` v1.0
+ * （原件为 Sony Electronics USA Brand Identity Guidelines v03，材料日期 2007-06-04）。
+ * 只借「黑场基底 + 开放框构图 + 几何无衬线 + 单点色光」这套视觉语法，
+ * 不使用索尼标志、like.no.other 标语及任何品牌资产；ITC Avant Garde 为商业授权字体，
+ * 按规范 §4.2 落地 Poppins / Jost / Questrial / 思源黑体替代栈。
+ *
+ * 四条硬规则贯穿本块，改动时勿破：
+ *   1. 一屏一个强调色（§2.3 铁律二）。深色取 ocean #00A4E8（黑底约 7.4:1），
+ *      浅色取 slate #165B65（白底约 7.6:1）——同属 §2.2 十九色，各自一屏一色。
+ *      浅色不沿用 ocean：它在白底仅约 2.7:1，扛不住文字，
+ *      §11.3 写明「浅色主题不是简单反转，白底上强调色须复核对比度」。
+ *   2. 强调色不作大色块（§2.3 铁律一），只以色光、渐变、色条三形态出现。
+ *      故选中态是 2px 下划线而非填充胶囊；卡片数字取白／黑而非彩色，
+ *      因为 §2.3 铁律四写死「正文与标题永不着色」。唯一着色的文字是链接（§2.5／§11.1 明许）。
+ *   3. 圆角趋零、无投影（§6）。所有 shadow token 置 none，深度只由
+ *      black → surface → surface-2 三阶明度表达。
+ *   4. 开放框（§5）：stage 的纯黑外圈即是框，panel 不铺满；卡片之间靠黑间隙分隔，
+ *      不靠描边。stage 内边距取手册在线原生厚度 27px。
+ *
+ * 主题方向：规范 §11.3 定深色为默认态，§11.2 定文字密集页反相为黑字白底。
+ * 本插件既有结构是「基础块＝浅色、.theme-dark 覆盖＝深色」，故基础块走 §11.2 反相口径、
+ * .theme-dark 走 §11.3 纯黑正稿——两侧都是规范原文，不是把深色简单取反。
+ */
+.workspace-leaf-content .view-content.vdash-content.vdash-style-sony {
+  /* Primitive — §2.4 中性阶 */
+  --vd-sn-black: #000000;
+  --vd-sn-surface: #0d0d0d;
+  --vd-sn-surface-2: #1a1a1a;
+  --vd-sn-line: #2b2b2b;
+  --vd-sn-white: #ffffff;
+  --vd-sn-muted: #878787;          /* §2.4：黑底次级文字，黑底约 6.3:1 */
+
+  /* Primitive — §2.2 强调色，本皮肤只启用其二，深浅各一 */
+  --vd-sn-ocean: #00a4e8;          /* PMS Cyan C，深色态强调色 */
+  --vd-sn-ocean-hi: #33b7ed;       /* 改编：悬停明度 +8%，不换色相（§7.1） */
+  --vd-sn-slate: #165b65;          /* PMS 316 C，浅色态强调色 */
+  --vd-sn-slate-hi: #1e7683;       /* 改编：同上 */
+
+  /* Primitive 改编 — 白底中性阶。§2.4 那套是为黑底定的：
+     #878787 在白底仅约 3.0:1，不足以承载次级文字，故按 §11.2 另立三值。 */
+  --vd-sn-paper-2: #f2f2f2;        /* 白底上的面板／卡片，靠明度差分区 */
+  --vd-sn-paper-line: #e0e0e0;     /* 白底分隔线 */
+  --vd-sn-paper-muted: #565656;    /* 白底次级文字，约 7.7:1 */
+  --vd-sn-gray-mid: #4d4d4d;       /* §7.5 图表中性序列之一 */
+
+  /* 热力图明度阶（§11.3「只用强调色单色明度阶，不用彩虹色阶」）。
+     取实色而非降透明度，以守 §2.3 铁律六「色始终 100% 使用」。
+     浅色态：白 → slate 四段插值。 */
+  --vd-sn-slate-20: #d0dee0;
+  --vd-sn-slate-42: #9dbabe;
+  --vd-sn-slate-68: #618f96;
+  /* 深色态：黑 → ocean 四段插值。 */
+  --vd-sn-ocean-25: #00293a;
+  --vd-sn-ocean-45: #004a68;
+  --vd-sn-ocean-70: #0073a2;
+
+  /* 开放框原生厚度（§5.1 在线三边同厚 27px；§7.3 顶栏 54px = 27×2） */
+  --vd-sn-frame: 27px;
+  --vd-sn-bar: 54px;
+
+  /* Semantic */
+  --vd-primary: var(--vd-sn-slate);
+  --vd-primary-hover: var(--vd-sn-slate-hi);
+  --vd-primary-focus: var(--vd-sn-slate);
+  --vd-primary-soft: var(--vd-sn-paper-2);   /* 「柔色底」一律走中性，不铺淡彩块 */
+  --vd-on-primary: var(--vd-sn-white);       /* §2.5：slate 是深色条，配白字 */
+  --vd-brand: var(--vd-sn-slate);
+  --vd-brand-hover: var(--vd-sn-slate-hi);
+  --vd-brand-soft: var(--vd-sn-paper-2);
+
+  --vd-canvas: var(--vd-sn-white);           /* panel 底 */
+  --vd-canvas-muted: var(--vd-sn-white);     /* stage 底，即开放框本身 */
+  --vd-surface-raised: var(--vd-sn-paper-2);
+
+  --vd-ink: var(--vd-sn-black);
+  --vd-body-muted: var(--vd-sn-paper-muted);
+  --vd-ink-subtle: var(--vd-sn-paper-muted);
+
+  --vd-divider-soft: var(--vd-sn-paper-line);
+  --vd-hairline: var(--vd-sn-black);         /* §11.2：反相页的开放框改为细黑边 */
+  --vd-state-hover: var(--vd-sn-paper-2);
+  --vd-hover-tint: var(--vd-sn-paper-2);
+
+  /* §6「不用投影」：深度只靠明度阶，所有阴影 token 归零 */
+  --vd-shadow-brand: transparent;
+  --vd-shadow-brand-soft: transparent;
+  --vd-shadow-ink: transparent;
+  --vd-shadow-ink-soft: transparent;
+  --vd-shadow-ink-raised: transparent;
+  --vd-tab-shadow: none;
+  --vd-control-shadow: none;
+  --vd-factory-tab-shadow: none;
+  --vd-card-shadow: none;
+  --vd-elevation-subtle: none;
+
+  /* §7.5：主序列取强调色，其余一律中性灰阶，禁止多色并置 */
+  --vd-viz-purple: var(--vd-sn-slate);
+  --vd-viz-cyan: var(--vd-sn-slate-68);
+  --vd-viz-green: var(--vd-sn-gray-mid);
+  --vd-viz-amber: var(--vd-sn-muted);
+  --vd-viz-pink: var(--vd-sn-paper-line);
+
+  --vd-heat-0: var(--vd-sn-paper-2);
+  --vd-heat-1: var(--vd-sn-slate-20);
+  --vd-heat-2: var(--vd-sn-slate-42);
+  --vd-heat-3: var(--vd-sn-slate-68);
+  --vd-heat-4: var(--vd-sn-slate);
+
+  /* §4.2 替代字体：几何构成、圆字腔、大 x 高度；禁衬线／手写／圆体 */
+  --vd-font-display: "Poppins", "Jost", "Century Gothic", "Futura", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --vd-font-body: "Questrial", "Poppins", "Helvetica Neue", Arial, "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --vd-font-num: var(--vd-font-display);
+
+  --vd-text-display: clamp(28px, 4vw, 44px);
+  --vd-text-tagline: 20px;
+  --vd-text-body: 16px;
+  --vd-text-fine: 12px;
+
+  --vd-space-md: 16px;
+  --vd-space-lg: 24px;
+  --vd-space-xl: 32px;
+
+  /* §6：圆角趋零，控件至多 2px */
+  --vd-radius-xs: 0px;
+  --vd-radius-sm: 0px;
+  --vd-radius-md: 0px;
+  --vd-radius-lg: 0px;
+  --vd-radius-pill: 2px;
+
+  /* §10：200—400ms、匀速沉稳、不弹跳 */
+  --vd-motion-fast: 200ms;
+  --vd-motion-standard: 280ms;
+  --vd-ease: cubic-bezier(.4, 0, .2, 1);
+
+  font-family: var(--vd-font-body);
+  line-height: 1.3;              /* §4.3：正文行高 1.3 × 字号 */
+  letter-spacing: 0;             /* §4.3：字距 0 */
+}
+
+/* §11.3 正稿：纯黑画布 + #0D0D0D 面板 + 单一强调色 ocean。
+   黑是硬黑，不得用 #111 之类柔和黑替代（§2.6）。 */
+.theme-dark .workspace-leaf-content .view-content.vdash-content.vdash-style-sony {
+  --vd-primary: var(--vd-sn-ocean);
+  --vd-primary-hover: var(--vd-sn-ocean-hi);
+  --vd-primary-focus: var(--vd-sn-ocean);
+  --vd-primary-soft: var(--vd-sn-surface-2);
+  --vd-on-primary: var(--vd-sn-black);        /* §2.5：ocean 是浅色条，配黑字 */
+  --vd-brand: var(--vd-sn-ocean);
+  --vd-brand-hover: var(--vd-sn-ocean-hi);
+  --vd-brand-soft: var(--vd-sn-surface-2);
+
+  --vd-canvas: var(--vd-sn-surface);
+  --vd-canvas-muted: var(--vd-sn-black);      /* stage 纯黑，即开放框 */
+  --vd-surface-raised: var(--vd-sn-surface-2);
+
+  --vd-ink: var(--vd-sn-white);
+  --vd-body-muted: var(--vd-sn-muted);
+  --vd-ink-subtle: var(--vd-sn-muted);
+
+  --vd-divider-soft: var(--vd-sn-line);
+  --vd-hairline: var(--vd-sn-line);
+  --vd-state-hover: var(--vd-sn-surface-2);
+  --vd-hover-tint: var(--vd-sn-surface-2);
+
+  --vd-viz-purple: var(--vd-sn-ocean);
+  --vd-viz-cyan: var(--vd-sn-ocean-70);
+  --vd-viz-green: var(--vd-sn-muted);
+  --vd-viz-amber: var(--vd-sn-gray-mid);
+  --vd-viz-pink: var(--vd-sn-line);
+
+  --vd-heat-0: var(--vd-sn-surface-2);
+  --vd-heat-1: var(--vd-sn-ocean-25);
+  --vd-heat-2: var(--vd-sn-ocean-45);
+  --vd-heat-3: var(--vd-sn-ocean-70);
+  --vd-heat-4: var(--vd-sn-ocean);
+}
+
+/* stage 的外圈即开放框：内容不铺满，被一圈基底色框住（§5.2 页面级） */
+.view-content.vdash-content.vdash-style-sony .vdash-stage {
+  padding: var(--vd-sn-frame);
+  background-color: var(--vd-canvas-muted);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-panel {
+  max-width: 1120px;                       /* §11.1 内容居中最大宽 */
+  padding: var(--vd-space-lg);
+  border: 1px solid var(--vd-hairline);
+  border-radius: 0;
+  background-color: var(--vd-canvas);
+  box-shadow: none;
+}
+
+/* §7.3 顶栏：高 54px（27×2），底部 1px 分隔线，不填色块 */
+.view-content.vdash-content.vdash-style-sony .vdash-header {
+  min-height: var(--vd-sn-bar);
+  margin-bottom: var(--vd-space-lg);
+  padding: var(--vd-space-md) 0;
+  border-bottom: 1px solid var(--vd-hairline);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--vd-ink);
+  box-shadow: none;
+}
+
+/* §7.3 标签：直角、不填大色块；未选中为次级文字色 */
+.view-content.vdash-content.vdash-style-sony .vdash-tab,
+.view-content.vdash-content.vdash-style-sony .vdash-range-btn,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tab {
+  min-height: 44px;                        /* §10 触控目标 ≥ 44px */
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--vd-body-muted);
+  font-weight: 500;
+  text-transform: none;                    /* §4.3 永不全大写 */
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+/* 选中态：文字由 muted 转 White／Black，配合滑块的 2px 强调色下划线。
+   两者都是 §7.3 列明的选中信号，文字本身不着色（§2.3 铁律四）。 */
+.view-content.vdash-content.vdash-style-sony .vdash-tab.is-active,
+.view-content.vdash-content.vdash-style-sony .vdash-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-sony .vdash-range-btn.is-active,
+.view-content.vdash-content.vdash-style-sony .vdash-range-btn.is-active:hover,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tab.is-active:hover,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tabs.is-sub .vdash-factory-tab.is-active:hover {
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--vd-ink);
+  box-shadow: none;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-tab:hover,
+.view-content.vdash-content.vdash-style-sony .vdash-range-btn:hover,
+.view-content.vdash-content.vdash-style-sony .vdash-factory-tab:hover {
+  background-color: transparent;
+  color: var(--vd-ink);
+}
+
+/*
+ * 滑块改作下划线：本体透明，只留 2px 强调色底边。
+ * 这样滑块仍横向滑行（§10「优先水平方向」），却不构成填充色块，
+ * 守住 §2.3 铁律一「强调色禁用于大色块」。
+ */
+.view-content.vdash-content.vdash-style-sony .vdash-slider {
+  display: block;
+  border-radius: 0;
+  background-color: transparent;
+  border-bottom: 2px solid var(--vd-primary);
+  box-shadow: none;
+}
+
+/* 区间切换器：直角描边轨道，不填底 */
+.view-content.vdash-content.vdash-style-sony .vdash-range {
+  padding: 0;
+  border: 1px solid var(--vd-hairline);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+/* §5.2 卡片级：不用圆角与描边分隔，改用间隙——间隙即框 */
+.view-content.vdash-content.vdash-style-sony .vdash-cards {
+  gap: var(--vd-space-md);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-card {
+  padding: var(--vd-space-lg);
+  border: none;
+  border-radius: 0;
+  background-color: var(--vd-surface-raised);
+  box-shadow: none;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-card-label {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* 数字取白／黑而非强调色（§2.3 铁律四）。
+   字重停在 500：§4.3「层级信号一次只用一种」——已靠字号拉开，就不再加粗。 */
+.view-content.vdash-content.vdash-style-sony .vdash-card-value {
+  font-family: var(--vd-font-display);
+  color: var(--vd-ink);
+  font-weight: 500;
+  line-height: 1.1;                        /* §4.3 标题行高 1.1 */
+}
+
+/*
+ * 热力图不自带底：空活动格取 surface-raised，若容器也用同一值，空格就与底融为一色。
+ * 按 §5.2「卡片级不用圆角与描边分隔，改用间隙」，容器留空，让格子自己站在 panel 上。
+ */
+.view-content.vdash-content.vdash-style-sony .vdash-heatmap {
+  padding: var(--vd-space-lg) 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-cell {
+  border-radius: 0;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-stack {
+  height: 8px;
+  border-radius: 0;
+  background-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-rows {
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-row {
+  border-radius: 0;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-row.is-openable:hover {
+  background-color: var(--vd-state-hover);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-row-added {
+  color: var(--vd-body-muted);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-row-bar {
+  border-radius: 0;
+  background-color: var(--vd-divider-soft);
+}
+
+/* 色条（§7.4）：进度条是本皮肤唯一的强调色实体面，且只占一条细带 */
+.view-content.vdash-content.vdash-style-sony .vdash-row-fill {
+  border-radius: 0;
+  background-color: var(--vd-primary);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory {
+  margin-top: var(--vd-space-xl);
+  padding-top: var(--vd-space-lg);
+  border-top: 1px solid var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory-title {
+  font-family: var(--vd-font-display);
+  color: var(--vd-ink);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory-list {
+  border-radius: 0;
+  background-color: var(--vd-surface-raised);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory-item {
+  border-radius: 0;
+  border-bottom-color: var(--vd-divider-soft);
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory-item:hover {
+  background-color: var(--vd-state-hover);
+}
+
+/* 链接是本皮肤唯一着色的文字：§2.5 判定 ocean 于黑底、slate 于白底均达 AA，
+   §11.1 亦明写「链接色 = 色光色」。 */
+.view-content.vdash-content.vdash-style-sony .vdash-factory-link {
+  color: var(--vd-primary);
+  text-decoration: none;
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-factory-link:hover {
+  color: var(--vd-primary-hover);
+  text-decoration: underline;              /* §7.1 文字按钮：悬停才加下划线 */
+}
+
+.view-content.vdash-content.vdash-style-sony .vdash-empty {
+  border-radius: 0;
+  background-color: var(--vd-surface-raised);
+}
+
+/* §10 焦点环：2px 强调色，偏移 2px */
+.view-content.vdash-content.vdash-style-sony :focus-visible {
+  outline: 2px solid var(--vd-primary-focus);
+  outline-offset: 2px;
+}
+
 /* 尊重「减少动态效果」：只留颜色变化，去掉位移与旋转过渡 */
 @media (prefers-reduced-motion: reduce) {
   .view-content.vdash-content *,

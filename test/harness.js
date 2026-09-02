@@ -142,6 +142,44 @@ assert("八个标准 HEX 均已声明", [...allowedHex].every((value) => usedHex
 assert("无规范外 HEX", disallowedHex.join(", ") || null, null);
 assert("透明色只由标准色派生", disallowedRgb.join(", ") || null, null);
 
+// 6) Sony 外观：色板闭集 + 三条形态硬规则（黑场、零圆角、无投影、不降透明度调色）。
+console.log("\n=== Sony 黑场规范 ===");
+const sonyBlocks = [...css.matchAll(/[^{}]*\.vdash-style-sony[^{}]*\{([^{}]*)\}/g)]
+  .map((match) => match[1])
+  .join("\n");
+// 规范 §2.4 六阶中性 + §2.2 两个强调色（深色 ocean、浅色 slate），
+// 其余为明度阶插值与白底改编中性色，逐个在样式表注释里标明出处。
+const sonyRequired = [
+  "#000000", "#0d0d0d", "#1a1a1a", "#2b2b2b", "#ffffff", "#878787",
+  "#00a4e8", "#165b65",
+];
+const sonyAllowed = new Set([
+  ...sonyRequired,
+  "#33b7ed", "#1e7683",                          // 悬停明度 +8%
+  "#f2f2f2", "#e0e0e0", "#565656", "#4d4d4d",    // 白底改编中性阶 + 图表灰
+  "#d0dee0", "#9dbabe", "#618f96",               // 白 → slate 明度阶
+  "#00293a", "#004a68", "#0073a2",               // 黑 → ocean 明度阶
+]);
+const sonyHex = [...sonyBlocks.matchAll(/#[0-9a-f]{6}\b/gi)].map((m) => m[0].toLowerCase());
+assert("八个基准色均已声明", sonyRequired.every((v) => sonyHex.includes(v)), true);
+assert("无色板外 HEX",
+  [...new Set(sonyHex.filter((v) => !sonyAllowed.has(v)))].join(", ") || null, null);
+// §2.3 铁律六「色始终 100% 使用，不得降透明度调色」：明度阶只能是实色。
+assert("不用 rgba 调色",
+  [...new Set([...sonyBlocks.matchAll(/rgba?\([^)]*\)/gi)].map((m) => m[0]))].join(", ") || null,
+  null);
+// §6「不用投影」：深度只由三阶明度表达。
+assert("无投影",
+  [...new Set([...sonyBlocks.matchAll(/box-shadow:\s*([^;]+);/gi)].map((m) => m[1].trim()))]
+    .filter((v) => v !== "none").join(", ") || null,
+  null);
+// §6「圆角趋零，控件至多 2px」。
+const sonyRadii = [...sonyBlocks.matchAll(/(?:border-radius|--vd-radius-[a-z]+):\s*([^;]+);/gi)]
+  .map((m) => m[1].trim())
+  .filter((v) => !v.startsWith("var("));
+assert("圆角 ≤ 2px",
+  sonyRadii.filter((v) => !/^0(px)?$/.test(v) && v !== "2px").join(", ") || null, null);
+
 const source = fs.readFileSync(path.join(pluginDir, "main.js"), "utf8");
 assert("热力格含无障碍名称", source.includes('cell.setAttr("aria-label", label)'), true);
 assert("可点击热力格支持键盘", source.includes('event.key !== "Enter" && event.key !== " "'), true);

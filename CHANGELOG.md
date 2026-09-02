@@ -23,6 +23,17 @@ The source of truth for the version is `version` in `manifest.json`; the release
 
 ---
 
+## [0.15.0] — 2026-09-02
+
+### Added
+
+- New appearance **Black Stage** (`sony`), built from the Sony-style visual spec at `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_索尼风格视觉设计规范.md` v1.0 (itself drawn from the 2007 Sony Electronics USA identity manual). Only the visual grammar is borrowed — black ground, open frame, geometric sans, a single point of coloured light. No logo, no tagline, no licensed typeface: ITC Avant Garde is replaced by a Poppins / Jost / Questrial / Source Han Sans stack. Pure `#000000` is the base rather than a softened near-black; depth comes from three lightness steps (`#000000` → `#0D0D0D` → `#1A1A1A`) instead of shadows, corners are square with controls capped at 2px, and exactly one accent colour is used per screen: ocean `#00A4E8` in dark mode (7.4:1 on black) and slate `#165B65` in light mode. Light mode does not reuse ocean because it falls to about 2.7:1 on white and cannot carry text — the spec requires re-checking accent contrast rather than mirroring the dark palette. The accent never fills a block, so the selected tab is a 2px sliding underline instead of a filled pill, card figures stay black or white, and links are the only coloured text. Dark mode is the spec's canonical form; light mode follows the spec's own inverted rule for text-dense pages.
+- The offline harness gained five Black Stage guards, each taken from a hard rule in the spec: a closed HEX palette, no `rgba()` tinting (colours must be used at full strength), no box-shadows, every radius ≤ 2px, and all eight base colours actually declared.
+
+### Changed
+
+- All seven READMEs updated to list five themes.
+
 ## [0.14.0] — 2026-09-01
 
 ### Added

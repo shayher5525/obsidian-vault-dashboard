@@ -18,6 +18,17 @@ La fonte di verità della versione è `version` in `manifest.json`; il tag di ri
 
 ---
 
+## [0.15.0] — 2026-09-02
+
+### Aggiunto
+
+- Nuovo aspetto **Scena nera** (`sony`), costruito dalla spec visiva stile Sony `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_索尼风格视觉设计规范.md` v1.0 (a sua volta tratta dal manuale d'identità Sony Electronics USA del 2007). Si prende in prestito solo la grammatica visiva: fondo nero, cornice aperta, sans-serif geometrico, un unico punto di luce colorata. Nessun logo, nessun claim, nessun carattere su licenza: ITC Avant Garde è sostituito da uno stack Poppins / Jost / Questrial / Source Han Sans. La base è nero puro `#000000`, non un nero addolcito; la profondità nasce da tre gradini di luminosità (`#000000` → `#0D0D0D` → `#1A1A1A`) e non da ombre, gli angoli sono retti (al massimo 2px sui controlli). Un solo colore d'accento per schermata: ocean `#00A4E8` in modalità scura (7,4:1 su nero) e slate `#165B65` in chiara. Il chiaro non riusa ocean perché su bianco scende a circa 2,7:1 e non regge il testo: la spec chiede di riverificare il contrasto, non di ribaltare la tavolozza scura. L'accento non riempie mai un blocco, quindi la scheda attiva è una sottolineatura scorrevole di 2px e non una pillola piena, i numeri delle schede restano neri o bianchi e i collegamenti sono l'unico testo colorato. La modalità scura è la forma canonica della spec; quella chiara segue la regola di inversione che la spec stessa detta per le pagine dense di testo.
+- Il test offline guadagna cinque tutele per Scena nera, ciascuna presa da una regola vincolante della spec: tavolozza HEX chiusa, nessuna tinta con `rgba()` (i colori si usano al 100%), nessuna ombra, raggi ≤ 2px e gli otto colori base effettivamente dichiarati.
+
+### Modificato
+
+- I sette README elencano ora cinque temi.
+
 ## [0.14.0] — 2026-09-01
 
 ### Aggiunto

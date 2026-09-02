@@ -1,6 +1,6 @@
 {
 	"name": "vault-dashboard-x",
-	"version": "0.14.0",
+	"version": "0.15.0",
 	"description": "A vault dashboard with an activity heatmap, folder distribution, and configurable visual-folder quick links.",
 	"license": "GPL-3.0-only",
 	"private": true,

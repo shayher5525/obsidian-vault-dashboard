@@ -18,6 +18,17 @@ La référence de version est `version` dans `manifest.json` ; le tag de publica
 
 ---
 
+## [0.15.0] — 2026-09-02
+
+### Ajouté
+
+- Nouvelle apparence **Scène noire** (`sony`), construite d'après la spec visuelle style Sony `AA_WorkMaterial 工作资料/91_DesignFiles 设计文件/2026-09-02_索尼风格视觉设计规范.md` v1.0 (elle-même tirée du manuel d'identité Sony Electronics USA de 2007). Seule la grammaire visuelle est empruntée : fond noir, cadre ouvert, sans-serif géométrique, un seul point de lumière colorée. Ni logo, ni slogan, ni fonte sous licence — ITC Avant Garde est remplacée par une pile Poppins / Jost / Questrial / Source Han Sans. La base est un noir pur `#000000`, pas un noir adouci ; la profondeur vient de trois paliers de clarté (`#000000` → `#0D0D0D` → `#1A1A1A`) et non d'ombres, les angles sont droits (2px au maximum pour les contrôles). Une seule couleur d'accent par écran : ocean `#00A4E8` en mode sombre (7,4:1 sur noir) et slate `#165B65` en mode clair. Le clair ne reprend pas ocean, qui tombe à environ 2,7:1 sur blanc et ne peut porter du texte : la spec demande de revérifier le contraste plutôt que d'inverser la palette sombre. L'accent ne remplit jamais un bloc, si bien que l'onglet actif est un soulignement glissant de 2px et non une pastille pleine, les chiffres des cartes restent noirs ou blancs, et seuls les liens sont colorés. Le mode sombre est la forme canonique de la spec ; le mode clair suit sa propre règle d'inversion pour les pages denses en texte.
+- Le test hors ligne gagne cinq gardes Scène noire, chacune reprise d'une règle stricte de la spec : palette HEX fermée, pas de teinte par `rgba()` (les couleurs s'emploient à 100%), aucune ombre portée, rayons ≤ 2px, et les huit couleurs de base réellement déclarées.
+
+### Modifié
+
+- Les sept README listent désormais cinq thèmes.
+
 ## [0.14.0] — 2026-09-01
 
 ### Ajouté
