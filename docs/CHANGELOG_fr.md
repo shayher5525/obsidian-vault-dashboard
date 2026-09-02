@@ -18,6 +18,12 @@ La référence de version est `version` dans `manifest.json` ; le tag de publica
 
 ---
 
+## [0.15.1] — 2026-09-02
+
+### Corrigé
+
+- Fast Food Pop, mode clair : les jours sans activité étaient invisibles sur la carte de chaleur. La couleur des cases vides et le fond derrière elles étaient tous deux le doré clair `#FFF4D6` — la même valeur, soit un contraste de 1,00:1. Les cases vides passent au blanc, ce qui conserve le fond doré (« l'or fait la surface ») tout en s'y lisant comme une ouverture. Le mode sombre était déjà distinguable et reste inchangé.
+
 ## [0.15.0] — 2026-09-02
 
 ### Ajouté

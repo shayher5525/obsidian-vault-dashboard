@@ -1804,8 +1804,14 @@
   --vd-viz-amber: var(--vd-ff-gold-tint);
   --vd-viz-pink: var(--vd-ff-ink);
 
-  /* 热力图：浅金（空）→ 金（中）→ 红（峰），对应「金成面、红成点」 */
-  --vd-heat-0: var(--vd-ff-gold-tint);
+  /*
+   * 热力图：白（空）→ 金（中）→ 红（峰），对应「金成面、红成点」。
+   * 空活动格取 White 而非 gold-tint：容器底本身就是 gold-tint（分区大色块），
+   * 两者同值时空格与底完全同色（1.00:1），一格都看不见。
+   * 改容器不改格子会丢掉「金成面」那块金底，故让格子退到 White——
+   * 它同属标准色，且在 gold-tint 上读作「留白」，语义正好是「这天没有活动」。
+   */
+  --vd-heat-0: var(--vd-ff-white);
   --vd-heat-1: rgba(255, 188, 13, 0.40);
   --vd-heat-2: var(--vd-ff-gold);
   --vd-heat-3: var(--vd-ff-gold-deep);

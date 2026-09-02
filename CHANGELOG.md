@@ -23,6 +23,12 @@ The source of truth for the version is `version` in `manifest.json`; the release
 
 ---
 
+## [0.15.1] — 2026-09-02
+
+### Fixed
+
+- Pop Fast Food, light mode: days with no activity were invisible in the heatmap. The empty-day colour and the panel behind it were both gold-tint `#FFF4D6` — literally the same value, a contrast ratio of 1.00:1. Empty days now use White, which keeps the gold panel intact ("gold forms the surface") and reads as a gap punched in it. Dark mode was already distinguishable and is unchanged.
+
 ## [0.15.0] — 2026-09-02
 
 ### Added

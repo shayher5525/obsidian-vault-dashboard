@@ -18,6 +18,12 @@ La fonte di verità della versione è `version` in `manifest.json`; il tag di ri
 
 ---
 
+## [0.15.1] — 2026-09-02
+
+### Corretto
+
+- Fast Food Pop, modalità chiara: i giorni senza attività erano invisibili nella mappa di calore. Il colore delle celle vuote e il fondo dietro di esse erano entrambi l'oro chiaro `#FFF4D6` — lo stesso valore, con un contrasto di 1,00:1. Le celle vuote passano al bianco: il fondo oro resta («l'oro fa la superficie») e la cella si legge come un'apertura al suo interno. La modalità scura era già distinguibile e non cambia.
+
 ## [0.15.0] — 2026-09-02
 
 ### Aggiunto

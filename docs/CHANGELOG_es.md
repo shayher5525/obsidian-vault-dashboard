@@ -18,6 +18,12 @@ La fuente de verdad de la versión es `version` en `manifest.json`; la etiqueta 
 
 ---
 
+## [0.15.1] — 2026-09-02
+
+### Corregido
+
+- Fast Food Pop, modo claro: los días sin actividad eran invisibles en el mapa de calor. El color de las celdas vacías y el fondo tras ellas eran ambos el dorado claro `#FFF4D6` — el mismo valor, un contraste de 1,00:1. Las celdas vacías pasan a blanco, lo que conserva el fondo dorado («el oro hace la superficie») y se lee como un hueco abierto en él. El modo oscuro ya se distinguía y no cambia.
+
 ## [0.15.0] — 2026-09-02
 
 ### Añadido
